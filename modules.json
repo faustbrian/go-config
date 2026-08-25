@@ -257,7 +257,7 @@
       "family_label": "Foundations",
       "family_description": "Common immutable values, deterministic seams, configuration, identity propagation, and input validation.",
       "family_order": 1,
-      "version": "v1.0.0",
+      "version": "1.0.0",
       "tag_prefix": "v",
       "owned_dependencies": [
         "github.com/faustbrian/go-cli",
@@ -439,7 +439,7 @@
       "family_label": "Foundations",
       "family_description": "Common immutable values, deterministic seams, configuration, identity propagation, and input validation.",
       "family_order": 1,
-      "version": "v1.0.0",
+      "version": "1.0.0",
       "tag_prefix": "adapters/awssecretsmanager/v",
       "owned_dependencies": [
         "github.com/faustbrian/go-config"
