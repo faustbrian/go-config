@@ -9,8 +9,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	tomlsource "github.com/faustbrian/golib/pkg/config/toml"
+	config "github.com/faustbrian/go-config"
+	tomlsource "github.com/faustbrian/go-config/toml"
 )
 
 func TestBytesLoadsDottedKeysAndArrayTables(t *testing.T) {

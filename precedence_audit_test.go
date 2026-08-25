@@ -6,12 +6,12 @@ import (
 	"reflect"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/defaults"
-	"github.com/faustbrian/golib/pkg/config/dotenv"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	jsonsource "github.com/faustbrian/golib/pkg/config/json"
-	"github.com/faustbrian/golib/pkg/config/programmatic"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/defaults"
+	"github.com/faustbrian/go-config/dotenv"
+	"github.com/faustbrian/go-config/environment"
+	jsonsource "github.com/faustbrian/go-config/json"
+	"github.com/faustbrian/go-config/programmatic"
 )
 
 func TestNewPlanEveryPrioritySubsetAndOrderHasTheDocumentedWinner(t *testing.T) {

@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/internal/sourceio"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/internal/sourceio"
 )
 
 const (

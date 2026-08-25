@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/merge"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/merge"
 )
 
 func TestLoadTreeOnlySuppressesAbsentOptionalSources(t *testing.T) {

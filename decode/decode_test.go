@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/config/decode"
+	"github.com/faustbrian/go-config/decode"
 )
 
 type panicText string

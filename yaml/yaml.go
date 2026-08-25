@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/internal/safeerror"
-	"github.com/faustbrian/golib/pkg/config/internal/sourceio"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/internal/safeerror"
+	"github.com/faustbrian/go-config/internal/sourceio"
 	yamlv4 "go.yaml.in/yaml/v4"
 )
 

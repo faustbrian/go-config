@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
+	config "github.com/faustbrian/go-config"
 )
 
 // Input is a repeatable immutable byte or filesystem input.

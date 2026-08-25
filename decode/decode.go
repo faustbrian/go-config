@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/config/internal/safeerror"
+	"github.com/faustbrian/go-config/internal/safeerror"
 )
 
 var (

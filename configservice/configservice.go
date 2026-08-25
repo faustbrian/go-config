@@ -9,11 +9,11 @@ import (
 	"io/fs"
 	"strings"
 
-	"github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/dotenv"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	"github.com/faustbrian/golib/pkg/config/validation"
-	"github.com/faustbrian/golib/pkg/service"
+	"github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/dotenv"
+	"github.com/faustbrian/go-config/environment"
+	"github.com/faustbrian/go-config/validation"
+	"github.com/faustbrian/go-service"
 )
 
 // ErrInvalidOptions identifies invalid loader construction.

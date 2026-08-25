@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/discover"
-	"github.com/faustbrian/golib/pkg/config/filesystem"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/discover"
+	"github.com/faustbrian/go-config/filesystem"
 )
 
 type settings struct {

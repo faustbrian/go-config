@@ -8,9 +8,9 @@ import (
 	"testing"
 	"testing/fstest"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/dotenv"
-	"github.com/faustbrian/golib/pkg/config/environment"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/dotenv"
+	"github.com/faustbrian/go-config/environment"
 )
 
 type configuration struct {

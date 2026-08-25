@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/dotenv"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	jsonsource "github.com/faustbrian/golib/pkg/config/json"
-	tomlsource "github.com/faustbrian/golib/pkg/config/toml"
-	yamlsource "github.com/faustbrian/golib/pkg/config/yaml"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/dotenv"
+	"github.com/faustbrian/go-config/environment"
+	jsonsource "github.com/faustbrian/go-config/json"
+	tomlsource "github.com/faustbrian/go-config/toml"
+	yamlsource "github.com/faustbrian/go-config/yaml"
 )
 
 func FuzzStructuredSources(f *testing.F) {

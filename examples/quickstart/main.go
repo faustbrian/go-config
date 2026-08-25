@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/defaults"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	jsonsource "github.com/faustbrian/golib/pkg/config/json"
-	"github.com/faustbrian/golib/pkg/config/programmatic"
-	"github.com/faustbrian/golib/pkg/config/validation"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/defaults"
+	"github.com/faustbrian/go-config/environment"
+	jsonsource "github.com/faustbrian/go-config/json"
+	"github.com/faustbrian/go-config/programmatic"
+	"github.com/faustbrian/go-config/validation"
 )
 
 type settings struct {

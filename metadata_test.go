@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/configtest"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/configtest"
 )
 
 func TestLoadPropagatesSecretAndDeprecatedFieldMetadataToOrigins(t *testing.T) {

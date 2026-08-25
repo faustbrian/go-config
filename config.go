@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/internal/safeerror"
-	"github.com/faustbrian/golib/pkg/config/merge"
-	"github.com/faustbrian/golib/pkg/config/validation"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/internal/safeerror"
+	"github.com/faustbrian/go-config/merge"
+	"github.com/faustbrian/go-config/validation"
 )
 
 // SourceInfo describes a source without exposing its values.

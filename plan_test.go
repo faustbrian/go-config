@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/validation"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/validation"
 )
 
 type source struct {

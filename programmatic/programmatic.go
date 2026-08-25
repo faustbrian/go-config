@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	config "github.com/faustbrian/golib/pkg/config"
+	config "github.com/faustbrian/go-config"
 )
 
 type source struct {

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/defaults"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/defaults"
 )
 
 type configuration struct {

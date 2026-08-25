@@ -18,9 +18,9 @@ import (
 	"time"
 	"unicode"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/internal/safeerror"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/internal/safeerror"
 )
 
 // CaseMode controls environment-name comparison.

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	"github.com/faustbrian/golib/pkg/config/programmatic"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/environment"
+	"github.com/faustbrian/go-config/programmatic"
 )
 
 type mode string

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	jsonsource "github.com/faustbrian/golib/pkg/config/json"
+	config "github.com/faustbrian/go-config"
+	jsonsource "github.com/faustbrian/go-config/json"
 )
 
 func TestFromFSValidatesFilesystemPathAndOptions(t *testing.T) {

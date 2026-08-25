@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/internal/sourceio"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/internal/sourceio"
 )
 
 type hardeningConfiguration struct {

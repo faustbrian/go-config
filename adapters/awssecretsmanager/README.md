@@ -53,7 +53,7 @@ text or mutate `os.Environ`.
 ## Development
 
 ```console
-make check MODULES=pkg/config/adapters/awssecretsmanager
+make check MODULES=adapters/awssecretsmanager
 ```
 
 ## License

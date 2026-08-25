@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/config/validation"
+	"github.com/faustbrian/go-config/validation"
 )
 
 var errSelfValidation = errors.New("self validation failed")

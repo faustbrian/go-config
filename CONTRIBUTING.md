@@ -1,26 +1,55 @@
 # Contributing
 
-Use Go 1.25 or newer. Changes should preserve the package boundaries and avoid
-global state, implicit discovery, unbounded input, secret-bearing diagnostics,
-or vendor SDK dependencies in core.
+## Before Editing
 
-Before opening a pull request, run:
+1. Read [`AGENTS.md`](AGENTS.md) and the affected module's goals and docs.
+2. Run `make inventory` and the narrow baseline gate for the module.
+3. Identify owned dependencies and reverse dependants in `modules.json`.
+4. Preserve unrelated work and generated/corpus provenance.
 
-```console
-make check
+## Changes
+
+Keep commits focused and conventional. Update every affected changelog with
+the behavior and migration impact. Public API changes require compatibility
+evidence and documentation. Specification behavior requires a decision record,
+fixture coverage, and interoperability evidence.
+
+New direct dependencies and dependency updates must follow the
+[dependency governance policy](docs/dependency-governance.md). Package-local
+update bots are forbidden; the root policy owns every module and action update.
+
+Specification-backed changes must follow the
+[specification governance contract](docs/specification-governance.md), update
+the affected stable decision entries, and complete the Specification Decisions
+section of the pull request template. An unresolved interpretation or stale
+source pin is release-blocking; peer behavior cannot silently select policy.
+
+Do not add package-local workflows, permanent replacements, machine-specific
+paths, bypass flags, broad mutation exclusions, or aggregate quality metrics
+that hide a failing package.
+
+## Verification
+
+Run during development:
+
+```bash
+make inventory
+make specification-decisions
+make check MODULES=pkg/<library>
 ```
 
-Behavior changes require tests that demonstrate success, failure, cancellation,
-atomicity, immutability, and redaction where applicable. Production statement
-coverage must remain exactly 100%. Add fuzz seeds for new hostile-input classes
-and benchmark material parser or reflection changes.
+Before submitting a repository-wide change:
 
-Public API changes require an intentional update to `api/stable.txt`. Breaking
-changes require a major release after v1. Update `CHANGELOG.md` and relevant
-guides in the same change. Commits use Conventional Commits with an explanatory
-body.
+```bash
+make ci-changed BASE=origin/main
+```
 
-Release maintainers add a dated version section to `CHANGELOG.md`, merge it to
-`main`, run `make release-patch`, `make release-minor`, or
-`make release-major`, inspect the annotated tag, and push the tag. GitHub Actions
-verifies and publishes a deterministic source archive and checksum.
+The full scheduled and release gate is `make ci`. Report every unavailable or
+failing command; do not describe partial results as release-ready.
+
+## Adding A Module
+
+Follow [module lifecycle procedures](docs/module-lifecycle.md). New modules
+require an explicit purpose, ownership boundary, dependency review, package
+catalog entry, full quality gates, documentation, changelog, license, security
+policy, compatibility plan, and release dry-run.

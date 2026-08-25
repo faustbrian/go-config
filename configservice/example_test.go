@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/configservice"
-	"github.com/faustbrian/golib/pkg/config/programmatic"
-	"github.com/faustbrian/golib/pkg/service"
+	"github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/configservice"
+	"github.com/faustbrian/go-config/programmatic"
+	"github.com/faustbrian/go-service"
 )
 
 func ExampleNew() {

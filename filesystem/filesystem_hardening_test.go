@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/discover"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/discover"
 )
 
 func TestReaderValidatesEveryOptionBoundary(t *testing.T) {

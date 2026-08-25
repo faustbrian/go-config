@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
+	config "github.com/faustbrian/go-config"
 )
 
 func TestNewDefaultPlanAssignsDocumentedPrecedence(t *testing.T) {

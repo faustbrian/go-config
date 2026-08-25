@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/config/internal/safeerror"
+	"github.com/faustbrian/go-config/internal/safeerror"
 )
 
 type customCause struct{}

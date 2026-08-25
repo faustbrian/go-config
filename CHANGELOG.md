@@ -5,6 +5,8 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-25
+
 ### Documentation
 
 - Replace obsolete standalone-repository links and workflow claims with
@@ -14,6 +16,7 @@ and releases use Semantic Versioning.
 
 ### Changed
 
+- Publish the module from its standalone `github.com/faustbrian/go-config` identity while preserving its documented API and behavior.
 - Replace obsolete owned-module pseudo-version pins with the monorepo's local
   `v0.0.0` source-proxy coordinates; release tooling continues to emit exact
   `v1.0.0` dependency versions.
@@ -66,4 +69,5 @@ and releases use Semantic Versioning.
 - Explicit conformance assertions that decoding, defaults, environment
   loading, metadata, and snapshot cloning do not mutate private struct state.
 
-[Unreleased]: https://github.com/faustbrian/golib/commits/main/pkg/config
+[Unreleased]: https://github.com/faustbrian/go-config/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/faustbrian/go-config/releases/tag/v1.0.0

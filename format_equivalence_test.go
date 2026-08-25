@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/defaults"
-	"github.com/faustbrian/golib/pkg/config/dotenv"
-	jsonsource "github.com/faustbrian/golib/pkg/config/json"
-	tomlsource "github.com/faustbrian/golib/pkg/config/toml"
-	yamlsource "github.com/faustbrian/golib/pkg/config/yaml"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/defaults"
+	"github.com/faustbrian/go-config/dotenv"
+	jsonsource "github.com/faustbrian/go-config/json"
+	tomlsource "github.com/faustbrian/go-config/toml"
+	yamlsource "github.com/faustbrian/go-config/yaml"
 )
 
 func TestUnsignedTypedDefaultCanBeOverriddenByEquivalentJSONNumber(

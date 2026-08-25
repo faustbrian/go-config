@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/programmatic"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/programmatic"
 )
 
 func TestDefaultsAndOverridesUseDocumentedPriorities(t *testing.T) {

@@ -10,13 +10,13 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/golib/pkg/config"
-	"github.com/faustbrian/golib/pkg/config/decode"
-	"github.com/faustbrian/golib/pkg/config/defaults"
-	"github.com/faustbrian/golib/pkg/config/environment"
-	tomlsource "github.com/faustbrian/golib/pkg/config/toml"
-	"github.com/faustbrian/golib/pkg/config/validation"
-	yamlsource "github.com/faustbrian/golib/pkg/config/yaml"
+	config "github.com/faustbrian/go-config"
+	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/defaults"
+	"github.com/faustbrian/go-config/environment"
+	tomlsource "github.com/faustbrian/go-config/toml"
+	"github.com/faustbrian/go-config/validation"
+	yamlsource "github.com/faustbrian/go-config/yaml"
 )
 
 const diagnosticCanary = "canary-secret-diagnostic-value"
