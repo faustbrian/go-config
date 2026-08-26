@@ -146,8 +146,7 @@ are safe.
 - [Migration from Laravel configuration and `os.Getenv`](docs/migration.md)
 - [Reusable configuration types for package authors](docs/package-authors.md)
 - [Runnable examples](docs/examples.md)
-- [Hardening evidence and findings](docs/hardening.md)
-- [Hardening audit traceability](docs/audit-evidence.md)
+- [Verification](docs/verification.md)
 
 ## Design boundaries
 
@@ -171,8 +170,3 @@ low-level Go safety, and vulnerability scanning. See
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## Ecosystem
-
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.

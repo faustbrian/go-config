@@ -1,6 +1,6 @@
-# Hardening audit traceability
+# Verification
 
-This document maps the hardening objective to authoritative repository
+This document maps the package guarantees to authoritative repository
 evidence. A filename alone is not proof: the named test behavior and the gate
 that executes it are part of each entry. `make check` is the local aggregate
 gate; the repository's authoritative root CI workflow runs the canonical
@@ -89,7 +89,7 @@ per-module contract through an attributable dynamic matrix.
 | No native Infisical adapter or SDK enters core | [`go.mod`](../go.mod) contains only the YAML and TOML parser dependencies. [`kubernetes.md`](kubernetes.md) documents Operator, CSI, and Agent-delivered environment/file workflows without claiming native equivalence. |
 | A future native adapter remains optional, separately imported, read-only, bounded, and independently audited | The non-implemented boundary is normative in [`security.md`](security.md) and [`kubernetes.md`](kubernetes.md); adapter-specific matrices are therefore not applicable to the current module. |
 | Meaningful production coverage remains exactly 100% | [`check-coverage.sh`](../scripts/check-coverage.sh), run by `make check` and CI. |
-| Formatting, API, safety, vet, race, fuzz, benchmark, docs, vulnerability, lint, and compatibility gates exist | [`Makefile`](../Makefile), the [authoritative root CI workflow](https://github.com/faustbrian/golib/blob/main/.github/workflows/ci.yml), and the verification commands in [`hardening.md`](hardening.md). |
+| Formatting, API, safety, vet, race, fuzz, benchmark, docs, vulnerability, lint, and compatibility gates exist | [`Makefile`](../Makefile), the [repository CI workflow](../.github/workflows/ci.yml), and the verification commands documented here. |
 
 ## Intentional trust boundaries
 

@@ -62,5 +62,5 @@ MIT.
 
 ## Ecosystem
 
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.
+See the root [documentation index](../../docs/README.md) for source ownership,
+security, and operations guidance.
