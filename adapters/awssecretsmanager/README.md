@@ -60,7 +60,7 @@ make check MODULES=adapters/awssecretsmanager
 
 MIT.
 
-## Ecosystem
+## Related packages
 
 See the root [documentation index](../../docs/README.md) for source ownership,
 security, and operations guidance.
