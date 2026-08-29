@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"os"
+	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
@@ -16,6 +18,30 @@ import (
 
 type hardeningConfiguration struct {
 	Value string `config:"value" env:"VALUE"`
+}
+
+func TestUnquotedEscapeAdvancesPastEscapedCharacter(t *testing.T) {
+	if os.Getenv("GO_CONFIG_DOTENV_UNQUOTED_HELPER") == "1" {
+		got, err := unquoted(`value\#tail`, 1)
+		if err != nil {
+			t.Fatalf("unquoted() error = %v", err)
+		}
+		if got != "value#tail" {
+			t.Fatalf("unquoted() = %q, want value#tail", got)
+		}
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	command := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestUnquotedEscapeAdvancesPastEscapedCharacter$")
+	command.Env = append(os.Environ(), "GO_CONFIG_DOTENV_UNQUOTED_HELPER=1")
+	if err := command.Run(); err != nil {
+		if ctx.Err() != nil {
+			t.Fatalf("unquoted() did not terminate while parsing an escaped character: %v", ctx.Err())
+		}
+		t.Fatalf("unquoted() subprocess error = %v", err)
+	}
 }
 
 func TestErrorsHaveStableSecretSafeFormatting(t *testing.T) {
