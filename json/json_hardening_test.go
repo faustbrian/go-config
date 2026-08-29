@@ -116,17 +116,19 @@ func TestSourceRejectsEveryInvalidRootAndDelimiterState(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]string{
-		"empty":               "",
-		"array root":          `[]`,
-		"null root":           `null`,
-		"multiple roots":      `{} {}`,
-		"trailing malformed":  `{} trailing`,
-		"invalid object key":  `{bad:1}`,
-		"truncated object":    `{`,
-		"truncated array":     `{"items":[`,
-		"nested value":        `{"value":}`,
-		"invalid array value": `{"items":[tru]}`,
-		"nested array value":  `{"items":[]`,
+		"empty":                       "",
+		"array root":                  `[]`,
+		"null root":                   `null`,
+		"multiple roots":              `{} {}`,
+		"trailing malformed":          `{} trailing`,
+		"invalid object key":          `{bad:1}`,
+		"truncated object":            `{`,
+		"mismatched object delimiter": `{"value":true]`,
+		"truncated array":             `{"items":[`,
+		"mismatched array delimiter":  `{"items":[true}`,
+		"nested value":                `{"value":}`,
+		"invalid array value":         `{"items":[tru]}`,
+		"nested array value":          `{"items":[]`,
 	}
 	for name, data := range tests {
 		t.Run(name, func(t *testing.T) {

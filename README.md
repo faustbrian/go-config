@@ -46,7 +46,8 @@ type Settings struct {
 }
 
 func main() {
-	base, _ := defaults.For[Settings]("defaults")
+	forDefaults := defaults.For[Settings]
+	base, _ := forDefaults("defaults")
 	file, _ := jsonsource.Bytes(
 		[]byte(`{"host":"service.internal","port":9000}`),
 		jsonsource.Options{Name: "config.json"},
@@ -65,7 +66,8 @@ func main() {
 		Environment: []config.Source{env},
 		Overrides: []config.Source{override},
 	})
-	snapshot, err := config.Load[Settings](context.Background(), plan)
+	load := config.Load[Settings]
+	snapshot, err := load(context.Background(), plan)
 	if err != nil {
 		panic(err)
 	}
@@ -118,36 +120,14 @@ are safe.
 
 ## What is included
 
-- Strict JSON, YAML, TOML, dotenv, environment, map, byte, reader, `fs.FS`, and
-  explicit-file sources.
-- Explicit bounded discovery with search-first/search-all, roots, stop
-  directories, symlink policy, and file-permission policy.
-- Object merge, scalar/slice replacement, explicit null and deletion, and type
-  conflict rejection.
-- `Optional[T]`, `Secret`, `ByteSize`, durations, URLs, timestamps, enums, and
-  text-unmarshaling types.
-- Struct-tag defaults, bounded dotenv interpolation, self-validation, typed
-  validators, and deterministic error aggregation.
-- Immutable typed snapshots and field-level provenance that never stores field
-  values.
-- A typed `configservice` adapter for command-scoped service configuration,
-  explicit local dotenv loading, and process-environment orchestration.
+Strict JSON, YAML, TOML, dotenv, environment, map, byte, reader, `fs.FS`, and
+explicit-file sources compose with bounded discovery, merging, typed values,
+validation, immutable snapshots, provenance, and an optional service adapter.
 
 ## Documentation
 
-- [API reference](docs/api.md)
-- [Sources and formats](docs/sources.md)
-- [Structured-format conformance matrix](docs/conformance.md)
-- [Layering, defaults, merging, interpolation, and validation](docs/layering.md)
-- [Discovery](docs/discovery.md)
-- [Security and threat model](docs/security.md)
-- [Kubernetes and Infisical recipes](docs/kubernetes.md)
-- [Operations, compatibility, performance, troubleshooting, and FAQ](docs/operations.md)
-- [Migration from Laravel configuration and `os.Getenv`](docs/migration.md)
-- [Reusable configuration types for package authors](docs/package-authors.md)
-- [Runnable examples](docs/examples.md)
-- [Hardening evidence and findings](docs/hardening.md)
-- [Hardening audit traceability](docs/audit-evidence.md)
+Use the [documentation index](docs/README.md) for formats, layering,
+discovery, Kubernetes, security, migration, and package-author guidance.
 
 ## Design boundaries
 
@@ -159,20 +139,9 @@ the resulting environment variables or files normally.
 
 ## Development
 
-```console
-make check
-```
-
-The release gate enforces race tests, exact 100% production statement coverage,
-all fuzz targets, benchmarks, docs/examples, API compatibility, vetting,
-low-level Go safety, and vulnerability scanning. See
-[CONTRIBUTING.md](CONTRIBUTING.md).
+Run `make check`. See [CONTRIBUTING.md](CONTRIBUTING.md) for focused and release
+verification.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## Ecosystem
-
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.

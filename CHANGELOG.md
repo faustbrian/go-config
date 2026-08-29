@@ -5,6 +5,17 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Replace copied repository tooling with the pinned `go-library-tools` v1.0.4
+  contract while retaining both module API baselines and approved mutation
+  evidence.
+
+### Documentation
+
+- Replace archived monorepo and hardening terminology with package-owned
+  documentation and reproducible verification guidance.
+
 ## [1.0.0] - 2026-08-25
 
 ### Changed
@@ -29,7 +40,7 @@ and releases use Semantic Versioning.
 - Replace obsolete standalone-repository links and workflow claims with
   monorepo-canonical targets and current release guidance.
 
-- Link the package README to the repository-wide Golib documentation portal.
+- Link the package README to package-owned documentation.
 
 ### Changed
 
