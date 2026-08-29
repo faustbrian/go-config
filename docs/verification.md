@@ -3,8 +3,8 @@
 This document maps the package guarantees to authoritative repository
 evidence. A filename alone is not proof: the named test behavior and the gate
 that executes it are part of each entry. `make check` is the local aggregate
-gate; the repository's authoritative root CI workflow runs the canonical
-per-module contract through an attributable dynamic matrix.
+gate; the repository's authoritative root CI workflow delegates the canonical
+per-module contract to the pinned shared workflow.
 
 ## Source order, presence, and atomicity
 
@@ -88,8 +88,8 @@ per-module contract through an attributable dynamic matrix.
 |---|---|
 | No native Infisical adapter or SDK enters core | [`go.mod`](../go.mod) contains only the YAML and TOML parser dependencies. [`kubernetes.md`](kubernetes.md) documents Operator, CSI, and Agent-delivered environment/file workflows without claiming native equivalence. |
 | A future native adapter remains optional, separately imported, read-only, bounded, and independently audited | The non-implemented boundary is normative in [`security.md`](security.md) and [`kubernetes.md`](kubernetes.md); adapter-specific matrices are therefore not applicable to the current module. |
-| Meaningful production coverage remains exactly 100% | [`check-coverage.sh`](../scripts/check-coverage.sh), run by `make check` and CI. |
-| Formatting, API, safety, vet, race, fuzz, benchmark, docs, vulnerability, lint, and compatibility gates exist | [`Makefile`](../Makefile), the [repository CI workflow](../.github/workflows/ci.yml), and the verification commands documented here. |
+| Meaningful production coverage remains exactly 100% | The coverage gate in `golib check --all`, run by `make check` and CI. |
+| Formatting, API, safety, vet, race, fuzz, benchmark, docs, vulnerability, lint, and compatibility gates exist | [`Makefile`](../Makefile), the [repository CI workflow](../.github/workflows/ci.yml), and the pinned [shared workflow](https://github.com/faustbrian/go-library-tools/blob/v1.0.4/.github/workflows/library-ci.yml). |
 
 ## Intentional trust boundaries
 

@@ -5,6 +5,12 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Replace copied repository tooling with the pinned `go-library-tools` v1.0.4
+  contract while retaining both module API baselines and approved mutation
+  evidence.
+
 ### Documentation
 
 - Replace archived monorepo and hardening terminology with package-owned

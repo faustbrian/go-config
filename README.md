@@ -46,7 +46,8 @@ type Settings struct {
 }
 
 func main() {
-	base, _ := defaults.For[Settings]("defaults")
+	forDefaults := defaults.For[Settings]
+	base, _ := forDefaults("defaults")
 	file, _ := jsonsource.Bytes(
 		[]byte(`{"host":"service.internal","port":9000}`),
 		jsonsource.Options{Name: "config.json"},
@@ -65,7 +66,8 @@ func main() {
 		Environment: []config.Source{env},
 		Overrides: []config.Source{override},
 	})
-	snapshot, err := config.Load[Settings](context.Background(), plan)
+	load := config.Load[Settings]
+	snapshot, err := load(context.Background(), plan)
 	if err != nil {
 		panic(err)
 	}
