@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "id": "CONFIG-DEC-001",
+      "authoritative_sources": [
+        "json-rfc8259-source",
+        "yaml-1.2.2-source",
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestSourceRejectsEveryInvalidRootAndDelimiterState",
+        "TestSourceRejectsNonMappingRoot",
+        "TestBytesLoadsDottedKeysAndArrayTables"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "Each structured source produces exactly one map[string]any root. JSON scalars, arrays, null, and trailing roots fail; YAML requires exactly one mapping document; TOML uses its root table."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-002",
+      "authoritative_sources": [
+        "json-rfc8259-source",
+        "yaml-1.2.2-source",
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestSourceRejectsDuplicateKeys",
+        "TestSourceRejectsAmbiguousOrExecutableFeatures",
+        "TestSourceRejectsDuplicateDefinitions"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "JSON, YAML, and TOML reject duplicate definitions. JSON and YAML report a safe key path, YAML also reports location, and no partial tree is published."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-003",
+      "authoritative_sources": [
+        "json-rfc8259-source",
+        "yaml-1.2.2-source",
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestSourceConvertsNullNegativeAndUnsignedNumberBoundaries",
+        "TestSourceRejectsNumberOverflowCategories",
+        "TestScalarAndIntegerBoundaries",
+        "TestJSONYAMLAndTOMLEquivalentDocumentsProduceSameTree"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "Signed integers normalize to int64, larger non-negative integers through math.MaxUint64 normalize to uint64, finite fractional and exponent values normalize to float64, and values outside the supported domain fail."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-004",
+      "authoritative_sources": [
+        "toml-1.0.0-source",
+        "json-rfc8259-source",
+        "yaml-1.2.2-source"
+      ],
+      "executable_evidence": [
+        "TestSourcePreservesTOMLNonFiniteFloats",
+        "TestScalarAndIntegerBoundaries",
+        "TestSourceRejectsNumberOverflowCategories"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "JSON rejects non-finite syntax, YAML rejects resolved infinity and NaN scalars, and TOML preserves inf, -inf, and nan as float64 values."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-005",
+      "authoritative_sources": [
+        "yaml-1.2.2-source"
+      ],
+      "executable_evidence": [
+        "TestSourceRejectsAmbiguousOrExecutableFeatures",
+        "TestConvertRejectsMalformedAndUnsupportedNodes",
+        "TestSourceRejectsNonMappingRoot"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "YAML accepts core scalar, sequence, and mapping nodes with string keys, but rejects aliases, merge keys, custom tags, non-string keys, tagged collections, and multiple documents."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-006",
+      "authoritative_sources": [
+        "yaml-1.2.2-source"
+      ],
+      "executable_evidence": [
+        "TestScalarAndIntegerBoundaries",
+        "TestCrossFormatDifferencesAreIntentionalAndNormalized"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "A YAML scalar resolved as a timestamp is returned as its lexical string value without timezone conversion or clock interpretation."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-007",
+      "authoritative_sources": [
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestSourceNormalizesEveryTOMLDateTimeCategory",
+        "TestCrossFormatDifferencesAreIntentionalAndNormalized"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "Offset date-time values use RFC3339Nano strings; local date-time, local date, and local time use fixed lexical layouts without adding a timezone."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-008",
+      "authoritative_sources": [
+        "json-rfc8259-source",
+        "yaml-1.2.2-source",
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestJSONYAMLAndTOMLEquivalentDocumentsProduceSameTree",
+        "TestJSONYAMLAndTOMLArrayOfObjectsProduceSameTree",
+        "TestCrossFormatDifferencesAreIntentionalAndNormalized"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "Equivalent objects, arrays of objects, strings, booleans, and finite numbers normalize identically before merge. JSON and YAML null become nil; TOML has no null. Timestamp and TOML date-time values normalize to strings."
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-009",
+      "authoritative_sources": [
+        "json-rfc8259-source",
+        "yaml-1.2.2-source",
+        "toml-1.0.0-source"
+      ],
+      "executable_evidence": [
+        "TestSourceEnforcesExactDepthKeyAndArrayIndexBoundaries",
+        "TestConvertEnforcesExactDepthKeyAndSequenceBoundaries",
+        "TestNormalizeEnforcesExactDepthKeyAndCollectionBoundaries",
+        "TestErrorsHaveStableSecretSafeFormatting",
+        "TestParseErrorHasStableSecretSafeFormatting",
+        "TestSecretAndErrorsNeverLeakAcrossDiagnosticSurfaces"
+      ],
+      "fixtures": [],
+      "fuzz": [
+        "FuzzStructuredSources"
+      ],
+      "interoperability_evidence": [],
+      "interoperability_classification": "not assessed",
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": [
+        "Each structured source enforces caller-configurable byte, depth, and key limits, checks cancellation during owned work, publishes no partial tree, and exposes stable errors without source tokens."
+      ]
+    }
+  ]
+}

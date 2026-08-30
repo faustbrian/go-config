@@ -283,16 +283,22 @@
       "build_tags": [],
       "test_tags": [],
       "interoperability_tools": [],
-      "specifications": [],
+      "specifications": [
+        "RFC 8259 The JavaScript Object Notation (JSON) Data Interchange Format",
+        "YAML 1.2.2",
+        "TOML 1.0.0"
+      ],
       "conformance_corpora": [],
-      "provenance": [],
+      "provenance": [
+        "specification/sources.tsv"
+      ],
       "goal_files": [],
       "goal_status": "not-applicable",
       "goal_evidence": [],
       "gates": {
         "api_compatibility": true,
         "benchmarks": true,
-        "conformance": false,
+        "conformance": true,
         "coverage": true,
         "documentation": true,
         "fuzz": true,

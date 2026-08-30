@@ -18,7 +18,8 @@ New direct dependencies and dependency updates must follow the
 [dependency governance policy](AGENTS.md#dependencies-and-supply-chain). Package-local
 update bots are forbidden; the root policy owns every module and action update.
 
-Specification-backed changes must follow the
+Specification-backed changes must update the
+[decision register](docs/specification-decisions.md) and follow the
 [specification governance contract](AGENTS.md#design), update
 the affected stable decision entries, and complete the Specification Decisions
 section of the pull request template. An unresolved interpretation or stale

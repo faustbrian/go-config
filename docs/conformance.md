@@ -4,6 +4,10 @@ JSON, YAML, and TOML sources normalize their shared data model before merge.
 The matrix below is the compatibility contract; differences are deliberate and
 must not depend on parser defaults.
 
+The [specification decision register](specification-decisions.md) records the
+source versions, application policies, and executable evidence behind this
+matrix.
+
 | Feature | JSON | YAML | TOML |
 |---|---|---|---|
 | Object root | required | mapping required | table required |
@@ -20,7 +24,7 @@ must not depend on parser defaults.
 | Aliases and merge keys | not applicable | rejected | not applicable |
 | Custom tags | not applicable | rejected | not applicable |
 | Non-string object key | not in the language | rejected | not in the language |
-| NaN and infinity | rejected | rejected | rejected during normalization |
+| NaN and infinity | rejected | rejected | preserved as `float64` |
 | Comments | not supported | supported | supported |
 
 Equivalent documents produce the same canonical tree for objects, arrays,

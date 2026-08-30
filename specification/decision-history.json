@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "id": "CONFIG-DEC-001",
+      "digests": [
+        "36c7c04c194ee53c5bcdba16b1a6b4d5771d1861a803de4b6cf1c84b04891b2e"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-002",
+      "digests": [
+        "bed8bd0f19425b5b3617e1921cc48c1f9c19df231028a63dff7db71187740d6c"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-003",
+      "digests": [
+        "f385bb784dbae76cdeb81164ecebeaf049de48d4592658b91ddcca2ba511bfb6"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-004",
+      "digests": [
+        "22415740993978504b16e29b9e79552a5a1b324cbae37cd5e0019e07d24762fc"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-005",
+      "digests": [
+        "6c70bad2d8e8808ae5a386975b7b92ebab98a5c7d4b34381c396f37e9e4f81e5"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-006",
+      "digests": [
+        "5fde9d85597a07907d9f816696ecf44ed23a402273ef1a2fb8c77283d70a6866"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-007",
+      "digests": [
+        "caa480104735facc30a670fe01ce79eeb175852a6564eebb96a54b80b896a189"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-008",
+      "digests": [
+        "ae3324209deb904ddbccad2a5e16805bb6195623d362d8f44611e3b8ea91668f"
+      ]
+    },
+    {
+      "id": "CONFIG-DEC-009",
+      "digests": [
+        "a7daf89cc315651001c22b15137caa0c90e254d0e60ae246d64f20da249bd794"
+      ]
+    }
+  ]
+}

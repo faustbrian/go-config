@@ -128,6 +128,8 @@ validation, immutable snapshots, provenance, and an optional service adapter.
 
 Use the [documentation index](docs/README.md) for formats, layering,
 discovery, Kubernetes, security, migration, and package-author guidance.
+Observable structured-format choices are recorded in the
+[specification decision register](docs/specification-decisions.md).
 
 ## Design boundaries
 

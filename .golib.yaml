@@ -66,6 +66,13 @@ operations:
         budget: 2s
         timeout: 20m
   - module: .
+    gate: conformance
+    steps:
+      - type: go-test
+        packages: [".", "./json", "./yaml", "./toml"]
+        count: 1
+        timeout: 20m
+  - module: .
     gate: benchmark
     steps:
       - type: go-test
