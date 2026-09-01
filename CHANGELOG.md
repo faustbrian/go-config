@@ -7,14 +7,41 @@ and releases use Semantic Versioning.
 
 ### Changed
 
-- Replace copied repository tooling with the pinned `go-library-tools` v1.0.13
-  contract while retaining both module API baselines and approved mutation
-  evidence.
+- Adopt the pinned `go-library-tools` v1.2.0 CLI and reusable workflow so CI
+  enforces specification decisions, conformance bindings, source monitoring,
+  and change control while retaining both module API baselines and approved
+  mutation evidence.
+  The required specification lane remains independent of module-resolution
+  failures in the broader repository gate.
 
 ### Documentation
 
 - Replace archived monorepo and hardening terminology with package-owned
   documentation and reproducible verification guidance.
+
+- Document the existing source-specific non-finite number behavior: JSON and
+  YAML reject non-finite values while TOML preserves them as `float64`.
+
+### Specification Decisions
+
+- CONFIG-DEC-001 sha256:36c7c04c194ee53c5bcdba16b1a6b4d5771d1861a803de4b6cf1c84b04891b2e:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-002 sha256:bed8bd0f19425b5b3617e1921cc48c1f9c19df231028a63dff7db71187740d6c:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-003 sha256:f385bb784dbae76cdeb81164ecebeaf049de48d4592658b91ddcca2ba511bfb6:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-004 sha256:22415740993978504b16e29b9e79552a5a1b324cbae37cd5e0019e07d24762fc:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-005 sha256:6c70bad2d8e8808ae5a386975b7b92ebab98a5c7d4b34381c396f37e9e4f81e5:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-006 sha256:5fde9d85597a07907d9f816696ecf44ed23a402273ef1a2fb8c77283d70a6866:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-007 sha256:caa480104735facc30a670fe01ce79eeb175852a6564eebb96a54b80b896a189:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-008 sha256:ae3324209deb904ddbccad2a5e16805bb6195623d362d8f44611e3b8ea91668f:
+  [Decision register](docs/specification-decisions.md).
+- CONFIG-DEC-009 sha256:a7daf89cc315651001c22b15137caa0c90e254d0e60ae246d64f20da249bd794:
+  [Decision register](docs/specification-decisions.md).
 
 ## [1.0.0] - 2026-08-25
 

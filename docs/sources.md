@@ -17,6 +17,9 @@ multiple documents, NaN, and infinity. TOML uses BurntSushi TOML, rejects
 duplicate definitions, and normalizes date, local time, local date-time, and
 offset date-time values to strings.
 
+JSON and YAML reject non-finite numbers. TOML preserves its specification's
+`inf`, `-inf`, and `nan` values as `float64` in the normalized tree.
+
 All three bound bytes, nesting depth, and key count. JSON and YAML check context
 during recursive parsing/conversion; TOML checks it during normalization.
 Equivalent documents intentionally normalize to `map[string]any`, `[]any`,

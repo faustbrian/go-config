@@ -1,0 +1,4 @@
+id	version	url	sha256	status
+json-rfc8259-source	RFC 8259	https://www.rfc-editor.org/rfc/rfc8259.txt	61a5378f4255c720beb2a4b4a63b29540147c140f36988bf086291989b4cd2d7	pinned
+yaml-1.2.2-source	YAML 1.2.2	https://yaml.org/spec/1.2.2/	2fe1bf40792df22ef8b8a5972a34c48e639969222e0bbae605aa9bb2ca85e9ab	pinned
+toml-1.0.0-source	TOML 1.0.0	https://raw.githubusercontent.com/toml-lang/toml/1.0.0/toml.md	db2ee7bd0bd4145cf9621313f0cfaa42977bb17da7d176b09a1b866f2b8b5ffa	pinned

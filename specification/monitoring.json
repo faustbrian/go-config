@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-30",
+  "review_interval_days": 90,
+  "authorities": [
+    {
+      "id": "json-rfc8259-source",
+      "version": "RFC 8259",
+      "url": "https://www.rfc-editor.org/rfc/rfc8259.txt",
+      "specifications": [
+        "RFC 8259 The JavaScript Object Notation (JSON) Data Interchange Format"
+      ],
+      "kind": "specification",
+      "sha256": "61a5378f4255c720beb2a4b4a63b29540147c140f36988bf086291989b4cd2d7"
+    },
+    {
+      "id": "json-rfc8259-errata",
+      "kind": "errata",
+      "version": "",
+      "url": "https://errata.rfc-editor.org/search/?rfc_number=8259&presentation=records",
+      "sha256": "5819db2e0233addf17ed540db88cf92cbefda5a60c38877e0d4cbf6b876b7cf4",
+      "specifications": [
+        "RFC 8259 The JavaScript Object Notation (JSON) Data Interchange Format"
+      ]
+    },
+    {
+      "id": "yaml-1.2.2-source",
+      "version": "YAML 1.2.2",
+      "url": "https://yaml.org/spec/1.2.2/",
+      "specifications": [
+        "YAML 1.2.2"
+      ],
+      "kind": "specification",
+      "sha256": "2fe1bf40792df22ef8b8a5972a34c48e639969222e0bbae605aa9bb2ca85e9ab"
+    },
+    {
+      "id": "yaml-specification-releases",
+      "kind": "releases",
+      "version": "",
+      "url": "https://api.github.com/repos/yaml/yaml-spec/tags?per_page=100",
+      "sha256": "449215ca76097b4c067f5ed6dd6f8c9828efe6cd9b465ce2603567dc44b795e1",
+      "specifications": [
+        "YAML 1.2.2"
+      ]
+    },
+    {
+      "id": "toml-1.0.0-source",
+      "version": "TOML 1.0.0",
+      "url": "https://raw.githubusercontent.com/toml-lang/toml/1.0.0/toml.md",
+      "specifications": [
+        "TOML 1.0.0"
+      ],
+      "kind": "specification",
+      "sha256": "db2ee7bd0bd4145cf9621313f0cfaa42977bb17da7d176b09a1b866f2b8b5ffa"
+    },
+    {
+      "id": "toml-specification-releases",
+      "kind": "releases",
+      "version": "",
+      "url": "https://api.github.com/repos/toml-lang/toml/tags?per_page=100",
+      "sha256": "add4b841bdb5b997f6dbdeff9775ac5d4b83328a0b7b16a0407c18b709fd5d39",
+      "specifications": [
+        "TOML 1.0.0"
+      ]
+    }
+  ]
+}

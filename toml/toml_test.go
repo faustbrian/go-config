@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io/fs"
+	"math"
 	"reflect"
 	"strings"
 	"testing"
@@ -44,6 +45,34 @@ func TestBytesLoadsDottedKeysAndArrayTables(t *testing.T) {
 	}
 	if !reflect.DeepEqual(document.Tree, want) {
 		t.Fatalf("Source.Load() tree = %#v, want %#v", document.Tree, want)
+	}
+}
+
+func TestSourcePreservesTOMLNonFiniteFloats(t *testing.T) {
+	t.Parallel()
+
+	source, err := tomlsource.Bytes(
+		[]byte("positive = inf\nnegative = -inf\nnot_number = nan\n"),
+		tomlsource.Options{Name: "toml"},
+	)
+	if err != nil {
+		t.Fatalf("Bytes() error = %v", err)
+	}
+	document, err := source.Load(context.Background())
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	positive, positiveOK := document.Tree["positive"].(float64)
+	negative, negativeOK := document.Tree["negative"].(float64)
+	notNumber, notNumberOK := document.Tree["not_number"].(float64)
+	if !positiveOK || !math.IsInf(positive, 1) {
+		t.Fatalf("positive = %#v, want positive infinity", document.Tree["positive"])
+	}
+	if !negativeOK || !math.IsInf(negative, -1) {
+		t.Fatalf("negative = %#v, want negative infinity", document.Tree["negative"])
+	}
+	if !notNumberOK || !math.IsNaN(notNumber) {
+		t.Fatalf("not_number = %#v, want NaN", document.Tree["not_number"])
 	}
 }
 
