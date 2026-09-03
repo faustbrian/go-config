@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "repository": "github.com/faustbrian/go-config",
+  "module": ".",
+  "package": "toml",
+  "gate": "mutation",
+  "input_digest": "sha256:3d3e37312ebee63df5f0324c57195864e78fad4bbafd4b53e6c88fb1ef8be7b1",
+  "verifier_digest": "sha256:9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
+  "result": "passed",
+  "report_digest": "sha256:547e5b0e49b12955237c73920ebff6c58c7c1685a85a568959a395eb7520b12f",
+  "environment": {
+    "CGO_ENABLED": "1",
+    "GOARCH": "arm64",
+    "GOOS": "darwin",
+    "GOVERSION": "go1.27.0",
+    "gremlins_binary_sha256": "sha256:6a2beddc477eb410f8a670b6c9049558563d3c4327498fe31604d31c773a959e"
+  },
+  "completed_at": "2026-09-03T09:51:19.962955Z"
+}

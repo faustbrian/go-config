@@ -127,8 +127,8 @@ validation, immutable snapshots, provenance, and an optional service adapter.
 ## Documentation
 
 For shared package selection, ownership, construction, and lifecycle guidance,
-see the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md)
-and its [Foundations family](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/design-language.md#package-families-and-selection).
+see the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
+and its [Foundations family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
 
 Use the [documentation index](docs/README.md) for formats, layering,
 discovery, Kubernetes, security, migration, and package-author guidance.

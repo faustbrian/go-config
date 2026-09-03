@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "repository": "github.com/faustbrian/go-config",
+  "module": ".",
+  "package": "configservice",
+  "gate": "mutation",
+  "input_digest": "sha256:16810c2b6bcc409e436741f0851c3c9a0b6d3c651b5fd1debd7518c2d8b890ad",
+  "verifier_digest": "sha256:9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
+  "result": "passed",
+  "report_digest": "sha256:7ca1c61aca8a584b8bb1ec778e4c3ea82a042003022610be8845bab27e8335ea",
+  "environment": {
+    "CGO_ENABLED": "1",
+    "GOARCH": "arm64",
+    "GOOS": "darwin",
+    "GOVERSION": "go1.27.0",
+    "gremlins_binary_sha256": "sha256:6a2beddc477eb410f8a670b6c9049558563d3c4327498fe31604d31c773a959e"
+  },
+  "completed_at": "2026-09-03T09:49:57.018077Z"
+}

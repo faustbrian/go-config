@@ -7,9 +7,14 @@ and releases use Semantic Versioning.
 
 ### Changed
 
-- Adopt the checksum-verified `go-library-tools` v1.3.0 CLI, schema-v2
+- Adopt the checksum-verified `go-library-tools` v1.4.0 CLI, schema-v2
   cohesion metadata for both modules, repository-local cohesion gate, and
-  immutable reusable workflow without changing public APIs or runtime behavior.
+  immutable W14-enforcement workflow without changing public APIs or runtime
+  behavior.
+
+- Reconcile Golib v1.0.0 dependency checksums with their immutable public
+  module identities so clean consumers verify released dependencies
+  successfully.
 
 - Adopt the pinned `go-library-tools` v1.2.0 CLI and reusable workflow so CI
   enforces specification decisions, conformance bindings, source monitoring,
@@ -22,7 +27,7 @@ and releases use Semantic Versioning.
 
 - Publish each module's family, capabilities, selection, ownership, lifecycle,
   support, and delivery boundaries and link both entry points to the immutable
-  v1.3.0 ecosystem index and Foundations guidance.
+  v1.4.0 ecosystem index and Foundations guidance.
 
 - Align public minimum-Go and CI-platform statements with the module's Go
   1.26.6 directive and authoritative Ubuntu workflow.
