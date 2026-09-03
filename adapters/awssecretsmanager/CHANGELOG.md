@@ -4,7 +4,18 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ## Unreleased
 
+### Changed
+
+- Adopt schema-v2 cohesion metadata and the repository's checksum-verified
+  v1.4.0 W14 gate without changing the adapter API or runtime behavior.
+
+- Reconcile the root module's v1.0.0 checksum with its immutable public module
+  identity so clean consumers verify the adapter dependency successfully.
+
 ### Documentation
+
+- Publish the adapter's selection, ownership, lifecycle, support, and delivery
+  boundaries and link its entry point to the immutable v1.4.0 ecosystem index.
 
 - Add a module documentation index for direct navigation.
 - Use human-oriented section names and package-owned documentation links.
