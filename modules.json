@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "repository": "github.com/faustbrian/go-config",
   "go_version": "1.26.6",
   "modules": [
@@ -257,6 +257,90 @@
       "family_label": "Foundations",
       "family_description": "Common immutable values, deterministic seams, configuration, identity propagation, and input validation.",
       "family_order": 1,
+      "cohesion": {
+        "family": "foundations",
+        "secondary_capabilities": [
+          "configuration",
+          "cryptography-and-secrets",
+          "data-encoding",
+          "http-and-service-edge",
+          "protocols-and-schemas",
+          "testing-and-conformance"
+        ],
+        "responsibility": "Load explicit, layered configuration sources into immutable typed snapshots with deterministic precedence, validation, safe provenance, and redacted secrets.",
+        "non_goals": [
+          "Provide global configuration state, implicit environment or filesystem discovery, runtime mutation, hot reload, secret management, or vendor credential ownership.",
+          "Replace application-owned composition, deployment configuration delivery, or domain-specific validation policy."
+        ],
+        "public_package_identifier": "config",
+        "primary_entry_packages": [
+          "github.com/faustbrian/go-config"
+        ],
+        "package_selection": {
+          "github.com/faustbrian/go-config": "Use for explicit startup configuration loading into immutable typed snapshots; use a settings package for runtime-mutable, versioned, persisted values."
+        },
+        "lifecycle_status": "active",
+        "maturity": "stable",
+        "construction_styles": [
+          "load",
+          "new-options",
+          "plain-function",
+          "validated-value"
+        ],
+        "lifecycle_styles": [
+          "stateless"
+        ],
+        "ownership": {
+          "configuration": "caller",
+          "mutable_inputs": [
+            "borrow",
+            "copy"
+          ],
+          "runtime_resources": "caller",
+          "background_work": "none"
+        },
+        "optional_owned_dependencies": [],
+        "adapters": [
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager"
+        ],
+        "companions": [],
+        "supported_go": {
+          "minimum": "1.26.6",
+          "tested": [
+            "1.26.6"
+          ]
+        },
+        "supported_platforms": [
+          "portable-go"
+        ],
+        "supported_backends": [
+          "local-filesystem"
+        ],
+        "supported_protocols": [
+          "json",
+          "toml",
+          "yaml"
+        ],
+        "documentation": {
+          "readme": "README.md",
+          "api": "docs/api.md",
+          "adoption": "docs/migration.md",
+          "security": "docs/security.md",
+          "compatibility": "COMPATIBILITY.md",
+          "performance": "docs/operations.md",
+          "examples": "docs/examples.md",
+          "faq": "docs/operations.md",
+          "changelog": "CHANGELOG.md",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config",
+          "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md"
+        },
+        "known_good_compatibility_sets": [],
+        "delivery": {
+          "implementation": "not-started",
+          "hardening": "not-started",
+          "release": "not-started"
+        }
+      },
       "version": "1.0.0",
       "tag_prefix": "v",
       "owned_dependencies": [
@@ -335,6 +419,81 @@
       "family_label": "Foundations",
       "family_description": "Common immutable values, deterministic seams, configuration, identity propagation, and input validation.",
       "family_order": 1,
+      "cohesion": {
+        "family": "foundations",
+        "secondary_capabilities": [
+          "configuration",
+          "cryptography-and-secrets",
+          "data-encoding",
+          "transport-and-networking"
+        ],
+        "responsibility": "Load one bounded JSON configuration document from AWS Secrets Manager as an explicit sensitive configuration source.",
+        "non_goals": [
+          "Own AWS credential resolution, retries, IAM policy, secret creation, rotation, caching, or refresh scheduling.",
+          "Perform global registration, mutate process environment, flatten dotenv input, or retain loaded secret plaintext."
+        ],
+        "public_package_identifier": "awssecretsmanager",
+        "primary_entry_packages": [
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager"
+        ],
+        "package_selection": {
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager": "Use when an application explicitly composes AWS Secrets Manager as a bounded JSON source; use the root module for local, environment, filesystem, or programmatic sources."
+        },
+        "lifecycle_status": "active",
+        "maturity": "stable",
+        "construction_styles": [
+          "new-options"
+        ],
+        "lifecycle_styles": [
+          "stateless"
+        ],
+        "ownership": {
+          "configuration": "caller",
+          "mutable_inputs": [
+            "borrow",
+            "copy"
+          ],
+          "runtime_resources": "caller",
+          "background_work": "none"
+        },
+        "optional_owned_dependencies": [],
+        "adapters": [],
+        "companions": [],
+        "supported_go": {
+          "minimum": "1.26.6",
+          "tested": [
+            "1.26.6"
+          ]
+        },
+        "supported_platforms": [
+          "portable-go"
+        ],
+        "supported_backends": [
+          "aws-secrets-manager"
+        ],
+        "supported_protocols": [
+          "json"
+        ],
+        "documentation": {
+          "readme": "adapters/awssecretsmanager/README.md",
+          "api": "adapters/awssecretsmanager/docs/api.md",
+          "adoption": "adapters/awssecretsmanager/docs/adoption.md",
+          "security": "adapters/awssecretsmanager/docs/security.md",
+          "compatibility": "adapters/awssecretsmanager/docs/compatibility.md",
+          "performance": "adapters/awssecretsmanager/docs/architecture.md",
+          "examples": "adapters/awssecretsmanager/example_test.go",
+          "faq": "adapters/awssecretsmanager/docs/faq.md",
+          "changelog": "adapters/awssecretsmanager/CHANGELOG.md",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager",
+          "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md"
+        },
+        "known_good_compatibility_sets": [],
+        "delivery": {
+          "implementation": "not-started",
+          "hardening": "not-started",
+          "release": "not-started"
+        }
+      },
       "version": "1.0.0",
       "tag_prefix": "adapters/awssecretsmanager/v",
       "owned_dependencies": [

@@ -4,7 +4,15 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ## Unreleased
 
+### Changed
+
+- Adopt schema-v2 cohesion metadata and the repository's checksum-verified
+  v1.3.0 cohesion gate without changing the adapter API or runtime behavior.
+
 ### Documentation
+
+- Publish the adapter's selection, ownership, lifecycle, support, and delivery
+  boundaries and link its entry point to the immutable v1.3.0 ecosystem index.
 
 - Add a module documentation index for direct navigation.
 - Use human-oriented section names and package-owned documentation links.

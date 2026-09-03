@@ -7,6 +7,10 @@ and releases use Semantic Versioning.
 
 ### Changed
 
+- Adopt the checksum-verified `go-library-tools` v1.3.0 CLI, schema-v2
+  cohesion metadata for both modules, repository-local cohesion gate, and
+  immutable reusable workflow without changing public APIs or runtime behavior.
+
 - Adopt the pinned `go-library-tools` v1.2.0 CLI and reusable workflow so CI
   enforces specification decisions, conformance bindings, source monitoring,
   and change control while retaining both module API baselines and approved
@@ -15,6 +19,13 @@ and releases use Semantic Versioning.
   failures in the broader repository gate.
 
 ### Documentation
+
+- Publish each module's family, capabilities, selection, ownership, lifecycle,
+  support, and delivery boundaries and link both entry points to the immutable
+  v1.3.0 ecosystem index and Foundations guidance.
+
+- Align public minimum-Go and CI-platform statements with the module's Go
+  1.26.6 directive and authoritative Ubuntu workflow.
 
 - Replace archived monorepo and hardening terminology with package-owned
   documentation and reproducible verification guidance.
