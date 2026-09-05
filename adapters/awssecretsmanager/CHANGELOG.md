@@ -14,6 +14,10 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ### Documentation
 
+- Add canonical installation and import guidance, the exact Go 1.26.6 support
+  floor, and explicit construction, lifecycle, concurrency, resource,
+  security, compatibility, and ecosystem navigation contracts.
+
 - Publish the adapter's selection, ownership, lifecycle, support, and delivery
   boundaries and link its entry point to the immutable v1.4.0 ecosystem index.
 

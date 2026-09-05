@@ -411,7 +411,7 @@
           "build_tags": []
         }
       ],
-      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `golib/config` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
+      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `github.com/faustbrian/go-config` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
       "lifecycle": "stable",
       "kind": "adapter",
       "releasable": true,
