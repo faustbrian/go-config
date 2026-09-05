@@ -62,8 +62,10 @@ independently released root `github.com/faustbrian/go-config` module.
 ## Construction and lifecycle
 
 `New(Client, Options)` validates configuration without network I/O and returns
-a stateless `config.Source`. The caller owns the AWS SDK configuration, client,
-credentials, retry policy, and client transport for their full lifetimes.
+a stateless `config.Source`. `Name` and `SecretID` must be non-empty, and
+`SecretID` is limited to 2,048 bytes before the client can be invoked. The
+caller owns the AWS SDK configuration, client, credentials, retry policy, and
+client transport for their full lifetimes.
 `Load(ctx)` observes caller cancellation and invokes the supplied
 `Client.GetSecretValue` at most once. It invokes the client zero times when
 cancellation is already observable, starts no goroutines, and retains no

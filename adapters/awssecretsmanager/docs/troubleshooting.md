@@ -3,9 +3,12 @@
 ## Construction fails
 
 Use `errors.Is` to distinguish `ErrClientRequired` from `ErrInvalidOptions`.
-For invalid options, verify that `Name` and `SecretID` are non-empty and that
-`MaximumBytes` is between 0 and 65,536. Constructing the source performs no
-provider I/O, so correct the configuration before retrying startup.
+For invalid options, verify that `Name` and `SecretID` are non-empty, that
+`SecretID` is no longer than 2,048 bytes, and that `MaximumBytes` is between 0
+and 65,536. If an ARN or generated identifier exceeds the bound, correct the
+configured identifier rather than truncating it, because truncation can select
+a different secret. Constructing the source performs no provider I/O, so
+correct the configuration before retrying startup.
 
 ## A load reports that the source was not found
 

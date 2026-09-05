@@ -19,8 +19,9 @@ All notable changes follow Keep a Changelog and semantic versioning.
   security, compatibility, and ecosystem navigation contracts.
 
 - Clarify the cancellation-aware client invocation bound, document portable-Go
-  support and actionable troubleshooting, and remove obsolete unreleased
-  status text after the v1.0.0 adapter release.
+  support, the 2,048-byte secret-identifier bound, and actionable
+  troubleshooting; remove obsolete unreleased status text and correct the
+  v1.0.0 release date.
 
 - Publish the adapter's selection, ownership, lifecycle, support, and delivery
   boundaries and link its entry point to the immutable v1.4.0 ecosystem index.
@@ -28,7 +29,7 @@ All notable changes follow Keep a Changelog and semantic versioning.
 - Add a module documentation index for direct navigation.
 - Use human-oriented section names and package-owned documentation links.
 
-## 1.0.0 - 2026-08-25
+## 1.0.0 - 2026-08-26
 
 ### Documentation
 
