@@ -14,13 +14,22 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ### Documentation
 
+- Add canonical installation and import guidance, the exact Go 1.26.6 support
+  floor, and explicit construction, lifecycle, concurrency, resource,
+  security, compatibility, and ecosystem navigation contracts.
+
+- Clarify the cancellation-aware client invocation bound, document portable-Go
+  support, the 2,048-byte secret-identifier bound, and actionable
+  troubleshooting; remove obsolete unreleased status text and correct the
+  v1.0.0 release date.
+
 - Publish the adapter's selection, ownership, lifecycle, support, and delivery
   boundaries and link its entry point to the immutable v1.4.0 ecosystem index.
 
 - Add a module documentation index for direct navigation.
 - Use human-oriented section names and package-owned documentation links.
 
-## 1.0.0 - 2026-08-25
+## 1.0.0 - 2026-08-26
 
 ### Documentation
 
@@ -38,5 +47,3 @@ All notable changes follow Keep a Changelog and semantic versioning.
 - A bounded, secret-safe AWS Secrets Manager JSON configuration source with
   explicit version selection, optional-source semantics, and caller-owned AWS
   default credential-chain composition.
-
-No release has been published.
