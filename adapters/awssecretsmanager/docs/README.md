@@ -19,6 +19,8 @@
 
 - [Security](security.md)
 
+- [Troubleshooting](troubleshooting.md)
+
 ## Security and compatibility
 
 - [Parent security policy](../../../SECURITY.md)

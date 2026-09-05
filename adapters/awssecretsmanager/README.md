@@ -64,9 +64,10 @@ independently released root `github.com/faustbrian/go-config` module.
 `New(Client, Options)` validates configuration without network I/O and returns
 a stateless `config.Source`. The caller owns the AWS SDK configuration, client,
 credentials, retry policy, and client transport for their full lifetimes.
-`Load(ctx)` observes caller cancellation, performs one `GetSecretValue` call,
-and returns after parsing one JSON object; it starts no goroutines and retains
-no response or payload buffer.
+`Load(ctx)` observes caller cancellation and invokes the supplied
+`Client.GetSecretValue` at most once. It invokes the client zero times when
+cancellation is already observable, starts no goroutines, and retains no
+response or payload buffer.
 
 The source is safe for concurrent use when the caller-provided `Client` is safe
 for concurrent use. The adapter has no `Close` or `Shutdown` method because it
@@ -75,7 +76,8 @@ or other resource owned by its client.
 
 ## Guarantees
 
-- exactly one explicit secret identifier is read per load;
+- at most one `Client.GetSecretValue` invocation is made per load, and zero
+  when cancellation is already observable;
 - payload work is bounded by the AWS 65,536-byte service limit;
 - both AWS string and binary JSON values are supported;
 - missing secrets map to `config.ErrNotFound` for optional-source semantics;
@@ -85,10 +87,12 @@ or other resource owned by its client.
 
 ## Tradeoffs
 
-Each load performs one provider read. Callers should load once during process
-startup unless they intentionally own refresh, version transition, and failure
-semantics. The adapter accepts JSON objects only and does not flatten dotenv
-text or mutate `os.Environ`.
+A load that is not already cancelled delegates to the caller's client at most
+once. The client owns whether that invocation performs network operations or
+retries. Callers should load once during process startup unless they
+intentionally own refresh, version transition, and failure semantics. The
+adapter accepts JSON objects only and does not flatten dotenv text or mutate
+`os.Environ`.
 
 Use the root module's environment or filesystem sources when an operator, CSI
 driver, or sidecar already materializes the secret. Do not use this adapter as
@@ -113,9 +117,10 @@ observability and shutdown lifecycle of their AWS client. See the full
 ## Compatibility and operations
 
 The supported backend is AWS Secrets Manager through AWS SDK for Go v2. String
-and binary secret values must contain one JSON object. Each load performs one
-provider request, so latency, availability, retries, and cost follow the
-caller-configured AWS client. See [compatibility](docs/compatibility.md),
+and binary secret values must contain one JSON object. The adapter makes at
+most one client invocation per load and none when cancellation is already
+observable; latency, availability, network behavior, retries, and cost follow
+the caller-configured client. See [compatibility](docs/compatibility.md),
 [architecture and performance](docs/architecture.md), and
 [adoption guidance](docs/adoption.md) before adding refresh behavior.
 
@@ -131,7 +136,7 @@ and its [Foundations family](https://github.com/faustbrian/go-library-tools/blob
 - [Compatibility](docs/compatibility.md)
 - [Security](docs/security.md)
 - [FAQ](docs/faq.md)
-- [Troubleshooting](docs/faq.md)
+- [Troubleshooting](docs/troubleshooting.md)
 - [Changelog](CHANGELOG.md)
 - [Support](../../SUPPORT.md)
 - [Contributing](../../CONTRIBUTING.md)

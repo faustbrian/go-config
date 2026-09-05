@@ -7,8 +7,9 @@ therefore controls workload identity and the default credential chain.
 
 ## Does it reload rotated secrets?
 
-No. Every `Load` is an explicit provider read, and the caller owns whether and
-when another load is safe.
+No. A `Load` that is not already cancelled invokes the supplied client at most
+once, and the caller owns whether and when another load is safe. The client,
+not the adapter, owns any network operations or retries behind that invocation.
 
 ## Can environment variables override the secret?
 

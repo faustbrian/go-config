@@ -18,6 +18,10 @@ All notable changes follow Keep a Changelog and semantic versioning.
   floor, and explicit construction, lifecycle, concurrency, resource,
   security, compatibility, and ecosystem navigation contracts.
 
+- Clarify the cancellation-aware client invocation bound, document portable-Go
+  support and actionable troubleshooting, and remove obsolete unreleased
+  status text after the v1.0.0 adapter release.
+
 - Publish the adapter's selection, ownership, lifecycle, support, and delivery
   boundaries and link its entry point to the immutable v1.4.0 ecosystem index.
 
@@ -42,5 +46,3 @@ All notable changes follow Keep a Changelog and semantic versioning.
 - A bounded, secret-safe AWS Secrets Manager JSON configuration source with
   explicit version selection, optional-source semantics, and caller-owned AWS
   default credential-chain composition.
-
-No release has been published.
