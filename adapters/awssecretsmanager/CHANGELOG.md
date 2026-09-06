@@ -14,6 +14,10 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ### Documentation
 
+- Link the adapter's stable-v1 support, exact Go compatibility, canonical tag
+  form, and live repository support and private-reporting routes from the
+  shared package documentation.
+
 - Add canonical installation and import guidance, the exact Go 1.26.6 support
   floor, and explicit construction, lifecycle, concurrency, resource,
   security, compatibility, and ecosystem navigation contracts.
