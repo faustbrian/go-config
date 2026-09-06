@@ -15,13 +15,19 @@ structs. It provides deterministic precedence, strict decoding, immutable
 snapshots, safe provenance, validation orchestration, and redacted secrets
 without introducing global state or implicit filesystem discovery.
 
-Requires Go 1.26.6 or newer.
+The root library and its separately released AWS Secrets Manager adapter are
+stable v1 modules. Their minimum supported Go version is 1.26.6; repository
+verification currently tests exactly Go 1.26.6.
 
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config
+go get github.com/faustbrian/go-config@v1
+go get github.com/faustbrian/go-config/adapters/awssecretsmanager@v1
 ```
+
+Install the second module only when an application reads configuration directly
+from AWS Secrets Manager.
 
 ## Five-minute quickstart
 
@@ -124,6 +130,12 @@ Strict JSON, YAML, TOML, dotenv, environment, map, byte, reader, `fs.FS`, and
 explicit-file sources compose with bounded discovery, merging, typed values,
 validation, immutable snapshots, provenance, and an optional service adapter.
 
+The independently versioned
+[`github.com/faustbrian/go-config/adapters/awssecretsmanager`](adapters/awssecretsmanager/README.md)
+module adapts one bounded AWS Secrets Manager JSON document into the same
+`config.Source` contract. Use it only when an operator, CSI driver, or sidecar
+does not already materialize the secret as an environment variable or file.
+
 ## Documentation
 
 For shared package selection, ownership, construction, and lifecycle guidance,
@@ -142,6 +154,15 @@ parents by default, execute configuration code, hot-reload snapshots, manage
 secrets, or define vendor credential structs. Kubernetes applications should
 normally receive Infisical values through the Operator, CSI, or Agent and load
 the resulting environment variables or files normally.
+
+The root module starts no background goroutines, watchers, refresh loops, or
+retry loops and exposes no `Close` or `Shutdown` method. Callers own supplied
+sources and collaborators, decide when loads occur, and finish in-flight loads
+before releasing those collaborators. Built-in sources close the transient I/O
+they open during a load; returned snapshots remain immutable values rather than
+live resource handles. The AWS adapter follows the same no-shutdown boundary
+and leaves its client, transport, credentials, retries, and refresh scheduling
+with the caller.
 
 ## Development
 

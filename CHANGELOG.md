@@ -25,6 +25,10 @@ and releases use Semantic Versioning.
 
 ### Documentation
 
+- Document stable root and AWS adapter entry points, canonical v1 installation,
+  exact Go support, caller-owned lifecycle boundaries, unambiguous tag forms,
+  complete navigation, and live support and security routes.
+
 - Publish each module's family, capabilities, selection, ownership, lifecycle,
   support, and delivery boundaries and link both entry points to the immutable
   v1.4.0 ecosystem index and Foundations guidance.

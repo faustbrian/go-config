@@ -2,15 +2,19 @@
 
 ## Supported versions
 
-Security fixes are applied to the latest released minor line. Before the first
-stable release, only the latest release is supported.
+The root module and the separately releasable AWS Secrets Manager adapter each
+have a published v1 line. The latest v1 patch release for each module is
+supported unless announced otherwise. Fixes land on the default branch before
+the affected module is released independently.
 
 ## Reporting a vulnerability
 
-Use GitHub private vulnerability reporting for this repository. Do not open a
-public issue containing secrets, credentials, exploit details, or vulnerable
-deployment information. Include the affected version, configuration source,
-minimal reproduction, impact, and any known mitigations.
+Use this repository's
+[private security advisory](https://github.com/faustbrian/go-config/security/advisories/new)
+form. Do not open a public issue containing secrets, credentials, exploit
+details, or vulnerable deployment information. Include the affected module and
+version, configuration source, minimal reproduction, impact, and any known
+mitigations.
 
 ## Scope
 

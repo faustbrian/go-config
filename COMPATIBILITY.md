@@ -1,7 +1,16 @@
 # Compatibility Policy
 
 Each releasable directory is an independent Go module and follows semantic
-versioning. Tags use `<module-directory>/v<version>`.
+versioning. Root-module releases use `v<version>` tags. The separately
+releasable AWS Secrets Manager adapter uses
+`adapters/awssecretsmanager/v<version>` tags. A directory prefix is never added
+to the root module's tag.
+
+The root and AWS Secrets Manager modules are stable v1 libraries. Their minimum
+supported Go version is 1.26.6, and repository verification currently tests
+exactly Go 1.26.6. The adapter supports AWS Secrets Manager through the AWS SDK
+for Go v2 and delegates region, endpoint, credentials, transport, and retry
+compatibility to the caller-provided client.
 
 Before `v1`, minor releases MAY contain reviewed breaking changes, but every
 break MUST be documented with migration guidance. Patch releases MUST remain
