@@ -28,6 +28,18 @@
     },
     {
       "module_directory": ".",
+      "directory": "adapters/service",
+      "name": "configservice",
+      "import_path": "github.com/faustbrian/go-config/adapters/service",
+      "kind": "public",
+      "production": true,
+      "executable": true,
+      "coverage_required": true,
+      "build_required": true,
+      "build_tags": []
+    },
+    {
+      "module_directory": ".",
       "directory": "configservice",
       "name": "configservice",
       "import_path": "github.com/faustbrian/go-config/configservice",
