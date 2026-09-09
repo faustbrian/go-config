@@ -90,10 +90,11 @@ in [examples/quickstart](examples/quickstart/main.go).
 
 ## Service command loading
 
-`configservice.New` adapts a typed plan to `service.CommandSpec.Load`. It loads
-only after command selection and before component construction. Local dotenv
-files require the explicit `Local` option; process environment and caller
-overrides retain the standard precedence.
+The target-oriented [`adapters/service`](adapters/service) package adapts a
+typed plan to `service.CommandSpec.Load`. Import it conventionally as
+`configservice`. It loads only after command selection and before component
+construction. Local dotenv files require the explicit `Local` option; process
+environment and caller overrides retain the standard precedence.
 
 ```go
 loader, err := configservice.New(configservice.Options[Settings]{
@@ -123,6 +124,9 @@ command := service.CommandFor(service.CommandSpec[Settings]{
 The adapter owns no resource, performs no retries, and does not reload
 configuration. The caller owns every source and decides whether repeated loads
 are safe.
+
+The original `github.com/faustbrian/go-config/configservice` path remains an
+API-compatible facade, so existing consumers do not need to migrate in lockstep.
 
 ## What is included
 

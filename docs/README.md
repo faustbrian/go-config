@@ -8,6 +8,7 @@
 - [Testing helpers (`configtest`)](https://pkg.go.dev/github.com/faustbrian/go-config/configtest)
 - [Testing-helper example](../examples/testing/main.go)
 - [API](api.md)
+- [Service adapter API](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/service)
 - [Sources and formats](sources.md)
 - [Examples](examples.md)
 

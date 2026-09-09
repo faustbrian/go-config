@@ -1,5 +1,18 @@
 # Migration guide
 
+## To the target-oriented service adapter
+
+New integrations should import
+`github.com/faustbrian/go-config/adapters/service`, conventionally aliased as
+`configservice`. Its generic `Options[T]` and `Loader[T]` shapes,
+`ErrInvalidOptions`, `OptionsError`, `Dotenv`, and `New[T]` behavior match the
+historical path. Types remain named by their import paths, so migrate an import
+as one source change rather than mixing both packages in one assignment.
+
+Existing consumers may keep importing
+`github.com/faustbrian/go-config/configservice`. It is a compatibility facade,
+so adopting this release does not require a coordinated source migration.
+
 ## From direct `os.Getenv`
 
 Define one root struct at the application composition root. Add `config` tags

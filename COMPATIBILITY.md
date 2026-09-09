@@ -22,6 +22,12 @@ protocol behavior, persistence schemas, environment variables, command output,
 resource ownership, ordering, retry/idempotency semantics, and documented
 defaults. A compile-compatible change can still be behaviorally breaking.
 
+The target-oriented `adapters/service` package owns service command loading.
+The historical `configservice` import path remains an API-compatible facade
+with its existing generic option and loader definitions, shared sentinel
+identity, equivalent structured errors, source precedence, cancellation, and
+caller-owned lifecycle semantics.
+
 Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs
 follow [`DEPRECATION.md`](DEPRECATION.md).

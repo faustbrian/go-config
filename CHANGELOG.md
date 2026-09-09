@@ -5,12 +5,16 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Added
+
+- Add the target-oriented `adapters/service` import path for typed service
+  command loading while retaining `configservice` as an API-compatible facade.
+
 ### Changed
 
-- Adopt the checksum-verified `go-library-tools` v1.4.0 CLI, schema-v2
+- Adopt the checksum-verified `go-library-tools` v1.6.2 CLI, schema-v2
   cohesion metadata for both modules, repository-local cohesion gate, and
-  immutable W14-enforcement workflow without changing public APIs or runtime
-  behavior.
+  proportional shared workflow without changing public APIs or runtime behavior.
 
 - Reconcile Golib v1.0.0 dependency checksums with their immutable public
   module identities so clean consumers verify released dependencies

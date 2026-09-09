@@ -1,5 +1,5 @@
-// Package configservice is the compatibility import path for the target-oriented
-// service adapter at github.com/faustbrian/go-config/adapters/service.
+// Package configservice adapts typed configuration plans to service command
+// loaders without owning long-lived resources.
 package configservice
 
 import (
@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"strings"
 
 	"github.com/faustbrian/go-config"
-	direct "github.com/faustbrian/go-config/adapters/service"
 	"github.com/faustbrian/go-config/dotenv"
 	"github.com/faustbrian/go-config/environment"
 	"github.com/faustbrian/go-config/validation"
@@ -17,7 +17,7 @@ import (
 )
 
 // ErrInvalidOptions identifies invalid loader construction.
-var ErrInvalidOptions = direct.ErrInvalidOptions
+var ErrInvalidOptions = errors.New("invalid config service options")
 
 // OptionsError identifies one invalid loader option without formatting its
 // underlying cause.
@@ -77,25 +77,47 @@ type Loader[T any] func(context.Context, service.Invocation) (T, error)
 // New constructs a typed loader. Configuration is resolved only when the
 // selected service command invokes the loader, before component construction.
 func New[T any](options Options[T]) (Loader[T], error) {
-	var directDotenv *direct.Dotenv
+	sources := options.Sources
 	if options.Dotenv != nil {
-		directDotenv = &direct.Dotenv{
-			FS: options.Dotenv.FS, Path: options.Dotenv.Path,
-			Options: options.Dotenv.Options,
+		if !options.Local {
+			return nil, invalid("Dotenv", "requires explicit local mode", nil)
 		}
+		if options.Dotenv.FS == nil || strings.TrimSpace(options.Dotenv.Path) == "" {
+			return nil, invalid("Dotenv", "requires a filesystem and path", nil)
+		}
+		source, err := dotenv.FromFSFor[T](
+			options.Dotenv.FS,
+			options.Dotenv.Path,
+			options.Dotenv.Options,
+		)
+		if err != nil {
+			return nil, invalid("Dotenv", "source construction failed", err)
+		}
+		sources.Dotenv = append(sources.Dotenv, source)
 	}
-	loader, err := direct.New(direct.Options[T]{
-		Sources: options.Sources, Local: options.Local, Dotenv: directDotenv,
-		Environment: options.Environment, Validators: options.Validators,
-	})
+	if options.Environment != nil {
+		source, err := environment.ProcessFor[T](*options.Environment)
+		if err != nil {
+			return nil, invalid("Environment", "source construction failed", err)
+		}
+		sources.Environment = append(sources.Environment, source)
+	}
+	plan, err := config.NewDefaultPlan(sources)
 	if err != nil {
-		optionsError := &direct.OptionsError{Cause: err}
-		// Preserve a safe fallback if the direct adapter later adds an error type.
-		_ = errors.As(err, &optionsError)
-		return nil, &OptionsError{
-			Field: optionsError.Field, Reason: optionsError.Reason,
-			Cause: optionsError.Cause,
-		}
+		return nil, invalid("Sources", "plan construction failed", err)
 	}
-	return Loader[T](loader), nil
+	validators := append([]validation.Validator[T](nil), options.Validators...)
+
+	return func(ctx context.Context, _ service.Invocation) (T, error) {
+		snapshot, err := config.LoadWithValidators[T](ctx, plan, validators...)
+		if err != nil {
+			var zero T
+			return zero, err
+		}
+		return snapshot.Value(), nil
+	}, nil
+}
+
+func invalid(field, reason string, cause error) error {
+	return &OptionsError{Field: field, Reason: reason, Cause: cause}
 }
