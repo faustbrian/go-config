@@ -5,6 +5,8 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-09
+
 ### Added
 
 - Add the target-oriented `adapters/service` import path for typed service
@@ -148,5 +150,6 @@ and releases use Semantic Versioning.
 - Explicit conformance assertions that decoding, defaults, environment
   loading, metadata, and snapshot cloning do not mutate private struct state.
 
-[Unreleased]: https://github.com/faustbrian/go-config/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/faustbrian/go-config/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/faustbrian/go-config/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/faustbrian/go-config/releases/tag/v1.0.0
