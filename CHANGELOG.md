@@ -12,7 +12,7 @@ and releases use Semantic Versioning.
 
 ### Changed
 
-- Adopt the checksum-verified `go-library-tools` v1.6.1 CLI, schema-v2
+- Adopt the checksum-verified `go-library-tools` v1.6.2 CLI, schema-v2
   cohesion metadata for both modules, repository-local cohesion gate, and
   proportional shared workflow without changing public APIs or runtime behavior.
 
