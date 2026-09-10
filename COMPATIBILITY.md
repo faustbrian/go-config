@@ -7,8 +7,8 @@ releasable AWS Secrets Manager adapter uses
 to the root module's tag.
 
 The root and AWS Secrets Manager modules are stable v1 libraries. Their minimum
-supported Go version is 1.26.6, and repository verification currently tests
-exactly Go 1.26.6. The adapter supports AWS Secrets Manager through the AWS SDK
+supported Go version is 1.27.0, and repository verification currently tests
+exactly Go 1.27.0. The adapter supports AWS Secrets Manager through the AWS SDK
 for Go v2 and delegates region, endpoint, credentials, transport, and retry
 compatibility to the caller-provided client.
 

@@ -6,7 +6,7 @@ Secrets Manager into a sensitive
 source. It leaves AWS credential resolution, retries, IAM, secret creation,
 rotation, and refresh scheduling to the caller.
 
-It requires Go 1.26.6 or newer. The adapter is released independently from the
+It requires Go 1.27.0 or newer. The adapter is released independently from the
 root module under `adapters/awssecretsmanager/v*` tags.
 
 ## Install
