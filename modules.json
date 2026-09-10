@@ -6,7 +6,7 @@
     {
       "directory": ".",
       "module_path": "github.com/faustbrian/go-config",
-      "go_version": "1.26.6",
+      "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": ".",
@@ -317,7 +317,7 @@
         ],
         "companions": [],
         "supported_go": {
-          "minimum": "1.26.6",
+          "minimum": "1.27.0",
           "tested": [
             "1.27.0"
           ]
@@ -408,7 +408,7 @@
     {
       "directory": "adapters/awssecretsmanager",
       "module_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager",
-      "go_version": "1.26.6",
+      "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": "adapters/awssecretsmanager",
@@ -472,7 +472,7 @@
         "adapters": [],
         "companions": [],
         "supported_go": {
-          "minimum": "1.26.6",
+          "minimum": "1.27.0",
           "tested": [
             "1.27.0"
           ]
