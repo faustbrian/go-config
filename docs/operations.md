@@ -16,7 +16,7 @@ readiness.
 ## Compatibility
 
 The minimum toolchain is Go 1.26.6. The authoritative CI workflow tests Go
-1.26.6 on Ubuntu 24.04. `CaseNative` intentionally differs on Windows;
+1.27.0 on Ubuntu 24.04. `CaseNative` intentionally differs on Windows;
 choose an explicit case mode for portable environment contracts. Symlink and
 POSIX permission behavior is tested where the operating system supports it.
 Windows discovery rejects reparse points by default, including junctions and

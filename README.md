@@ -17,7 +17,7 @@ without introducing global state or implicit filesystem discovery.
 
 The root library and its separately released AWS Secrets Manager adapter are
 stable v1 modules. Their minimum supported Go version is 1.26.6; repository
-verification currently tests exactly Go 1.26.6.
+verification currently tests exactly Go 1.27.0.
 
 ## Install
 
