@@ -5,6 +5,12 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Security
+
+- Confine `filesystem.FromDiscovered` loads to the approved directory identity
+  and reject discovery-to-open symlink or directory replacement races instead
+  of reopening a swapped target outside the trusted root.
+
 ### Changed
 
 - Update Service and Correlation to v1.1.0 while retaining the service

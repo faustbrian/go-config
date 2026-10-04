@@ -43,12 +43,20 @@ results, err := discover.Search(ctx, discover.Options{
 
 Pass a result to `filesystem.FromDiscovered`. The file is opened through its
 canonical resolved target while provenance records the lexical discovered path.
+The source binds the approved directory identity when it is constructed. Every
+load then uses a root-confined open and verifies that the regular file identity
+is stable across that open. Directory replacement, final-component symlinks,
+and discovery-to-open target swaps fail closed. A concurrent regular-file
+replacement can return `config.ErrSourceChanged`; a later load can accept the
+new stable regular file. `filesystem.FromPath` retains its path-following reload
+contract for explicitly trusted paths such as Kubernetes projected volumes.
 Opening and parsing remain separate from discovery, so malformed and unreadable
 files are never mistaken for absence.
 
 Errors expose only fixed policy categories. Rejected paths and arbitrary
 platform error text are not formatted, while `errors.Is` still identifies the
 policy sentinel or platform cause. Successful results intentionally contain
-paths as provenance. Discovery does not protect against an attacker who can
-replace files inside an otherwise trusted root; use deployment ownership and
-read-only mounts.
+paths as provenance. Confinement prevents a replacement from escaping the
+approved directory; it does not authenticate a stable regular file supplied by
+an attacker who can write inside that directory. Use deployment ownership,
+read-only mounts, and artifact verification for content integrity.

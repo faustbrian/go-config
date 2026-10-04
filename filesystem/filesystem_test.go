@@ -148,6 +148,136 @@ func TestFromDiscoveredPreservesPathProvenance(t *testing.T) {
 	}
 }
 
+func TestFromDiscoveredRejectsTargetSwapOutsideApprovedDirectory(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		t.Skip("filesystem confinement regression runs in hosted CI")
+	}
+	t.Parallel()
+
+	directory := t.TempDir()
+	outsideDirectory := t.TempDir()
+	path := filepath.Join(directory, "config.json")
+	outsidePath := filepath.Join(outsideDirectory, "outside.json")
+	mustWrite(t, path, `{"name":"approved"}`)
+	mustWrite(t, outsidePath, `{"name":"outside"}`)
+
+	results, err := discover.Search(context.Background(), discover.Options{
+		Root:         directory,
+		Directories:  []string{directory},
+		SearchPlaces: []string{"config.json"},
+		Symlinks:     discover.RejectSymlinks,
+	})
+	if err != nil {
+		t.Fatalf("Search() error = %v", err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("Search() results = %d, want 1", len(results))
+	}
+	source, err := filesystem.FromDiscovered(results[0], filesystem.Options{Name: "discovered"})
+	if err != nil {
+		t.Fatalf("FromDiscovered() error = %v", err)
+	}
+	if err := os.Remove(path); err != nil {
+		t.Fatalf("Remove() error = %v", err)
+	}
+	if err := os.Symlink(outsidePath, path); err != nil {
+		t.Skipf("Symlink() unavailable: %v", err)
+	}
+
+	document, err := source.Load(context.Background())
+	if !errors.Is(err, discover.ErrSymlink) {
+		t.Fatalf("Source.Load() = %#v, %v; want ErrSymlink", document, err)
+	}
+}
+
+func TestFromDiscoveredReloadsAtomicallyReplacedRegularFile(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		t.Skip("filesystem confinement control runs in hosted CI")
+	}
+	t.Parallel()
+
+	directory := t.TempDir()
+	path := filepath.Join(directory, "config.json")
+	mustWrite(t, path, `{"name":"first"}`)
+	source, err := filesystem.FromDiscovered(discover.Result{
+		Path: path, ResolvedPath: path, Directory: directory, SearchPlace: "config.json",
+	}, filesystem.Options{Name: "discovered"})
+	if err != nil {
+		t.Fatalf("FromDiscovered() error = %v", err)
+	}
+
+	replacement := filepath.Join(directory, "replacement.json")
+	mustWrite(t, replacement, `{"name":"second"}`)
+	if err := os.Rename(replacement, path); err != nil {
+		t.Fatalf("Rename() error = %v", err)
+	}
+	document, err := source.Load(context.Background())
+	if err != nil {
+		t.Fatalf("Source.Load() error = %v", err)
+	}
+	if document.Tree["name"] != "second" {
+		t.Fatalf("Source.Load() name = %#v, want second", document.Tree["name"])
+	}
+}
+
+func TestFromDiscoveredRejectsApprovedDirectoryReplacement(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		t.Skip("filesystem confinement regression runs in hosted CI")
+	}
+	t.Parallel()
+
+	parent := t.TempDir()
+	directory := filepath.Join(parent, "approved")
+	if err := os.Mkdir(directory, 0o700); err != nil {
+		t.Fatalf("Mkdir() error = %v", err)
+	}
+	path := filepath.Join(directory, "config.json")
+	mustWrite(t, path, `{"name":"approved"}`)
+	source, err := filesystem.FromDiscovered(discover.Result{
+		Path: path, ResolvedPath: path, Directory: directory, SearchPlace: "config.json",
+	}, filesystem.Options{Name: "discovered"})
+	if err != nil {
+		t.Fatalf("FromDiscovered() error = %v", err)
+	}
+
+	if err := os.Rename(directory, filepath.Join(parent, "moved")); err != nil {
+		t.Fatalf("Rename() error = %v", err)
+	}
+	if err := os.Mkdir(directory, 0o700); err != nil {
+		t.Fatalf("Mkdir(replacement) error = %v", err)
+	}
+	mustWrite(t, path, `{"name":"replacement"}`)
+	if document, err := source.Load(context.Background()); !errors.Is(err, config.ErrSourceChanged) {
+		t.Fatalf("Source.Load() = %#v, %v; want ErrSourceChanged", document, err)
+	}
+}
+
+func TestFromDiscoveredRejectsRemovedApprovedDirectory(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		t.Skip("filesystem confinement regression runs in hosted CI")
+	}
+	t.Parallel()
+
+	directory := t.TempDir()
+	path := filepath.Join(directory, "config.json")
+	mustWrite(t, path, `{"name":"approved"}`)
+	source, err := filesystem.FromDiscovered(discover.Result{
+		Path: path, ResolvedPath: path, Directory: directory, SearchPlace: "config.json",
+	}, filesystem.Options{Name: "discovered"})
+	if err != nil {
+		t.Fatalf("FromDiscovered() error = %v", err)
+	}
+	if err := os.Remove(path); err != nil {
+		t.Fatalf("Remove(file) error = %v", err)
+	}
+	if err := os.Remove(directory); err != nil {
+		t.Fatalf("Remove(directory) error = %v", err)
+	}
+	if document, err := source.Load(context.Background()); err == nil {
+		t.Fatalf("Source.Load() = %#v, want removed-directory error", document)
+	}
+}
+
 func TestOptionalFileSuppressesOnlyAbsence(t *testing.T) {
 	t.Parallel()
 

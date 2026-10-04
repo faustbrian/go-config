@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	config "github.com/faustbrian/go-config"
 	"github.com/faustbrian/go-config/discover"
@@ -142,6 +143,13 @@ func TestFromDiscoveredValidatesPathsAndFallsBackToLexicalPath(t *testing.T) {
 	if err != nil || document.Tree["value"] != "fallback" {
 		t.Fatalf("Load() = %#v, %v", document, err)
 	}
+
+	missing := filepath.Join(t.TempDir(), "missing", "config.json")
+	if _, err := FromDiscovered(discover.Result{
+		Path: missing, ResolvedPath: missing,
+	}, Options{Name: "file"}); err == nil {
+		t.Fatal("FromDiscovered(missing directory) error = nil")
+	}
 }
 
 func TestPathConstructorsPropagateAbsolutePathFailure(t *testing.T) {
@@ -156,6 +164,130 @@ func TestPathConstructorsPropagateAbsolutePathFailure(t *testing.T) {
 		Path: "config.json", ResolvedPath: "config.json",
 	}, Options{Name: "file"}, absolutePath); !errors.Is(err, failure) {
 		t.Fatal("FromDiscovered() error = nil")
+	}
+}
+
+func TestNewDiscoveredFSRejectsUnavailableOrNonDirectoryRoot(t *testing.T) {
+	t.Parallel()
+
+	failure := errors.New("stat failure")
+	for name, operations := range map[string]discoveredFSOperations{
+		"stat failure": {
+			stat: func(string) (fs.FileInfo, error) { return nil, failure },
+		},
+		"not directory": {
+			stat: func(string) (fs.FileInfo, error) {
+				return discoveredFileInfo{id: "file", mode: 0o600}, nil
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if _, err := newDiscoveredFSWithOperations("root", operations); err == nil {
+				t.Fatal("newDiscoveredFSWithOperations() error = nil")
+			}
+		})
+	}
+}
+
+func TestDiscoveredFSRejectsOpenBoundaryFailures(t *testing.T) {
+	t.Parallel()
+
+	failure := errors.New("filesystem failure")
+	tests := map[string]struct {
+		configure func(*stubDiscoveredRoot)
+		openError error
+		want      error
+	}{
+		"open root": {openError: failure, want: failure},
+		"stat root": {
+			configure: func(root *stubDiscoveredRoot) { root.statError = failure }, want: failure,
+		},
+		"replaced root": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.directory = discoveredFileInfo{id: "replacement", mode: fs.ModeDir}
+			},
+			want: config.ErrSourceChanged,
+		},
+		"lstat before": {
+			configure: func(root *stubDiscoveredRoot) { root.beforeError = failure }, want: failure,
+		},
+		"symlink before": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.before = discoveredFileInfo{id: "file", mode: fs.ModeSymlink}
+			},
+			want: discover.ErrSymlink,
+		},
+		"non-regular before": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.before = discoveredFileInfo{id: "file", mode: fs.ModeDir}
+			},
+			want: config.ErrSourceChanged,
+		},
+		"open file": {
+			configure: func(root *stubDiscoveredRoot) { root.openError = failure }, want: failure,
+		},
+		"stat opened file": {
+			configure: func(root *stubDiscoveredRoot) { root.file.statError = failure }, want: failure,
+		},
+		"lstat after": {
+			configure: func(root *stubDiscoveredRoot) { root.afterError = failure }, want: failure,
+		},
+		"symlink after": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.after = discoveredFileInfo{id: "file", mode: fs.ModeSymlink}
+			},
+			want: config.ErrSourceChanged,
+		},
+		"opened identity changed": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.file.info = discoveredFileInfo{id: "other", mode: 0o600}
+			},
+			want: config.ErrSourceChanged,
+		},
+		"path identity changed": {
+			configure: func(root *stubDiscoveredRoot) {
+				root.after = discoveredFileInfo{id: "other", mode: 0o600}
+			},
+			want: config.ErrSourceChanged,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			root := newStubDiscoveredRoot()
+			if test.configure != nil {
+				test.configure(root)
+			}
+			operations := discoveredFSOperations{
+				stat: func(string) (fs.FileInfo, error) {
+					return discoveredFileInfo{id: "root", mode: fs.ModeDir}, nil
+				},
+				openRoot: func(string) (discoveredRoot, error) {
+					if test.openError != nil {
+						return nil, test.openError
+					}
+					return root, nil
+				},
+				sameFile: func(left, right fs.FileInfo) bool {
+					return left.Sys() == right.Sys()
+				},
+			}
+			filesystem, err := newDiscoveredFSWithOperations("root", operations)
+			if err != nil {
+				t.Fatalf("newDiscoveredFSWithOperations() error = %v", err)
+			}
+			file, err := filesystem.Open("config.json")
+			if file != nil {
+				_ = file.Close()
+			}
+			if !errors.Is(err, test.want) {
+				t.Fatalf("Open() error = %v, want %v", err, test.want)
+			}
+			if test.openError == nil && !root.closed {
+				t.Fatal("Open() did not close root")
+			}
+		})
 	}
 }
 
@@ -236,6 +368,72 @@ func TestReaderSourceHonorsAlreadyCanceledContext(t *testing.T) {
 type emptyFilesystem struct{}
 
 func (emptyFilesystem) Open(string) (fs.File, error) { return nil, fs.ErrNotExist }
+
+type discoveredFileInfo struct {
+	id   string
+	mode fs.FileMode
+}
+
+func (info discoveredFileInfo) Name() string       { return info.id }
+func (info discoveredFileInfo) Size() int64        { return 0 }
+func (info discoveredFileInfo) Mode() fs.FileMode  { return info.mode }
+func (info discoveredFileInfo) ModTime() time.Time { return time.Time{} }
+func (info discoveredFileInfo) IsDir() bool        { return info.mode.IsDir() }
+func (info discoveredFileInfo) Sys() any           { return info.id }
+
+type stubDiscoveredFile struct {
+	info      fs.FileInfo
+	statError error
+	closed    bool
+}
+
+func (file *stubDiscoveredFile) Stat() (fs.FileInfo, error) { return file.info, file.statError }
+func (file *stubDiscoveredFile) Read([]byte) (int, error)   { return 0, io.EOF }
+func (file *stubDiscoveredFile) Close() error {
+	file.closed = true
+	return nil
+}
+
+type stubDiscoveredRoot struct {
+	directory   fs.FileInfo
+	before      fs.FileInfo
+	after       fs.FileInfo
+	file        *stubDiscoveredFile
+	statError   error
+	beforeError error
+	afterError  error
+	openError   error
+	lstatCalls  int
+	closed      bool
+}
+
+func newStubDiscoveredRoot() *stubDiscoveredRoot {
+	file := discoveredFileInfo{id: "file", mode: 0o600}
+	return &stubDiscoveredRoot{
+		directory: discoveredFileInfo{id: "root", mode: fs.ModeDir},
+		before:    file,
+		after:     file,
+		file:      &stubDiscoveredFile{info: file},
+	}
+}
+
+func (root *stubDiscoveredRoot) Open(string) (fs.File, error) {
+	return root.file, root.openError
+}
+func (root *stubDiscoveredRoot) Stat(string) (fs.FileInfo, error) {
+	return root.directory, root.statError
+}
+func (root *stubDiscoveredRoot) Lstat(string) (fs.FileInfo, error) {
+	root.lstatCalls++
+	if root.lstatCalls == 1 {
+		return root.before, root.beforeError
+	}
+	return root.after, root.afterError
+}
+func (root *stubDiscoveredRoot) Close() error {
+	root.closed = true
+	return nil
+}
 
 type staticFilesystemSource struct {
 	info     config.SourceInfo
