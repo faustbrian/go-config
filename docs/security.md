@@ -1,5 +1,12 @@
 # Security and threat model
 
+## Model version and scope
+
+This is threat model `CONFIG-TM-1.1`, reviewed 2026-10-05. It applies to the
+root module's current unreleased v1 line. Reassess it when discovery,
+filesystem loading, source trust, platform support, or secret-handling
+boundaries change.
+
 ## Protected properties
 
 The package protects atomic publication, deterministic precedence, root-bounded
@@ -41,6 +48,22 @@ secret-bearing local files. Kubernetes projected-volume modes and ownership are
 platform settings; verify them in the pod security context. Optional sources
 only suppress `ErrNotFound`, never permission, syntax, decoding, or validation
 errors.
+
+`filesystem.FromDiscovered` binds the approved directory identity at source
+construction. Each load uses `os.Root` confinement and compares the regular
+file identity before, during, and after open. A swapped final symlink is
+rejected, an outside-root symlink cannot be followed on platforms where
+`os.Root` provides its documented confinement, and a concurrent identity
+change returns `ErrSourceChanged`. `filesystem.FromPath` intentionally remains
+path-following for caller-approved hot-reload paths.
+
+## Versioned risk register
+
+| Risk | Status in CONFIG-TM-1.1 | Owner | Rationale | Control or required mitigation | Review condition |
+|---|---|---|---|---|---|
+| CONFIG-FS-001: a discovered target or its approved directory is replaced before load to escape the trusted root | Mitigated on operating systems with descriptor-backed `os.Root` confinement | Library maintainers | The discovered path is attacker-mutable after discovery, so lexical validation alone cannot authorize the later open. | Directory identity binding, root-confined open, final-symlink rejection, and pre/open/post file identity comparison. | Reassess when discovery, filesystem loading, or the minimum Go version changes. |
+| CONFIG-FS-002: an attacker writes a stable regular file inside the approved directory | Accepted caller boundary | Deploying application owner | A generic configuration loader cannot distinguish authorized bytes from malicious bytes at a caller-approved path. | Read-only ownership, deployment policy, and artifact authenticity controls; this library does not authenticate local file contents. | Reassess if the library adds content-authenticity policy or accepts a new source trust model. |
+| CONFIG-FS-003: JavaScript or Plan 9 directory replacement, or OS-level bind-mount/device namespace changes | Accepted platform boundary | Library maintainers | The supported standard-library confinement primitive cannot provide stronger guarantees on these platforms or against namespace administration. | Do not treat attacker-writable roots as confined on JavaScript; avoid hostile directory renames on Plan 9; protect mount and namespace administration on all platforms. | Reassess when `os.Root` platform guarantees change or supported platforms change. |
 
 ## Known limits
 

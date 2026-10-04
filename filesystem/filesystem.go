@@ -128,12 +128,126 @@ func fromDiscovered(
 	if err != nil {
 		return nil, err
 	}
+	absolute = filepath.Clean(absolute)
+	confined, err := newDiscoveredFS(filepath.Dir(absolute))
+	if err != nil {
+		return nil, err
+	}
 	return fromFS(
-		os.DirFS(filepath.Dir(absolute)),
+		confined,
 		filepath.Base(absolute),
 		result.Path,
 		options,
 	)
+}
+
+type discoveredFS struct {
+	directory  string
+	identity   fs.FileInfo
+	operations discoveredFSOperations
+}
+
+func newDiscoveredFS(directory string) (discoveredFS, error) {
+	return newDiscoveredFSWithOperations(directory, discoveredFSOperations{
+		stat: os.Stat,
+		openRoot: func(path string) (discoveredRoot, error) {
+			root, err := os.OpenRoot(path)
+			if err != nil {
+				return nil, err
+			}
+			return osDiscoveredRoot{root: root}, nil
+		},
+		sameFile: os.SameFile,
+	})
+}
+
+type discoveredRoot interface {
+	Open(string) (fs.File, error)
+	Stat(string) (fs.FileInfo, error)
+	Lstat(string) (fs.FileInfo, error)
+	Close() error
+}
+
+type osDiscoveredRoot struct{ root *os.Root }
+
+func (root osDiscoveredRoot) Open(name string) (fs.File, error) { return root.root.Open(name) }
+func (root osDiscoveredRoot) Stat(name string) (fs.FileInfo, error) {
+	return root.root.Stat(name)
+}
+func (root osDiscoveredRoot) Lstat(name string) (fs.FileInfo, error) {
+	return root.root.Lstat(name)
+}
+func (root osDiscoveredRoot) Close() error { return root.root.Close() }
+
+type discoveredFSOperations struct {
+	stat     func(string) (fs.FileInfo, error)
+	openRoot func(string) (discoveredRoot, error)
+	sameFile func(fs.FileInfo, fs.FileInfo) bool
+}
+
+func newDiscoveredFSWithOperations(
+	directory string,
+	operations discoveredFSOperations,
+) (discoveredFS, error) {
+	identity, err := operations.stat(directory)
+	if err != nil {
+		return discoveredFS{}, err
+	}
+	if !identity.IsDir() {
+		return discoveredFS{}, config.ErrSourceChanged
+	}
+	return discoveredFS{
+		directory: directory, identity: identity, operations: operations,
+	}, nil
+}
+
+func (filesystem discoveredFS) Open(name string) (fs.File, error) {
+	root, err := filesystem.operations.openRoot(filesystem.directory)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = root.Close() }()
+
+	currentDirectory, err := root.Stat(".")
+	if err != nil {
+		return nil, err
+	}
+	if !filesystem.operations.sameFile(filesystem.identity, currentDirectory) {
+		return nil, config.ErrSourceChanged
+	}
+
+	before, err := root.Lstat(name)
+	if err != nil {
+		return nil, err
+	}
+	if before.Mode()&fs.ModeSymlink != 0 {
+		return nil, discover.ErrSymlink
+	}
+	if !before.Mode().IsRegular() {
+		return nil, config.ErrSourceChanged
+	}
+
+	file, err := root.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	opened, err := file.Stat()
+	if err != nil {
+		_ = file.Close()
+		return nil, err
+	}
+	after, err := root.Lstat(name)
+	if err != nil {
+		_ = file.Close()
+		return nil, err
+	}
+	if after.Mode()&fs.ModeSymlink != 0 ||
+		!filesystem.operations.sameFile(before, opened) ||
+		!filesystem.operations.sameFile(opened, after) {
+		_ = file.Close()
+		return nil, config.ErrSourceChanged
+	}
+	return file, nil
 }
 
 func fromFS(filesystem fs.FS, path, location string, options Options) (config.Source, error) {
