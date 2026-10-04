@@ -5,6 +5,12 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Update Service and Correlation to v1.1.0 while retaining the service
+  adapter and compatibility facade loader APIs, configuration precedence,
+  cancellation, and safe error behavior.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
