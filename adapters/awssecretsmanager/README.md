@@ -1,8 +1,8 @@
 # AWS Secrets Manager configuration source
 
-This stable adapter loads one bounded JSON configuration document from AWS
+The v2 adapter on main loads one bounded JSON configuration document from AWS
 Secrets Manager into a sensitive
-[`github.com/faustbrian/go-config`](https://pkg.go.dev/github.com/faustbrian/go-config)
+[`github.com/faustbrian/go-config/v2`](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
 source. It leaves AWS credential resolution, retries, IAM, secret creation,
 rotation, and refresh scheduling to the caller.
 
@@ -12,13 +12,13 @@ root module under `adapters/awssecretsmanager/v*` tags.
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config/adapters/awssecretsmanager@latest
+go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2
 ```
 
-Import the canonical module path directly:
+Use this command after the v2 release is published. Import its module path:
 
 ```go
-import "github.com/faustbrian/go-config/adapters/awssecretsmanager"
+import "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
 ```
 
 ## Quick start
@@ -54,10 +54,10 @@ below process-environment overrides in an explicit `config.Plan`. See the
 
 | Package | Use |
 | --- | --- |
-| `github.com/faustbrian/go-config/adapters/awssecretsmanager` | Construct one explicit AWS Secrets Manager-backed `config.Source`. |
+| `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2` | Construct one explicit AWS Secrets Manager-backed `config.Source`. |
 
 This module has no public subpackages. It is an optional adapter for the
-independently released root `github.com/faustbrian/go-config` module.
+independently released root `github.com/faustbrian/go-config/v2` module.
 
 ## Construction and lifecycle
 
