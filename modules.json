@@ -312,9 +312,7 @@
           "background_work": "none"
         },
         "optional_owned_dependencies": [],
-        "adapters": [
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
-        ],
+        "adapters": [],
         "companions": [],
         "supported_go": {
           "minimum": "1.27.0",
@@ -362,7 +360,6 @@
         "github.com/faustbrian/go-service"
       ],
       "reverse_owned_dependencies": [
-        "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
         "github.com/faustbrian/go-international",
         "github.com/faustbrian/go-localized",
         "github.com/faustbrian/go-opening-hours",
@@ -407,14 +404,14 @@
     },
     {
       "directory": "adapters/awssecretsmanager",
-      "module_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+      "module_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager",
       "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": "adapters/awssecretsmanager",
           "directory": ".",
           "name": "awssecretsmanager",
-          "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+          "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager",
           "kind": "public",
           "production": true,
           "executable": true,
@@ -423,7 +420,7 @@
           "build_tags": []
         }
       ],
-      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `github.com/faustbrian/go-config/v2` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
+      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `github.com/faustbrian/go-config` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
       "lifecycle": "stable",
       "kind": "adapter",
       "releasable": true,
@@ -446,10 +443,10 @@
         ],
         "public_package_identifier": "awssecretsmanager",
         "primary_entry_packages": [
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager"
         ],
         "package_selection": {
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2": "Use when an application explicitly composes AWS Secrets Manager as a bounded JSON source; use the root module for local, environment, filesystem, or programmatic sources."
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager": "Use when an application explicitly composes AWS Secrets Manager as a bounded JSON source; use the root module for local, environment, filesystem, or programmatic sources."
         },
         "lifecycle_status": "active",
         "maturity": "stable",
@@ -496,7 +493,7 @@
           "examples": "adapters/awssecretsmanager/example_test.go",
           "faq": "adapters/awssecretsmanager/docs/faq.md",
           "changelog": "adapters/awssecretsmanager/CHANGELOG.md",
-          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager",
           "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md"
         },
         "known_good_compatibility_sets": [],
@@ -506,10 +503,10 @@
           "release": "not-started"
         }
       },
-      "version": "2.0.0",
+      "version": "1.0.0",
       "tag_prefix": "adapters/awssecretsmanager/v",
       "owned_dependencies": [
-        "github.com/faustbrian/go-config/v2"
+        "github.com/faustbrian/go-config"
       ],
       "reverse_owned_dependencies": [],
       "external_runtime_dependencies": [

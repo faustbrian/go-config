@@ -4,8 +4,9 @@
 
 The root module and the separately releasable AWS Secrets Manager adapter each
 have a published v1 line. Reports for the latest public v1 releases remain
-supported during the v2 transition. Main tracks the Go 1.27-only v2 lines;
-untagged main is not a supported public release. Use v2.0.0 or later for the
+supported during the v2 transition. Main prepares the Go 1.27 root-v2 line;
+the AWS-v2 migration follows root-v2 publication. Untagged main is not a
+supported public release. Use root v2.0.0 or later for the
 discovery identity fix once published; v1.1.0 does not include that fix. Fixes
 land on main before the affected module is released independently; no v1
 backport is promised by the v2 plan.

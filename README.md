@@ -15,20 +15,22 @@ structs. It provides deterministic precedence, strict decoding, immutable
 snapshots, safe provenance, validation orchestration, and redacted secrets
 without introducing global state or implicit filesystem discovery.
 
-Main tracks v2 of the root library and its independently released AWS Secrets
-Manager adapter. Both require Go 1.27.0; published v1 releases retain their
-original Go support contract. Use published tags rather than untagged main. See
-the [migration guide](docs/migration.md) before adopting the new identities.
+Main prepares the Go 1.27 root-v2 release first. The independently released
+AWS Secrets Manager adapter temporarily retains its root-v1 dependency;
+its v2 migration follows actual root-v2 publication. Published v1 releases
+retain their original Go support contract. Use published tags rather than
+untagged main and read the [migration guide](docs/migration.md).
 
 ## Install
 
 ```console
 go get github.com/faustbrian/go-config/v2@v2
-go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2
 ```
 
-Use these commands after the v2 tags are published. Install the second module
-only when an application reads configuration directly from AWS Secrets Manager.
+Use this command after the root-v2 tag is published. The retained AWS-v1
+adapter cannot supply sources to root-v2 plans. After its separate v2 release,
+applications needing AWS Secrets Manager may install
+`github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2`.
 
 ## Five-minute quickstart
 
@@ -138,10 +140,12 @@ explicit-file sources compose with bounded discovery, merging, typed values,
 validation, immutable snapshots, provenance, and an optional service adapter.
 
 The independently versioned
-[`github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`](adapters/awssecretsmanager/README.md)
-module adapts one bounded AWS Secrets Manager JSON document into the same
-`config.Source` contract. Use it only when an operator, CSI driver, or sidecar
-does not already materialize the secret as an environment variable or file.
+[`AWS Secrets Manager adapter`](adapters/awssecretsmanager/README.md)
+module adapts one bounded JSON document into a configuration source. Its
+retained v1 source types are not interchangeable with root-v2 types; AWS-v2
+adoption remains pending the independent adapter release. Use that adapter
+only when an operator, CSI driver, or sidecar does not already materialize
+the secret as an environment variable or file.
 
 ## Documentation
 

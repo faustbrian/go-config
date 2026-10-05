@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	awsconfig "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
+	awsconfig "github.com/faustbrian/go-config/adapters/awssecretsmanager"
 )
 
 type exampleClient struct{}

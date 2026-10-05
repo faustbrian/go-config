@@ -6,9 +6,10 @@ releasable AWS Secrets Manager adapter uses
 `adapters/awssecretsmanager/v<version>` tags. A directory prefix is never added
 to the root module's tag.
 
-Main prepares v2 of the root and AWS Secrets Manager modules. Both require
-Go 1.27.0, which repository verification tests exactly. Published v1 releases
-retain their original Go 1.26.6 support contract; the v2 identities and tags
+Main prepares the root-v2 release with Go 1.27.0. Repository verification
+tests exactly that toolchain. The retained AWS adapter still consumes root-v1
+types; its own v2 migration and release follow root-v2 publication. Published
+v1 releases retain their original Go 1.26.6 support contract. The v2 tags
 must be published before applications can adopt them. The adapter supports
 AWS Secrets Manager through the AWS SDK for Go v2 and delegates region,
 endpoint, credentials, transport, and retry compatibility to the caller's client.

@@ -1,10 +1,10 @@
-module github.com/faustbrian/go-config/adapters/awssecretsmanager/v2
+module github.com/faustbrian/go-config/adapters/awssecretsmanager
 
 go 1.27.0
 
 require (
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.44.2
-	github.com/faustbrian/go-config/v2 v2.0.0
+	github.com/faustbrian/go-config v1.0.0
 )
 
 require (

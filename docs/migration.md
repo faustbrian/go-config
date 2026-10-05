@@ -7,10 +7,14 @@ the Go 1.27 minimum explicit without changing the Go 1.26.6 contract of already
 published v1 releases. Upgrade the toolchain before adopting the new tags.
 
 Replace root imports with `github.com/faustbrian/go-config/v2`, retaining each
-subpackage suffix after `/v2`. The optional AWS adapter instead uses its own
-identity, `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`.
-Its sources return root-v2 types; do not mix them with root-v1 plans or loaders.
-Update both module requirements together when using that adapter.
+subpackage suffix after `/v2`. The optional AWS adapter currently retains its
+v1 source and root-v1 dependency so ordinary CI can qualify root-v2 before
+publication. These sources cannot be used with root-v2 plans or loaders.
+
+After root-v2 is published, the adapter migration will use its independent
+identity, `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`,
+and return root-v2 types. Applications using that adapter must wait for both
+public v2 releases and then update both module requirements together.
 
 Root tags are `v2.0.0`; adapter tags are
 `adapters/awssecretsmanager/v2.0.0`. Both are created from main without separate

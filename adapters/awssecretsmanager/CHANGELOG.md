@@ -6,10 +6,6 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ### Changed
 
-- Prepare the adapter's independent v2 identity and Go 1.27 minimum. Use
-  `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2` with root-v2
-  plans and loaders; returned sources no longer have the root-v1 type identity.
-
 - Adopt schema-v2 cohesion metadata and the repository's checksum-verified
   v1.4.0 W14 gate without changing the adapter API or runtime behavior.
 
