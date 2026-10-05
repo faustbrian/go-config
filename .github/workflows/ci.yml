@@ -13,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      release_module:
+        description: Rehearse one module directory; blank rehearses all
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -24,6 +29,7 @@ jobs:
     with:
       tooling_sha: 0eaeb3405839b19ca6958784e7c55b55e3358ee1
       release_dry_run: ${{ inputs.release_dry_run || false }}
+      release_module: ${{ inputs.release_module || '' }}
 
   specification:
     name: Specification governance
