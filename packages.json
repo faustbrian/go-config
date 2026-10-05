@@ -18,7 +18,7 @@
       "module_directory": "adapters/awssecretsmanager",
       "directory": ".",
       "name": "awssecretsmanager",
-      "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager",
+      "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
       "kind": "public",
       "production": true,
       "executable": true,
