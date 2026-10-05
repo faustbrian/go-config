@@ -1,7 +1,7 @@
 # API reference
 
 The canonical symbol-level reference is generated from Go doc comments at
-[pkg.go.dev](https://pkg.go.dev/github.com/faustbrian/go-config). This guide
+[pkg.go.dev](https://pkg.go.dev/github.com/faustbrian/go-config/v2). This guide
 describes how the packages compose.
 
 ## Root package

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/faustbrian/go-config/internal/safeerror"
+	"github.com/faustbrian/go-config/v2/internal/safeerror"
 )
 
 // Validator checks a complete decoded candidate.

@@ -3,7 +3,7 @@ package config
 import (
 	"reflect"
 
-	"github.com/faustbrian/go-config/decode"
+	"github.com/faustbrian/go-config/v2/decode"
 )
 
 // Presence distinguishes values that ordinary Go zero values cannot.

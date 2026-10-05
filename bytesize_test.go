@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	config "github.com/faustbrian/go-config"
+	config "github.com/faustbrian/go-config/v2"
 )
 
 func TestByteSizeParsesSupportedUnitsAndPlainBytes(t *testing.T) {

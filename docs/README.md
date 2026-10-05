@@ -4,11 +4,11 @@
 
 - [Package overview and installation](../README.md)
 - [Compiler-checked package examples](../examples_test.go)
-- [Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config)
-- [Testing helpers (`configtest`)](https://pkg.go.dev/github.com/faustbrian/go-config/configtest)
+- [Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
+- [Testing helpers (`configtest`)](https://pkg.go.dev/github.com/faustbrian/go-config/v2/configtest)
 - [Testing-helper example](../examples/testing/main.go)
 - [API](api.md)
-- [Service adapter API](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/service)
+- [Service adapter API](https://pkg.go.dev/github.com/faustbrian/go-config/v2/adapters/service)
 - [Sources and formats](sources.md)
 - [Examples](examples.md)
 
@@ -25,7 +25,7 @@
 - [AWS Secrets Manager adapter](../adapters/awssecretsmanager/docs/README.md)
 - [AWS adapter overview and installation](../adapters/awssecretsmanager/README.md)
 - [AWS adapter compiler-checked example](../adapters/awssecretsmanager/example_test.go)
-- [AWS adapter Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager)
+- [AWS adapter Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v2)
 - [Operations, performance, troubleshooting, and FAQ](operations.md)
 - [Security](security.md)
 - [Verification](verification.md)

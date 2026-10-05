@@ -1,5 +1,5 @@
 // Package configservice is the compatibility import path for the target-oriented
-// service adapter at github.com/faustbrian/go-config/adapters/service.
+// service adapter at github.com/faustbrian/go-config/v2/adapters/service.
 package configservice
 
 import (
@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/faustbrian/go-config"
-	direct "github.com/faustbrian/go-config/adapters/service"
-	"github.com/faustbrian/go-config/dotenv"
-	"github.com/faustbrian/go-config/environment"
-	"github.com/faustbrian/go-config/validation"
+	"github.com/faustbrian/go-config/v2"
+	direct "github.com/faustbrian/go-config/v2/adapters/service"
+	"github.com/faustbrian/go-config/v2/dotenv"
+	"github.com/faustbrian/go-config/v2/environment"
+	"github.com/faustbrian/go-config/v2/validation"
 	"github.com/faustbrian/go-service"
 )
 

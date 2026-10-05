@@ -3,7 +3,7 @@
 ## Model version and scope
 
 This is threat model `CONFIG-TM-1.1`, reviewed 2026-10-05. It applies to the
-root module's current unreleased v1 line. Reassess it when discovery,
+root module's current unreleased v2 line. Reassess it when discovery,
 filesystem loading, source trust, platform support, or secret-handling
 boundaries change.
 

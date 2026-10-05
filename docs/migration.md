@@ -1,17 +1,35 @@
 # Migration guide
 
+## To v2 and Go 1.27
+
+The v2 release line is maintained on main. Its new module identities make
+the Go 1.27 minimum explicit without changing the Go 1.26.6 contract of already
+published v1 releases. Upgrade the toolchain before adopting the new tags.
+
+Replace root imports with `github.com/faustbrian/go-config/v2`, retaining each
+subpackage suffix after `/v2`. The optional AWS adapter instead uses its own
+identity, `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`.
+Its sources return root-v2 types; do not mix them with root-v1 plans or loaders.
+Update both module requirements together when using that adapter.
+
+Root tags are `v2.0.0`; adapter tags are
+`adapters/awssecretsmanager/v2.0.0`. Both are created from main without separate
+version directories or branches. The existing v1 tags remain unchanged.
+
 ## To the target-oriented service adapter
 
 New integrations should import
-`github.com/faustbrian/go-config/adapters/service`, conventionally aliased as
+`github.com/faustbrian/go-config/v2/adapters/service`, conventionally aliased as
 `configservice`. Its generic `Options[T]` and `Loader[T]` shapes,
 `ErrInvalidOptions`, `OptionsError`, `Dotenv`, and `New[T]` behavior match the
-historical path. Types remain named by their import paths, so migrate an import
+v2 facade path. Types remain named by their import paths, so migrate an import
 as one source change rather than mixing both packages in one assignment.
 
-Existing consumers may keep importing
-`github.com/faustbrian/go-config/configservice`. It is a compatibility facade,
-so adopting this release does not require a coordinated source migration.
+After migrating from v1, consumers may use
+`github.com/faustbrian/go-config/v2/configservice` as a compatibility facade.
+Switching between this facade and the target-oriented v2 adapter does not
+require a coordinated source migration; adopting v2 still requires the module
+and import changes described above.
 
 ## From direct `os.Getenv`
 

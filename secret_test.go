@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/go-config"
+	config "github.com/faustbrian/go-config/v2"
 )
 
 func TestSecretRedactsFormattingAndMarshaling(t *testing.T) {

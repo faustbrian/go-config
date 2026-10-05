@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	config "github.com/faustbrian/go-config"
+	config "github.com/faustbrian/go-config/v2"
 )
 
 func TestCollectRejectsSchemaBeyondDepthLimitInternally(t *testing.T) {
