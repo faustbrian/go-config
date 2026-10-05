@@ -9,10 +9,10 @@ import (
 	"io/fs"
 	"strings"
 
-	"github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/dotenv"
-	"github.com/faustbrian/go-config/environment"
-	"github.com/faustbrian/go-config/validation"
+	"github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/dotenv"
+	"github.com/faustbrian/go-config/v2/environment"
+	"github.com/faustbrian/go-config/v2/validation"
 	"github.com/faustbrian/go-service"
 )
 

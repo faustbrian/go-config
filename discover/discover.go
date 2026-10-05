@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/faustbrian/go-config/internal/safeerror"
+	"github.com/faustbrian/go-config/v2/internal/safeerror"
 )
 
 const (

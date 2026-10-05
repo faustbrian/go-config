@@ -5,6 +5,12 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Prepare the root v2 module identity and Go 1.27 minimum. Migrate imports to
+  `github.com/faustbrian/go-config/v2`; existing v1 tags retain their original
+  module identity and Go support contract.
+
 ### Security
 
 - Confine `filesystem.FromDiscovered` loads to the approved directory identity

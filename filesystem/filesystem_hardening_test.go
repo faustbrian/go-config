@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/discover"
+	config "github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/discover"
 )
 
 func TestReaderValidatesEveryOptionBoundary(t *testing.T) {

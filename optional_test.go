@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	config "github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/decode"
-	"github.com/faustbrian/go-config/programmatic"
-	"github.com/faustbrian/go-config/validation"
+	config "github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/decode"
+	"github.com/faustbrian/go-config/v2/programmatic"
+	"github.com/faustbrian/go-config/v2/validation"
 )
 
 func TestOptionalPreservesAbsentNullEmptyAndZero(t *testing.T) {

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	config "github.com/faustbrian/go-config"
-	yamlsource "github.com/faustbrian/go-config/yaml"
+	config "github.com/faustbrian/go-config/v2"
+	yamlsource "github.com/faustbrian/go-config/v2/yaml"
 )
 
 func TestBytesLoadsStrictTree(t *testing.T) {

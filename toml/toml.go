@@ -11,9 +11,9 @@ import (
 	"time"
 
 	btoml "github.com/BurntSushi/toml"
-	config "github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/internal/safeerror"
-	"github.com/faustbrian/go-config/internal/sourceio"
+	config "github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/internal/safeerror"
+	"github.com/faustbrian/go-config/v2/internal/sourceio"
 )
 
 const (

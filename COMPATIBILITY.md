@@ -6,11 +6,13 @@ releasable AWS Secrets Manager adapter uses
 `adapters/awssecretsmanager/v<version>` tags. A directory prefix is never added
 to the root module's tag.
 
-The root and AWS Secrets Manager modules are stable v1 libraries. Their minimum
-supported Go version is 1.27.0, and repository verification currently tests
-exactly Go 1.27.0. The adapter supports AWS Secrets Manager through the AWS SDK
-for Go v2 and delegates region, endpoint, credentials, transport, and retry
-compatibility to the caller-provided client.
+Main prepares the root-v2 release with Go 1.27.0. Repository verification
+tests exactly that toolchain. The retained AWS adapter still consumes root-v1
+types; its own v2 migration and release follow root-v2 publication. Published
+v1 releases retain their original Go 1.26.6 support contract. The v2 tags
+must be published before applications can adopt them. The adapter supports
+AWS Secrets Manager through the AWS SDK for Go v2 and delegates region,
+endpoint, credentials, transport, and retry compatibility to the caller's client.
 
 Before `v1`, minor releases MAY contain reviewed breaking changes, but every
 break MUST be documented with migration guidance. Patch releases MUST remain
@@ -23,10 +25,12 @@ resource ownership, ordering, retry/idempotency semantics, and documented
 defaults. A compile-compatible change can still be behaviorally breaking.
 
 The target-oriented `adapters/service` package owns service command loading.
-The historical `configservice` import path remains an API-compatible facade
+Within v2, `configservice` remains an API-compatible facade
 with its existing generic option and loader definitions, shared sentinel
 identity, equivalent structured errors, source precedence, cancellation, and
-caller-owned lifecycle semantics.
+caller-owned lifecycle semantics. V1 consumers must migrate their module and
+import identities before using either v2 package; facade compatibility does
+not make nominal v1 and v2 types interchangeable.
 
 Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs

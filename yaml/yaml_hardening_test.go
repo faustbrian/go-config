@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/go-config"
+	config "github.com/faustbrian/go-config/v2"
 	yamlv4 "go.yaml.in/yaml/v4"
 )
 

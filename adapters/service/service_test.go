@@ -6,12 +6,12 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/faustbrian/go-config"
-	configservice "github.com/faustbrian/go-config/adapters/service"
-	"github.com/faustbrian/go-config/dotenv"
-	"github.com/faustbrian/go-config/environment"
-	"github.com/faustbrian/go-config/programmatic"
-	"github.com/faustbrian/go-config/validation"
+	"github.com/faustbrian/go-config/v2"
+	configservice "github.com/faustbrian/go-config/v2/adapters/service"
+	"github.com/faustbrian/go-config/v2/dotenv"
+	"github.com/faustbrian/go-config/v2/environment"
+	"github.com/faustbrian/go-config/v2/programmatic"
+	"github.com/faustbrian/go-config/v2/validation"
 	"github.com/faustbrian/go-service"
 )
 

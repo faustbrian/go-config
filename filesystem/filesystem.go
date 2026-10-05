@@ -12,12 +12,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	config "github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/discover"
-	"github.com/faustbrian/go-config/internal/sourceio"
-	jsonsource "github.com/faustbrian/go-config/json"
-	tomlsource "github.com/faustbrian/go-config/toml"
-	yamlsource "github.com/faustbrian/go-config/yaml"
+	config "github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/discover"
+	"github.com/faustbrian/go-config/v2/internal/sourceio"
+	jsonsource "github.com/faustbrian/go-config/v2/json"
+	tomlsource "github.com/faustbrian/go-config/v2/toml"
+	yamlsource "github.com/faustbrian/go-config/v2/yaml"
 )
 
 const defaultMaxBytes int64 = 1 << 20

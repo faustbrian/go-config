@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/configservice"
-	"github.com/faustbrian/go-config/programmatic"
+	"github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/configservice"
+	"github.com/faustbrian/go-config/v2/programmatic"
 	"github.com/faustbrian/go-service"
 )
 

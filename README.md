@@ -5,7 +5,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-config.svg)](https://pkg.go.dev/github.com/faustbrian/go-config)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-config/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-config?sort=semver)](https://github.com/faustbrian/go-config/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -15,19 +15,22 @@ structs. It provides deterministic precedence, strict decoding, immutable
 snapshots, safe provenance, validation orchestration, and redacted secrets
 without introducing global state or implicit filesystem discovery.
 
-The root library and its separately released AWS Secrets Manager adapter are
-stable v1 modules. Their minimum supported Go version is 1.27.0; repository
-verification currently tests exactly Go 1.27.0.
+Main prepares the Go 1.27 root-v2 release first. The independently released
+AWS Secrets Manager adapter temporarily retains its root-v1 dependency;
+its v2 migration follows actual root-v2 publication. Published v1 releases
+retain their original Go support contract. Use published tags rather than
+untagged main and read the [migration guide](docs/migration.md).
 
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config@v1
-go get github.com/faustbrian/go-config/adapters/awssecretsmanager@v1
+go get github.com/faustbrian/go-config/v2@v2
 ```
 
-Install the second module only when an application reads configuration directly
-from AWS Secrets Manager.
+Use this command after the root-v2 tag is published. The retained AWS-v1
+adapter cannot supply sources to root-v2 plans. After its separate v2 release,
+applications needing AWS Secrets Manager may install
+`github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2`.
 
 ## Five-minute quickstart
 
@@ -38,11 +41,11 @@ import (
 	"context"
 	"fmt"
 
-	config "github.com/faustbrian/go-config"
-	"github.com/faustbrian/go-config/defaults"
-	"github.com/faustbrian/go-config/environment"
-	jsonsource "github.com/faustbrian/go-config/json"
-	"github.com/faustbrian/go-config/programmatic"
+	config "github.com/faustbrian/go-config/v2"
+	"github.com/faustbrian/go-config/v2/defaults"
+	"github.com/faustbrian/go-config/v2/environment"
+	jsonsource "github.com/faustbrian/go-config/v2/json"
+	"github.com/faustbrian/go-config/v2/programmatic"
 )
 
 type Settings struct {
@@ -125,8 +128,10 @@ The adapter owns no resource, performs no retries, and does not reload
 configuration. The caller owns every source and decides whether repeated loads
 are safe.
 
-The original `github.com/faustbrian/go-config/configservice` path remains an
-API-compatible facade, so existing consumers do not need to migrate in lockstep.
+Within v2, `github.com/faustbrian/go-config/v2/configservice` remains an
+API-compatible facade for the target-oriented v2 service adapter. V1 consumers
+must first migrate their imports; choosing between the two v2 adapter paths
+does not require a coordinated migration.
 
 ## What is included
 
@@ -135,10 +140,12 @@ explicit-file sources compose with bounded discovery, merging, typed values,
 validation, immutable snapshots, provenance, and an optional service adapter.
 
 The independently versioned
-[`github.com/faustbrian/go-config/adapters/awssecretsmanager`](adapters/awssecretsmanager/README.md)
-module adapts one bounded AWS Secrets Manager JSON document into the same
-`config.Source` contract. Use it only when an operator, CSI driver, or sidecar
-does not already materialize the secret as an environment variable or file.
+[`AWS Secrets Manager adapter`](adapters/awssecretsmanager/README.md)
+module adapts one bounded JSON document into a configuration source. Its
+retained v1 source types are not interchangeable with root-v2 types; AWS-v2
+adoption remains pending the independent adapter release. Use that adapter
+only when an operator, CSI driver, or sidecar does not already materialize
+the secret as an environment variable or file.
 
 ## Documentation
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/faustbrian/go-config/merge"
+	"github.com/faustbrian/go-config/v2/merge"
 )
 
 func TestTrees(t *testing.T) {
