@@ -23,6 +23,10 @@ and releases use Semantic Versioning.
   adapter and compatibility facade loader APIs, configuration precedence,
   cancellation, and safe error behavior.
 
+- Adopt Service v1.1.3 with bounded maintenance-file reads and
+  Correlation v1.1.1 with redacted entropy failures while preserving the
+  typed service adapter and compatibility facade loader contracts.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
