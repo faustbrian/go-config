@@ -31,9 +31,11 @@ permissions:
 jobs:
   ci:
     if: github.event_name != 'workflow_dispatch' || !inputs.security_diagnostic
-    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@be0fd7d09b02c9dff29e6b00a5245ceac3cdfdfb # v1.8.5
+    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@f173deb9a9b501c85137a00fa9cccd5287f8cc26 # v2.0.0 patched documentation tooling
     with:
-      tooling_sha: 0eaeb3405839b19ca6958784e7c55b55e3358ee1
+      tooling_sha: f173deb9a9b501c85137a00fa9cccd5287f8cc26
+      source_bootstrap: true
+      public_dependencies: true
       release_dry_run: ${{ inputs.release_dry_run || false }}
       release_module: ${{ inputs.release_module || '' }}
 
@@ -143,11 +145,28 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: faustbrian/go-library-tools
-          ref: 0eaeb3405839b19ca6958784e7c55b55e3358ee1 # v1.6.2
+          ref: f173deb9a9b501c85137a00fa9cccd5287f8cc26 # v2.0.0 patched documentation tooling
           path: .golib-tooling
           persist-credentials: false
       - uses: ./.golib-tooling/.github/actions/setup-golib
+        with:
+          source_bootstrap: true
+          tooling_sha: f173deb9a9b501c85137a00fa9cccd5287f8cc26
       - run: golib specification check --online
+      - name: Remove specification source bootstrap resources
+        if: always()
+        run: |
+          set -euo pipefail
+          if [[ -n "${GOLIB_SOURCE_INSTALL_ROOT:-}" ]]; then
+            case "${GOLIB_SOURCE_INSTALL_ROOT}" in
+              "${RUNNER_TEMP}/golib-source-install."*) ;;
+              *) echo 'unexpected specification bootstrap resource path' >&2; exit 1 ;;
+            esac
+            if [[ -d "${GOLIB_SOURCE_INSTALL_ROOT}" ]]; then
+              chmod -R u+w "${GOLIB_SOURCE_INSTALL_ROOT}"
+              find "${GOLIB_SOURCE_INSTALL_ROOT}" -depth -delete
+            fi
+          fi
 
   required:
     name: Required
