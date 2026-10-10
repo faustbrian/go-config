@@ -31,9 +31,9 @@ permissions:
 jobs:
   ci:
     if: github.event_name != 'workflow_dispatch' || !inputs.security_diagnostic
-    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@bc04c70333514799f3e94455a04f320e5c0906dd # reviewed security maintenance source
+    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@c7f232472d9c4c5ac5359d70bbef3b8f1571b834 # reviewed security maintenance source
     with:
-      tooling_sha: bc04c70333514799f3e94455a04f320e5c0906dd
+      tooling_sha: c7f232472d9c4c5ac5359d70bbef3b8f1571b834
       source_bootstrap: true
       public_dependencies: true
       release_dry_run: ${{ inputs.release_dry_run || false }}
@@ -146,13 +146,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: faustbrian/go-library-tools
-          ref: bc04c70333514799f3e94455a04f320e5c0906dd # reviewed security maintenance source
+          ref: c7f232472d9c4c5ac5359d70bbef3b8f1571b834 # reviewed security maintenance source
           path: .golib-tooling
           persist-credentials: false
       - uses: ./.golib-tooling/.github/actions/setup-golib
         with:
           source_bootstrap: true
-          tooling_sha: bc04c70333514799f3e94455a04f320e5c0906dd
+          tooling_sha: c7f232472d9c4c5ac5359d70bbef3b8f1571b834
       - run: golib specification check --online
       - name: Remove specification source bootstrap resources
         if: always()
