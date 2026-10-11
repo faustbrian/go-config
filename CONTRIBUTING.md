@@ -27,7 +27,7 @@ source pin is release-blocking; peer behavior cannot silently select policy.
 
 Selected mutation gates must finish with zero surviving viable mutants.
 
-Do not add package-local workflows, permanent replacements, machine-specific
+Do not fork shared verification workflows, add permanent replacements, machine-specific
 paths, bypass flags, broad mutation exclusions, or aggregate quality metrics
 that hide a failing package.
 
@@ -66,10 +66,31 @@ API baselines. Hosted CI retains its separate blocking online specification job.
 For source, filesystem, cancellation or AWS adapter changes, select the affected
 behavioral, lifecycle and integration tests; the AWS adapter's client and retry
 ownership remain caller-controlled. Run directly affected public consumers for
-contract changes. Scheduled and release qualification retain their full selected
+contract changes. Explicit full and release qualification retain their selected
 gates and release rehearsal. The separate development security diagnostic is not
 a release substitute. Report unavailable or failing checks without claiming
 release readiness. CI/configuration-only changes do not require a library release.
+
+## Selected Scheduled Assurance
+
+The separate [selected-assurance caller](.github/workflows/assurance.yml) runs
+only on main, every Tuesday at 04:11 UTC. It rotates one current declared root
+fuzz target for 30 seconds, exploring:
+structured source parsing, bounded interpolation and environment mapping,
+destination decoding, filesystem inputs and discovery containment.
+Only the root module's six declared targets participate; the AWS Secrets
+Manager adapter's separate fuzz, API and integration contracts remain explicit.
+
+Base-free ordinary checks execute deterministic seeds, not active exploration;
+committed-range CI selects affected active smoke. Manual assurance requires an
+exact anchored selector from the root fuzz operation in `.golib.yaml`, for
+example `^FuzzDiscoveryBoundary$`.
+Empty, unknown and malformed selections refuse.
+The shared job bounds setup and execution to ten minutes, active workers and
+CPU to two, owned memory to 2 GiB, native output to 1 MiB and private-cache
+lifetime. Failure, cancellation, exhausted budgets and cleanup refusal remain
+attributable failures. This lane does not run mutation or replace Required,
+explicit `make check-full`, or relevant release qualification.
 
 ## Adding A Module
 
