@@ -2,9 +2,11 @@
 
 This document maps the package guarantees to authoritative repository
 evidence. A filename alone is not proof: the named test behavior and the gate
-that executes it are part of each entry. `make check` is the local aggregate
-gate; the repository's authoritative root CI workflow delegates the canonical
-per-module contract to the pinned shared workflow.
+that executes it are part of each entry. `make check` and `make ci` use bounded
+local checks. `make check-full` selects full assurance and online specification
+checks; the repository's authoritative root CI workflow delegates its selected
+per-module contract to the pinned shared workflow and separately requires online
+specification governance.
 
 ## Source order, presence, and atomicity
 
@@ -40,7 +42,7 @@ per-module contract to the pinned shared workflow.
 | TOML covers dotted/nested tables, arrays of tables, duplicate definitions, all date/time types, numeric boundaries, and unsupported normalized values | [`toml_test.go`](../toml/toml_test.go), [`toml_hardening_test.go`](../toml/toml_hardening_test.go), and the array-of-objects conformance case. |
 | Dotenv covers quoting, escaping, comments, multiline values, `export`, duplicates, interpolation, cycles, fallbacks, missing variables, Unicode names, and CRLF | [`dotenv_test.go`](../dotenv/dotenv_test.go) and [`dotenv_hardening_test.go`](../dotenv/dotenv_hardening_test.go). |
 | Bytes, depth, keys, strings/lines, collections, aliases, expansion growth, and parsing work are bounded | Each source has constructor-validated limits; the format hardening suites exercise each limit. Bounded readers and context-aware parser readers are in [`sourceio_test.go`](../internal/sourceio/sourceio_test.go). |
-| Hostile parser and interpolation inputs have persistent fuzz corpora | `FuzzStructuredSources` and `FuzzDotenvInterpolation` in [`fuzz_test.go`](../fuzz_test.go); `make fuzz` executes every committed seed and a timed mutation pass. |
+| Hostile parser and interpolation inputs have persistent fuzz corpora | `FuzzStructuredSources` and `FuzzDotenvInterpolation` in [`fuzz_test.go`](../fuzz_test.go); ordinary Go tests execute committed seeds, focused native fuzzing selects an active smoke, and `make check-full` retains all configured fuzz budgets. |
 
 ## Discovery and filesystem behavior
 
@@ -79,7 +81,7 @@ per-module contract to the pinned shared workflow.
 
 | Contract | Executable evidence |
 |---|---|
-| Parallel plans, loads, hooks, validators, snapshots, provenance, cancellation, and repeated failure paths are race-tested | [`concurrency_test.go`](../concurrency_test.go), executed under `go test -race ./...` by `make check`. |
+| Parallel plans, loads, hooks, validators, snapshots, provenance, cancellation, and repeated failure paths are race-tested | [`concurrency_test.go`](../concurrency_test.go), selected with the full race suite by `make check-full`; bounded ordinary checks still run its deterministic assertions. |
 | Source, recursive merge/canonicalization, parser, mapping, decode-hook, validation, filesystem, and cleanup operations observe cancellation where Go permits cooperation | Context cases throughout the package suites; context-aware filesystem cleanup and independent close context are in [`sourceio_test.go`](../internal/sourceio/sourceio_test.go). |
 | Files, readers, closers, buffers, timers, and goroutines have explicit ownership and failure tests | Reader/open/stat/read/close matrices in [`sourceio_test.go`](../internal/sourceio/sourceio_test.go) and [`filesystem_test.go`](../filesystem/filesystem_test.go). The library starts no background goroutines, watchers, remote clients, or retry loops. Context-aware close owns a one-second cleanup timer and cancels it on return. |
 
@@ -89,7 +91,7 @@ per-module contract to the pinned shared workflow.
 |---|---|
 | No native Infisical adapter or SDK enters core | [`go.mod`](../go.mod) contains only the YAML and TOML parser dependencies. [`kubernetes.md`](kubernetes.md) documents Operator, CSI, and Agent-delivered environment/file workflows without claiming native equivalence. |
 | A future native adapter remains optional, separately imported, read-only, bounded, and independently audited | The non-implemented boundary is normative in [`security.md`](security.md) and [`kubernetes.md`](kubernetes.md); adapter-specific matrices are therefore not applicable to the current module. |
-| Meaningful production coverage remains exactly 100% | The coverage gate in `golib check --all`, run by `make check` and CI. |
+| Meaningful production coverage remains exactly 100% | The coverage gate in `golib check --all`, selected by `make check-full` and full scheduled/release assurance. |
 | Formatting, API, safety, vet, race, fuzz, benchmark, docs, vulnerability, lint, and compatibility gates exist | [`Makefile`](../Makefile), the [repository CI workflow](../.github/workflows/ci.yml), and the pinned [shared workflow](https://github.com/faustbrian/go-library-tools/blob/v1.0.4/.github/workflows/library-ci.yml). |
 
 ## Intentional trust boundaries

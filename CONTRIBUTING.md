@@ -3,7 +3,7 @@
 ## Before Editing
 
 1. Read [`AGENTS.md`](AGENTS.md) and the affected module's docs.
-2. Run `make inventory` and the narrow shared-tool gate for the module.
+2. Run ordinary Go tests for the affected package before editing.
 3. Identify owned dependencies and reverse dependants in `modules.json`.
 4. Preserve unrelated work and generated/corpus provenance.
 
@@ -25,7 +25,7 @@ the affected stable decision entries, and complete the Specification Decisions
 section of the pull request template. An unresolved interpretation or stale
 source pin is release-blocking; peer behavior cannot silently select policy.
 
-Required mutation gates must finish with zero surviving viable mutants.
+Selected mutation gates must finish with zero surviving viable mutants.
 
 Do not add package-local workflows, permanent replacements, machine-specific
 paths, bypass flags, broad mutation exclusions, or aggregate quality metrics
@@ -33,21 +33,43 @@ that hide a failing package.
 
 ## Verification
 
-Run during development:
+Use Go 1.27.2 for development and CI; both modules retain their Go 1.27.0
+minimum. An ordinary checkout is sufficient for tests and a focused active fuzz
+smoke, without sibling repositories or goal ledgers:
 
 ```bash
-make inventory
-make check
+GOWORK=off go test ./...
+GOWORK=off go test . -run '^$' -fuzz '^FuzzStructuredSources$' -fuzztime=2s
+(cd adapters/awssecretsmanager && GOWORK=off go test ./...)
 ```
 
-Before submitting a repository-wide change:
+Select the native target and package affected by your change; ordinary Go tests
+already exercise deterministic fuzz seeds. For shared checks, install the public
+`golib` v2.1.1 release declared in `.golib.yaml` and verify its checksums. The
+ordinary shared workflow and specification setup use that same public verifier:
 
 ```bash
+make check
 make ci
 ```
 
-The full scheduled and release gate is `make ci`. Report every unavailable or
-failing command; do not describe partial results as release-ready.
+Both Make routes use bounded local checks. Neither module declares required
+services or test tags. Optional mutation analysis can select one affected package:
+
+```bash
+golib mutation --module . --package ./decode
+```
+
+Use `make check-full` for explicit full assurance, including the online
+specification check, configured full fuzz budgets, conformance and both modules'
+API baselines. Hosted CI retains its separate blocking online specification job.
+For source, filesystem, cancellation or AWS adapter changes, select the affected
+behavioral, lifecycle and integration tests; the AWS adapter's client and retry
+ownership remain caller-controlled. Run directly affected public consumers for
+contract changes. Scheduled and release qualification retain their full selected
+gates and release rehearsal. The separate development security diagnostic is not
+a release substitute. Report unavailable or failing checks without claiming
+release readiness. CI/configuration-only changes do not require a library release.
 
 ## Adding A Module
 

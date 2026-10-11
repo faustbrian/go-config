@@ -15,9 +15,11 @@ readiness.
 
 ## Compatibility
 
-The minimum toolchain is Go 1.27.0. The authoritative CI workflow tests Go
-1.27.0 on Ubuntu 24.04. `CaseNative` intentionally differs on Windows;
-choose an explicit case mode for portable environment contracts. Symlink and
+The minimum toolchain is Go 1.27.0. Ordinary CI uses producer Go 1.27.2 on
+Ubuntu 24.04; the independent development security diagnostic retains its
+explicit toolchain and is not release qualification. `CaseNative` intentionally
+differs on Windows; choose an explicit case mode for portable environment
+contracts. Symlink and
 POSIX permission behavior is tested where the operating system supports it.
 Windows discovery rejects reparse points by default, including junctions and
 mount points. Exact root containment deliberately fails closed for
@@ -30,8 +32,10 @@ race tests, fuzz smoke, and API comparison.
 ## Performance budgets
 
 The committed benchmark classes cover plan load, decode, merge, validation, and
-a 10,000-key JSON document. They are smoke-gated on pull requests and archived
-weekly. On an Apple M4 Max reference run, the 10,000-key parser processed about
+a 10,000-key JSON document. Select the configured benchmarks through
+`make check-full` for performance-sensitive changes and scheduled/release
+assurance; ordinary bounded checks do not run that campaign.
+On an Apple M4 Max reference run, the 10,000-key parser processed about
 36 MB/s; machine-specific values are evidence, not a guarantee.
 
 Operational budgets should be set per service. Keep startup configuration small

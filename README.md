@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-config/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-config/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-config/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
-[![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
+[![Mutation](https://img.shields.io/badge/mutation-local_or_scheduled-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-config/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-config?sort=semver)](https://github.com/faustbrian/go-config/releases)
@@ -174,8 +174,11 @@ with the caller.
 
 ## Development
 
-Run `make check`. See [CONTRIBUTING.md](CONTRIBUTING.md) for focused and release
-verification.
+Use Go 1.27.2 for development; the public minimum remains Go 1.27.0.
+`make check` and `make ci` run bounded local checks with the public pinned
+verifier. Use `make check-full` for full assurance and online specification
+checks. See [CONTRIBUTING.md](CONTRIBUTING.md) for standalone Go tests,
+focused fuzzing, optional mutation and selected integration/release qualification.
 
 ## License
 
