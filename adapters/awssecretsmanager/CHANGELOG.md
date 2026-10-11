@@ -6,11 +6,6 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ### Changed
 
-- Update AWS Secrets Manager to 1.50.4 with the matching SDK and Smithy
-  graph so received responses are closed before returning interceptor errors.
-  Preserve sensitive JSON results, private error causes, and caller-owned
-  retries with one tracing loop per operation.
-
 - Prepare the adapter's independent v2 identity and Go 1.27 minimum. Use
   `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2` with root-v2
   plans and loaders; returned sources no longer have the root-v1 type identity.
@@ -41,6 +36,15 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 - Add a module documentation index for direct navigation.
 - Use human-oriented section names and package-owned documentation links.
+
+## 2.0.1 - 2026-10-11
+
+### Changed
+
+- Update AWS Secrets Manager to 1.50.4 with the matching SDK and Smithy
+  graph so received responses are closed before returning interceptor errors.
+  Preserve sensitive JSON results, private error causes, and caller-owned
+  retries with one tracing loop per operation.
 
 ## 1.0.0 - 2026-08-26
 
