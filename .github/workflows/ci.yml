@@ -77,12 +77,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: faustbrian/go-library-tools
-          ref: 7744b4df6c4750d43af980ee332607dc2c1827ad
+          ref: d38bf31e7403501075442de9fde78f9479052996
           path: security-tooling
           persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.27.0'
+          go-version: '1.27.2'
           cache: false
       - name: Build development qualification tooling
         working-directory: security-tooling
@@ -97,7 +97,7 @@ jobs:
         run: |
           set -euo pipefail
           scanner_status=0
-          go run github.com/securego/gosec/v2/cmd/gosec@v2.29.0 \
+          GOSEC_AI_PROVIDER= GOSEC_AI_API_KEY= GOSEC_AI_BASE_URL= go run github.com/securego/gosec/v2/cmd/gosec@v2.29.0 \
             -nosec-require-rules -nosec-require-justification \
             -fmt=json -out="${GOTMPDIR}/gosec.json" ./... \
             >"${GOTMPDIR}/gosec.log" 2>&1 || scanner_status=$?
