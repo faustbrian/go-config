@@ -1,4 +1,8 @@
-// Package defaults builds typed lowest-precedence sources from struct tags.
+// Package defaults builds priority-10 sources from a struct's default tags.
+// For inspects a struct/pointer schema once and returns copied documents on load.
+// Schema recursion/depth is bounded; tag/collection text is trusted application
+// input without a byte budget. It does not load files/environment or invoke
+// conversion hooks until typed decoding. Field names/paths must be non-secret.
 package defaults
 
 import (
@@ -28,26 +32,35 @@ type source struct {
 
 // Error describes an invalid default without exposing its configured text.
 type Error struct {
-	Path     string
+	// Path identifies the trusted field whose default conversion failed.
+	Path string
+	// Expected identifies its declared Go type.
 	Expected string
-	Cause    error
+	// Cause retains conversion failure; Unwrap hides arbitrary text/type.
+	Cause error
 }
 
 // SchemaError reports a recursive or excessively deep default schema.
 type SchemaError struct {
-	Path   string
-	Type   string
+	// Path identifies the trusted recursive or over-depth field path.
+	Path string
+	// Type identifies the schema's Go type.
+	Type string
+	// Reason identifies recursive type or depth limit.
 	Reason string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *SchemaError) Error() string {
 	return fmt.Sprintf("default schema at %q: %s %s", e.Path, e.Reason, e.Type)
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *Error) Error() string {
 	return fmt.Sprintf("decode default for config field %q as %s", e.Path, e.Expected)
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *Error) Unwrap() error {
 	return safeerror.Redact(e.Cause, "default conversion cause redacted")
 }
@@ -62,7 +75,11 @@ func (e *Error) MarshalText() ([]byte, error) {
 	return []byte(e.Error()), nil
 }
 
-// For builds a default source from default tags on T.
+// For builds a default source from trusted default tags on a struct/pointer T.
+// Recursive schemas and nesting beyond 64 structs are rejected. Collections are
+// parsed as one JSON value; tag byte size is not limited and duplicate JSON members
+// follow encoding/json. Scalar hooks are deferred to typed decoding. Sources are
+// reusable with copied canonical containers and no I/O/background work.
 func For[T any](name string) (config.Source, error) {
 	if strings.TrimSpace(name) == "" {
 		return nil, errors.New("default source name must not be empty")

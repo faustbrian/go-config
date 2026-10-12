@@ -5,13 +5,14 @@
 Construct sources and the plan once at the composition root, then load with a
 startup deadline. Treat any constructor, source, merge, decode, or validation
 error as a failed candidate. Required sources fail closed. Keep the immutable
-snapshot or its typed value; `Value` returns a defensive copy.
+snapshot or its typed value subject to the [typed copying limitations](api.md);
+`Value` returns a defensive copy.
 
-V1 does not watch or hot-reload. An application implementing reconciliation
-must reopen all sources, rebuild the complete plan, validate, and atomically
-publish a new snapshot. Failed refreshes must leave the prior snapshot clearly
-identified as stale; the library does not terminate processes or manage
-readiness.
+The library does not watch or hot-reload. An application implementing
+reconciliation must reopen all sources, rebuild the complete plan, validate, and
+atomically publish a new snapshot. Failed refreshes must leave the prior
+snapshot clearly identified as stale; the library does not terminate processes
+or manage readiness.
 
 ## Compatibility
 
@@ -77,8 +78,9 @@ not values. `Secret.Reveal` is the explicit plaintext boundary.
 **Is Infisical supported?** Platform-delivered environment/files are supported
 normally. A native SDK adapter is intentionally absent from core.
 
-**Can I mutate a snapshot?** Returned values are copies; mutation does not alter
-the stored snapshot. Build a new plan/load for a new generation.
+**Can I mutate a snapshot?** Supported canonical/typed graphs are copied.
+Custom array references and unsupported wrapper state are not universally
+isolated; keep them immutable. Build a new plan/load for a new generation.
 
 **Can cancellation preempt arbitrary extension code?** Only cooperative code
 can be canceled safely in Go. Use context-aware decode and filesystem

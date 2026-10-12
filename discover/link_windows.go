@@ -5,6 +5,8 @@ import (
 	"syscall"
 )
 
+// Windows junctions/mount-point reparse attributes can redirect traversal even
+// without ModeSymlink. Treat either representation as link-like for reject policy.
 func isLinkLike(info os.FileInfo) bool {
 	switch hasModeFlag(info.Mode(), os.ModeSymlink) {
 	case true:

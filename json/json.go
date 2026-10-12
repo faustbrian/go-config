@@ -1,4 +1,14 @@
-// Package json provides strict, bounded JSON configuration sources.
+// Package json loads explicit RFC 8259 configuration into canonical documents.
+// One object root is required; duplicate keys and trailing roots fail. Integers use
+// int64/uint64 and fractional/exponent numbers use float64. Direct syntax errors
+// retain standard-library causes and can contain offending characters; use the plan
+// boundary for source-error redaction.
+// Bytes copies input before load-time byte admission; FromFS borrows/reopens an
+// fs.FS path and checks generation metadata. Sources own no watcher/goroutine,
+// retry or shutdown. Context is cooperative around owned/parser work, not forced
+// preemption of ordinary filesystem or backend operations. See CONFIG-DEC-001
+// through CONFIG-DEC-009 and the maintained conformance guide for exact policy,
+// not a claim of complete specification conformance.
 package json
 
 import (
@@ -24,25 +34,35 @@ const (
 
 // Limits bounds parser resource use. Zero values select conservative defaults.
 type Limits struct {
+	// MaxBytes caps each accepted input on load; zero selects 1 MiB.
 	MaxBytes int64
+	// MaxDepth caps normalized value depth; zero selects 64.
 	MaxDepth int
-	MaxKeys  int
+	// MaxKeys caps mapping keys across the document; zero selects 100000.
+	MaxKeys int
 }
 
 // Options configures source metadata and parser bounds.
 type Options struct {
-	Name      string
-	Priority  int
+	// Name is a required nonblank, non-secret diagnostic label.
+	Name string
+	// Priority passes unchanged to NewPlan ordering.
+	Priority int
+	// Sensitive marks provenance, not encrypted or erased storage.
 	Sensitive bool
-	Optional  bool
-	Limits    Limits
+	// Optional permits plan-level ErrNotFound suppression only.
+	Optional bool
+	// Limits chooses positive admission bounds; negative values are invalid.
+	Limits Limits
 }
 
 // DuplicateKeyError reports an ambiguous JSON object key.
 type DuplicateKeyError struct {
+	// Path identifies the trusted dotted key path, without its value.
 	Path string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *DuplicateKeyError) Error() string {
 	return fmt.Sprintf("decode JSON config: duplicate key at %q", e.Path)
 }
@@ -53,7 +73,9 @@ type source struct {
 	limits Limits
 }
 
-// Bytes constructs a repeatable source from an immutable copy of data.
+// Bytes constructs a repeatable source from copied data and validated options.
+// Size is admitted only on Load after the constructor copy; decoded plaintext
+// and copied input are retained without guaranteed secure erasure.
 func Bytes(data []byte, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -63,7 +85,10 @@ func Bytes(data []byte, options Options) (config.Source, error) {
 	return &source{info: info, input: sourceio.Bytes(data), limits: limits}, nil
 }
 
-// FromFS constructs a repeatable source for path in filesystem.
+// FromFS constructs a source for an fs.ValidPath name in a borrowed filesystem.
+// It reopens the path each load, checks metadata/generation and owns closing each
+// admitted file. It imposes no discovery permission/symlink policy or I/O sandbox;
+// ordinary filesystem methods must return and support the caller's concurrency.
 func FromFS(filesystem fs.FS, path string, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -125,6 +150,8 @@ func validate(options Options) (config.SourceInfo, Limits, error) {
 }
 
 func parse(ctx context.Context, data []byte, limits Limits) (map[string]any, error) {
+	// Token walking owns CONFIG-DEC-001/002/009 admission. Standard-library
+	// syntax causes remain here; plan-level SourceError provides redaction.
 	decoder := stdjson.NewDecoder(bytes.NewReader(data))
 	decoder.UseNumber()
 	keys := 0

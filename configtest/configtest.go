@@ -1,5 +1,9 @@
-// Package configtest provides deterministic configuration fixtures and test
-// assertions without mutating process-global state.
+// Package configtest provides deterministic configuration fixtures and assertions
+// without mutating process-global state. NewSource copies canonical map/slice
+// containers; unsupported custom references are borrowed. Filesystem returns a
+// fresh, mutable fstest.MapFS, not an immutable filesystem enforcement mechanism.
+// These helpers are for tests, not source authentication or hostile-input admission;
+// diagnostic names/paths and test failure output must remain non-secret.
 package configtest
 
 import (
@@ -15,7 +19,9 @@ import (
 
 // TestingT is the subset of testing.T used by configtest helpers.
 type TestingT interface {
+	// Helper attributes test failures to the caller of the fixture/assertion helper.
 	Helper()
+	// Fatalf reports failure and must stop the current test, as testing.T does.
 	Fatalf(format string, args ...any)
 }
 
@@ -25,12 +31,15 @@ type source struct {
 	err      error
 }
 
-// NewSource returns an immutable source that yields a fresh document per load.
+// NewSource captures copied canonical map/slice containers and returns fresh
+// documents per load. It does not admit arbitrary input; custom references
+// outside that container shape remain shared and must be immutable.
 func NewSource(info config.SourceInfo, document config.Document) config.Source {
 	return &source{info: info, document: cloneDocument(document)}
 }
 
-// FailingSource returns a deterministic source that always returns cause.
+// FailingSource returns cause on a non-canceled load; canceled contexts take
+// precedence. The cause is borrowed, not redacted by this test helper.
 func FailingSource(info config.SourceInfo, cause error) config.Source {
 	return &source{info: info, err: cause}
 }
@@ -62,7 +71,9 @@ func Environment(values map[string]string) []string {
 	return environment
 }
 
-// Filesystem returns an immutable in-memory filesystem with owner-only files.
+// Filesystem returns a fresh in-memory filesystem with 0600-mode copied files.
+// The returned fstest.MapFS is mutable through a type assertion; ownership and
+// containment/permission enforcement are not supplied by this fixture helper.
 func Filesystem(files map[string]string) fs.FS {
 	fixture := make(fstest.MapFS, len(files))
 	for name, contents := range files {
@@ -103,6 +114,7 @@ func DiffSecrets(got, want config.Secret) string {
 func AssertOrigin(
 	t TestingT,
 	snapshot interface {
+		// Origin returns declared metadata for path and whether it exists; no value is exposed.
 		Origin(string) (config.Origin, bool)
 	},
 	path string,

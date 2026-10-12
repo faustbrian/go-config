@@ -1,4 +1,10 @@
-// Package discover provides explicit, bounded configuration file discovery.
+// Package discover searches explicitly enabled configuration paths in stable
+// order without reading file contents. Search checks candidates, lexical/canonical
+// root containment, link policy and optional permission bits. Results are metadata,
+// not held/opened authorization: files may change before a consumer opens them.
+// Filesystem operations are synchronous and cannot be preempted by context.
+// No watcher, cache, loader, credential ownership or background worker is provided;
+// callers choose trustworthy roots and source-loading policy.
 package discover
 
 import (
@@ -33,7 +39,9 @@ var (
 type Mode uint8
 
 const (
+	// SearchFirst stops after the first accepted result in traversal order.
 	SearchFirst Mode = iota
+	// SearchAll collects all accepted results up to MaxResults.
 	SearchAll
 )
 
@@ -41,7 +49,9 @@ const (
 type SymlinkPolicy uint8
 
 const (
+	// RejectSymlinks rejects link-like components (Windows includes reparse points).
 	RejectSymlinks SymlinkPolicy = iota
+	// AllowWithinRoot allows links subject to Root when configured; empty Root is unconfined.
 	AllowWithinRoot
 )
 
@@ -49,40 +59,66 @@ const (
 type PermissionPolicy uint8
 
 const (
+	// IgnorePermissions does not reject group/other permission bits.
 	IgnorePermissions PermissionPolicy = iota
+	// OwnerOnly rejects group/other permission bits; it does not check UID/ACL identity.
 	OwnerOnly
 )
 
 // Options defines all search roots and policies. No path is searched unless it
 // is explicitly present here or enabled through UseUserConfigDir.
 type Options struct {
-	Explicit         []string
-	Directories      []string
-	StartDir         string
-	StopDir          string
-	Root             string
-	SearchPlaces     []string
-	Application      string
-	UserConfigDir    string
+	// Explicit lists paths/directories searched first, in caller order.
+	Explicit []string
+	// Directories lists search directories visited after Explicit.
+	Directories []string
+	// StartDir starts the optional single/upward directory search.
+	StartDir string
+	// StopDir is required for Upward and must canonically contain StartDir.
+	StopDir string
+	// Root optionally confines lexical and resolved candidates; empty means no root boundary.
+	Root string
+	// SearchPlaces lists safe single-component filenames in priority order.
+	SearchPlaces []string
+	// Application is the safe user-config child name when that search is enabled.
+	Application string
+	// UserConfigDir supplies the explicit user-config base; empty uses
+	// os.UserConfigDir when enabled.
+	UserConfigDir string
+	// UseUserConfigDir enables the last user-config search, never implicitly.
 	UseUserConfigDir bool
-	Upward           bool
-	Mode             Mode
-	Symlinks         SymlinkPolicy
-	Permissions      PermissionPolicy
-	MaxCandidates    int
-	MaxResults       int
-	MaxUpwardDepth   int
+	// Upward visits parents through StopDir, subject to MaxUpwardDepth.
+	Upward bool
+	// Mode selects first match or all matches; zero selects SearchFirst.
+	Mode Mode
+	// Symlinks selects link policy; zero rejects links/reparse points.
+	Symlinks SymlinkPolicy
+	// Permissions checks permission bits, not owner identity or ACLs; zero ignores them.
+	Permissions PermissionPolicy
+	// MaxCandidates caps considered entries, including duplicates; zero selects 1000.
+	MaxCandidates int
+	// MaxResults caps accepted results; zero selects 100.
+	MaxResults int
+	// MaxUpwardDepth caps directory visits; zero selects 64.
+	MaxUpwardDepth int
 }
 
 // Result contains discovered-path provenance without file contents.
 type Result struct {
-	Path         string
+	// Path is the cleaned absolute lexical candidate used for provenance.
+	Path string
+	// ResolvedPath is the discovered canonical target, not a held file descriptor.
 	ResolvedPath string
-	Directory    string
-	SearchPlace  string
-	Explicit     bool
-	UserConfig   bool
-	Symlink      bool
+	// Directory identifies the visited directory, empty for explicit file candidates.
+	Directory string
+	// SearchPlace is the matched filename, empty for explicit file candidates.
+	SearchPlace string
+	// Explicit reports the Explicit search stage.
+	Explicit bool
+	// UserConfig reports the user-config search stage.
+	UserConfig bool
+	// Symlink reports a detected link-like path component at discovery time.
+	Symlink bool
 }
 
 type settings struct {
@@ -120,7 +156,13 @@ type candidate struct {
 	userConfig  bool
 }
 
-// Search returns deterministic results according to options.
+// Search considers explicit paths, ordered directories, StartDir/upward visits,
+// then optional user config in that order. Duplicate absolute lexical paths are
+// skipped after consuming a candidate slot; distinct paths to one file can remain.
+// Missing/nonregular candidates are skipped; policy/limit failures return no
+// partial results. Files may change after inspection; context checks surround
+// synchronous OS work, not force cancellation. Input slices must not be mutated
+// during Search. OwnerOnly tests mode bits, not OS user identity or ACLs.
 func Search(ctx context.Context, options Options) ([]Result, error) {
 	return search(ctx, options, defaultFileOperations)
 }

@@ -1,4 +1,9 @@
-// Package validation orchestrates small post-decode configuration validators.
+// Package validation runs post-decode checks synchronously in stable order.
+// Run recovers callback panics and redacts arbitrary cause text/type while retaining
+// errors.Is. It does not copy values, enforce resource budgets, roll back callback
+// side effects or forcibly stop blocking code. Callbacks receive the same value
+// graph and must be safe for the application's concurrent reuse. Paths and other
+// caller metadata must be non-secret. No goroutine or I/O resource is owned.
 package validation
 
 import (
@@ -9,14 +14,18 @@ import (
 	"github.com/faustbrian/go-config/v2/internal/safeerror"
 )
 
-// Validator checks a complete decoded candidate.
+// Validator checks a complete decoded candidate synchronously under ctx.
+// It must cooperate with cancellation, avoid side effects and not mutate shared
+// candidate references. Run recovers panics but cannot preempt blocking code.
 type Validator[T any] func(context.Context, T) error
 
 // PanicError reports a recovered validator panic without retaining its value.
 type PanicError struct {
+	// Operation names the self-validator or registered validator seam.
 	Operation string
 }
 
+// Error returns the aggregate/category diagnostic without arbitrary cause or panic text.
 func (e *PanicError) Error() string {
 	return fmt.Sprintf("configuration %s panicked", e.Operation)
 }
@@ -36,6 +45,7 @@ func At(path string, cause error) error {
 	return &Failure{path: path, cause: redactCause(cause)}
 }
 
+// Error returns the validation category and trusted path without arbitrary cause text.
 func (e *Failure) Error() string {
 	if e.path == "" {
 		return "configuration validation failed"
@@ -43,6 +53,7 @@ func (e *Failure) Error() string {
 	return fmt.Sprintf("configuration validation failed at %q", e.path)
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *Failure) Unwrap() error { return redactCause(e.cause) }
 
 // Path returns the safe configuration field path.
@@ -53,6 +64,7 @@ type Errors struct {
 	failures []error
 }
 
+// Error returns the aggregate/category diagnostic without arbitrary cause or panic text.
 func (e *Errors) Error() string {
 	label := "errors"
 	if len(e.failures) == 1 {
@@ -61,6 +73,8 @@ func (e *Errors) Error() string {
 	return fmt.Sprintf("configuration validation failed (%d %s)", len(e.failures), label)
 }
 
+// Unwrap returns a fresh slice of shared child failures; their metadata remains
+// caller-trusted.
 func (e *Errors) Unwrap() []error {
 	return append([]error(nil), e.failures...)
 }
@@ -79,6 +93,10 @@ func (e *Errors) Paths() []string {
 
 // Run invokes the candidate's Validate method, when present, followed by all
 // registered validators. Independent failures are aggregated in stable order.
+// The value is not copied here; a self-validator and validators share its reference
+// graph. Nil validators produce failures. Cancellation before a later validator
+// returns ctx.Err rather than accumulated failures; no final context recheck occurs
+// after the last callback. No callback side effect is rolled back.
 func Run[T any](ctx context.Context, value T, validators ...Validator[T]) error {
 	if err := ctx.Err(); err != nil {
 		return err

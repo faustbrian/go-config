@@ -1,4 +1,11 @@
-// Package decode maps format-independent configuration trees into Go values.
+// Package decode strictly maps configuration trees into fresh Go candidates.
+// Into/Value commit the destination only after successful decoding and a final
+// context check; custom hook side effects are not transactional. Unknown/required
+// fields and numeric overflow are rejected. Hooks run synchronously, may see input
+// maps directly, and must cooperate with context and avoid external side effects.
+// This standalone package does not bound/cycle-check arbitrary input; use config
+// loading for canonical admission. Concurrent calls need independent destinations
+// and immutable inputs/hooks. There is no watcher, I/O or background resource.
 package decode
 
 import (
@@ -26,22 +33,28 @@ var (
 // ValueUnmarshaler decodes a format-independent configuration value. It is
 // intended for presence-aware wrappers that must observe explicit null.
 type ValueUnmarshaler interface {
+	// UnmarshalConfigValue consumes a borrowed value synchronously; do not mutate or
+	// retain its mutable graph.
 	UnmarshalConfigValue(any) error
 }
 
 // ContextValueUnmarshaler decodes a value while observing cancellation.
 type ContextValueUnmarshaler interface {
+	// UnmarshalConfigValueContext consumes a borrowed value and must cooperate with ctx.
 	UnmarshalConfigValueContext(context.Context, any) error
 }
 
 // ContextTextUnmarshaler decodes text while observing cancellation.
 type ContextTextUnmarshaler interface {
+	// UnmarshalTextContext receives a fresh byte slice and must cooperate with ctx.
 	UnmarshalTextContext(context.Context, []byte) error
 }
 
 // TextTargeter lets presence-aware wrappers declare the underlying type that
 // textual sources should convert before calling ValueUnmarshaler.
 type TextTargeter interface {
+	// ConfigTextTarget returns a valid non-nil conversion type; implementations must
+	// avoid recursive target chains.
 	ConfigTextTarget() reflect.Type
 }
 
@@ -53,14 +66,21 @@ var (
 
 // FieldError describes a decode failure without including the received value.
 type FieldError struct {
-	Path     string
-	Source   string
+	// Path is the trusted dotted field/index path.
+	Path string
+	// Source is optional caller-originated source metadata.
+	Source string
+	// Location is optional caller-originated location metadata.
 	Location string
+	// Expected describes the required type/category, not a value.
 	Expected string
+	// Received describes the input type/category, not its content.
 	Received string
-	Cause    error
+	// Cause retains conversion failure; Unwrap exposes only safe identity wrappers.
+	Cause error
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *FieldError) Error() string {
 	message := fmt.Sprintf(
 		"decode config field %q: expected %s, received %s",
@@ -80,6 +100,7 @@ func (e *FieldError) Error() string {
 	return message
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *FieldError) Unwrap() error { return redactCause(e.Cause) }
 
 // Format prevents detailed formatting from traversing the conversion cause.
@@ -94,18 +115,22 @@ func (e *FieldError) MarshalText() ([]byte, error) {
 
 // Errors contains independent field failures in lexical path order.
 type Errors struct {
+	// Fields is the exposed failure slice; decoder results are ordered lexically by Path.
 	Fields []*FieldError
 }
 
 // PanicError reports a recovered extension panic without retaining its value.
 type PanicError struct {
+	// Operation names the extension seam whose panic was recovered.
 	Operation string
 }
 
+// Error identifies the recovered extension operation without retaining the panic value.
 func (e *PanicError) Error() string {
 	return fmt.Sprintf("config %s panicked", e.Operation)
 }
 
+// Error returns only the number of child field failures.
 func (e *Errors) Error() string {
 	return fmt.Sprintf("decode config: %d field errors", len(e.Fields))
 }
@@ -120,6 +145,8 @@ func (e *Errors) MarshalText() ([]byte, error) {
 	return []byte(e.Error()), nil
 }
 
+// Unwrap returns a fresh slice of shared child failures; their metadata remains
+// caller-trusted.
 func (e *Errors) Unwrap() []error {
 	errors := make([]error, len(e.Fields))
 	for index, field := range e.Fields {
@@ -144,7 +171,13 @@ func Value(input any, destination any) error {
 	return ValueContext(context.Background(), input, destination)
 }
 
-// ValueContext atomically decodes one value while observing ctx.
+// ValueContext decodes into a zero candidate and commits destination only on
+// complete success and a final context check. ctx must be non-nil; destination
+// must be a non-nil pointer. Unknown/required fields, incompatible types and
+// overflow fail. Input is not admitted or universally cloned at this standalone
+// seam; custom hooks and unsupported interface shapes remain caller-trusted.
+// Owned hook panics become PanicError, but side effects/input mutation cannot
+// be rolled back and arbitrary blocking code is not preempted.
 func ValueContext(ctx context.Context, input any, destination any) error {
 	if err := ctx.Err(); err != nil {
 		return err

@@ -1,4 +1,13 @@
-// Package toml provides strict, bounded TOML configuration sources.
+// Package toml loads explicit TOML 1.0.0 configuration into canonical documents.
+// The root table is normalized; date/time categories become strings, and TOML
+// non-finite floats remain float64. Depth/key admission follows backend
+// materialization, not a pre-parser heap cap.
+// Bytes copies input before load-time byte admission; FromFS borrows/reopens an
+// fs.FS path and checks generation metadata. Sources own no watcher/goroutine,
+// retry or shutdown. Context is cooperative around owned/parser work, not forced
+// preemption of ordinary filesystem or backend operations. See CONFIG-DEC-001
+// through CONFIG-DEC-009 and the maintained conformance guide for exact policy,
+// not a claim of complete specification conformance.
 package toml
 
 import (
@@ -24,26 +33,38 @@ const (
 
 // Limits bounds parser resource use. Zero values select conservative defaults.
 type Limits struct {
+	// MaxBytes caps each accepted input on load; zero selects 1 MiB.
 	MaxBytes int64
+	// MaxDepth caps normalized value depth; zero selects 64.
 	MaxDepth int
-	MaxKeys  int
+	// MaxKeys caps mapping keys across the document; zero selects 100000.
+	MaxKeys int
 }
 
 // Options configures source metadata and parser bounds.
 type Options struct {
-	Name      string
-	Priority  int
+	// Name is a required nonblank, non-secret diagnostic label.
+	Name string
+	// Priority passes unchanged to NewPlan ordering.
+	Priority int
+	// Sensitive marks provenance, not encrypted or erased storage.
 	Sensitive bool
-	Optional  bool
-	Limits    Limits
+	// Optional permits plan-level ErrNotFound suppression only.
+	Optional bool
+	// Limits chooses positive admission bounds; negative values are invalid.
+	Limits Limits
 }
 
 // ParseError wraps a parser cause without including source text in diagnostics.
 type ParseError struct {
+	// Cause retains parser failure; Unwrap hides arbitrary text and concrete types.
 	Cause error
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (*ParseError) Error() string { return "decode TOML config: malformed document" }
+
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *ParseError) Unwrap() error {
 	return safeerror.Redact(e.Cause, "TOML parser cause redacted")
 }
@@ -64,7 +85,9 @@ type source struct {
 	limits Limits
 }
 
-// Bytes constructs a repeatable source from an immutable copy of data.
+// Bytes constructs a repeatable source from copied data and validated options.
+// Size is admitted only on Load after the constructor copy; decoded plaintext
+// and copied input are retained without guaranteed secure erasure.
 func Bytes(data []byte, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -73,7 +96,10 @@ func Bytes(data []byte, options Options) (config.Source, error) {
 	return &source{info: info, input: sourceio.Bytes(data), limits: limits}, nil
 }
 
-// FromFS constructs a repeatable source for path in filesystem.
+// FromFS constructs a source for an fs.ValidPath name in a borrowed filesystem.
+// It reopens the path each load, checks metadata/generation and owns closing each
+// admitted file. It imposes no discovery permission/symlink policy or I/O sandbox;
+// ordinary filesystem methods must return and support the caller's concurrency.
 func FromFS(filesystem fs.FS, path string, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -93,6 +119,8 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 	if err != nil {
 		return config.Document{}, err
 	}
+	// Backend grammar/duplicate checks precede owned depth/key normalization;
+	// those limits do not prevent backend materialization under MaxBytes.
 	tree := make(map[string]any)
 	if _, err := btoml.NewDecoder(sourceio.ContextReader(ctx, data)).Decode(&tree); err != nil {
 		return config.Document{}, &ParseError{

@@ -1,5 +1,10 @@
-// Package configservice adapts typed configuration plans to service command
-// loaders without owning long-lived resources.
+// Package configservice adapts typed plans to go-service command loaders.
+// New fixes precedence and validator slices; each invocation loads a fresh candidate
+// and ignores Invocation. Configuration/source copying limitations remain those
+// of config.Snapshot. Sources/filesystems/SDKs/hooks are borrowed, so repeated or
+// concurrent loads require their corresponding safety. No publication manager,
+// refresh loop, resource shutdown or retry is owned. This optional integration
+// introduces go-service/go-cli dependencies; errors and metadata are caller-trusted.
 package configservice
 
 import (
@@ -55,7 +60,7 @@ type Dotenv struct {
 	Options dotenv.Options
 }
 
-// Options configure one immutable typed service loader.
+// Options configures a structurally fixed typed loader with borrowed Sources.
 type Options[T any] struct {
 	// Sources contains caller-owned sources grouped by default precedence.
 	Sources config.DefaultSources

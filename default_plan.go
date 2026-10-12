@@ -5,16 +5,26 @@ import "context"
 // DefaultSources groups sources by the documented default precedence model.
 // Order within each category is preserved.
 type DefaultSources struct {
-	Defaults          []Source
-	DiscoveredBase    []Source
+	// Defaults supplies the priority-10 lowest-precedence category.
+	Defaults []Source
+	// DiscoveredBase supplies priority-20 base documents, not automatic discovery.
+	DiscoveredBase []Source
+	// DiscoveredProfile supplies priority-30 profile documents.
 	DiscoveredProfile []Source
-	ExplicitFiles     []Source
-	Dotenv            []Source
-	Environment       []Source
-	Overrides         []Source
+	// ExplicitFiles supplies priority-40 explicitly chosen file sources.
+	ExplicitFiles []Source
+	// Dotenv supplies priority-50 textual sources.
+	Dotenv []Source
+	// Environment supplies priority-60 environment sources.
+	Environment []Source
+	// Overrides supplies the priority-70 final category; custom NewPlan priorities may differ.
+	Overrides []Source
 }
 
-// NewDefaultPlan assigns category priorities and returns an inspectable plan.
+// NewDefaultPlan assigns category priorities without mutating Source.Info and
+// returns a plan with stable caller order within each category. It borrows the
+// source instances; the category slices are not retained. Duplicate names across
+// categories and nil sources fail as in NewPlan.
 func NewDefaultPlan(sources DefaultSources) (Plan, error) {
 	var resolved []Source
 	resolved = appendPriority(resolved, sources.Defaults, PriorityDefaults)

@@ -1,5 +1,10 @@
-// Package sourceio provides immutable, bounded byte and fs.FS inputs for
-// format source packages.
+// Package sourceio supplies repeatable byte/fs.FS inputs with admitted read
+// sizes and before/after metadata-generation checks for format sources.
+// Inputs borrow filesystem implementations and never sandbox their I/O or memory.
+// Context methods must cooperate; ordinary methods can block. Owned operations
+// recover filesystem panics, and context-aware close gets independent cleanup.
+// Generation metadata is trusted, not an authenticity/atomic-read oracle.
+// No goroutine/watcher/retry is owned; Reader factories use their own lifecycle.
 package sourceio
 
 import (
@@ -16,7 +21,8 @@ import (
 	config "github.com/faustbrian/go-config/v2"
 )
 
-// Input is a repeatable immutable byte or filesystem input.
+// Input is a repeatable copied-byte or borrowed-filesystem input. The zero
+// Input holds empty bytes; filesystem contents may change between loads.
 type Input struct {
 	data     []byte
 	open     func(context.Context) (io.ReadCloser, error)
@@ -28,7 +34,8 @@ const closeTimeout = time.Second
 // Bytes returns an immutable copy-backed input.
 func Bytes(data []byte) Input { return Input{data: bytes.Clone(data)} }
 
-// ContextReader returns a reader over data that checks ctx before every read.
+// ContextReader borrows data and checks non-nil ctx before each read. Do not
+// mutate data or reuse the reader concurrently; it creates no goroutine.
 func ContextReader(ctx context.Context, data []byte) io.Reader {
 	return &contextReader{ctx: ctx, reader: bytes.NewReader(data)}
 }
@@ -159,6 +166,9 @@ func inspectFile(ctx context.Context, file fs.File) (fileVersion, error) {
 	return version, nil
 }
 
+// Metadata detects observed changes, not authenticity or every intervening
+// write. A trusted generation token covers same-size/same-time rewrites; native
+// change time is available only on some operating systems.
 func fileChanged(before, after fileVersion) bool {
 	if before.generated != after.generated ||
 		before.generated && before.generation != after.generation {
@@ -171,7 +181,10 @@ func fileChanged(before, after fileVersion) bool {
 		before.tracked && before.change != after.change
 }
 
-// Read reads a bounded stream and checks ctx between reader operations.
+// Read reads at most maxBytes+1 to detect oversize input and checks ctx between
+// synchronous reads. Callers supply a nonnegative representable budget; MaxInt64
+// avoids the extra-byte addition. No reader close is performed here. Panics/count
+// violations/no-progress are errors; blocking reads require cooperative methods.
 func Read(ctx context.Context, reader io.Reader, maxBytes int64) ([]byte, error) {
 	if reader == nil {
 		return nil, errors.New("source reader must not be nil")

@@ -6,6 +6,8 @@ import (
 	"testing/fstest"
 )
 
+// FuzzFilesystemBoundary explores bounded names/format selectors/data with an
+// in-memory filesystem, not host filesystem containment qualification.
 func FuzzFilesystemBoundary(f *testing.F) {
 	f.Add("config.json", uint8(FormatAuto), []byte(`{"value":"safe"}`))
 	f.Add("../config.yaml", uint8(FormatYAML), []byte("value: safe\n"))

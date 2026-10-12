@@ -21,6 +21,10 @@ const (
 )
 
 // Optional preserves absence, explicit null, and present zero values.
+// Its zero value is Absent. Get returns T directly, not a defensive copy.
+// Snapshot's clone hook supports ordinary maps/slices/pointers, but bypasses
+// payload validation; custom arrays or cyclic/unsupported T state must remain
+// caller-controlled and must not be treated as universally isolated.
 type Optional[T any] struct {
 	value T
 	state Presence
@@ -39,7 +43,9 @@ func (o Optional[T]) ConfigTextTarget() reflect.Type { return reflect.TypeFor[T]
 
 func (o *Optional[T]) setConfigPresence(state Presence) { o.state = state }
 
-// UnmarshalConfigValue implements decode.ValueUnmarshaler.
+// UnmarshalConfigValue decodes into a fresh T and changes the receiver only on
+// success. Nil input clears the value and sets Null; other success sets Present.
+// A nil receiver is not supported. Extension behavior follows decode.Value.
 func (o *Optional[T]) UnmarshalConfigValue(input any) error {
 	var zero T
 	if input == nil {

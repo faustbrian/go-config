@@ -1,4 +1,9 @@
-// Package programmatic provides immutable map-backed configuration sources.
+// Package programmatic provides explicit copied map-backed sources. Map
+// normalizes string-key maps and arrays/slices into canonical containers; Defaults
+// and Overrides select conventional priorities. Construction walks trusted acyclic
+// input without a depth/count/context budget, before config's load admission.
+// Sources own copied containers, retain scalar strings, and create fresh documents
+// on Load. No I/O, process mutation, deletion policy or background work is owned.
 package programmatic
 
 import (
@@ -17,17 +22,23 @@ type source struct {
 	defaulted bool
 }
 
-// Map creates a source at an explicit priority.
+// Map creates a source at an explicit priority from a nonblank name and trusted
+// acyclic tree. Containers are normalized/copied at construction and every load.
+// Nested nil containers normalize to null; a nil root becomes an empty object.
+// Arbitrary pointers/structs are rejected.
+// No constructor resource/cycle budget exists; strings/numeric scalars are retained.
 func Map(name string, priority int, tree map[string]any) (config.Source, error) {
 	return newSource(name, priority, tree, false)
 }
 
-// Defaults creates a lowest-precedence source whose provenance is defaulted.
+// Defaults creates a PriorityDefaults source with defaulted provenance.
+// Custom NewPlan priorities can still precede it; Map construction limits apply.
 func Defaults(name string, tree map[string]any) (config.Source, error) {
 	return newSource(name, config.PriorityDefaults, tree, true)
 }
 
-// Overrides creates a highest-precedence explicit override source.
+// Overrides creates a PriorityOverrides source. Custom NewPlan priorities may
+// still follow it; this constructor does not impose a global final-write rule.
 func Overrides(name string, tree map[string]any) (config.Source, error) {
 	return newSource(name, config.PriorityOverrides, tree, false)
 }

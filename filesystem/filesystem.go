@@ -1,5 +1,10 @@
-// Package filesystem dispatches explicit and discovered files to strict format
-// sources while preserving path provenance.
+// Package filesystem dispatches explicit files/readers to JSON, YAML and TOML
+// sources and records trusted path provenance. FromFS borrows fs.FS; FromPath
+// follows the caller-approved path on each load. FromDiscovered adds directory
+// identity and confined-open checks but does not authenticate file contents or
+// reapply every discovery permission policy. Reader borrows a factory and owns
+// each returned reader's close. No watcher/retry/cache/goroutine is created;
+// callbacks/ordinary filesystem calls must return and support concurrent reuse.
 package filesystem
 
 import (
@@ -26,31 +31,46 @@ const defaultMaxBytes int64 = 1 << 20
 type Format uint8
 
 const (
+	// FormatAuto selects a parser by filename extension, not content sniffing.
 	FormatAuto Format = iota
+	// FormatJSON selects the JSON object source.
 	FormatJSON
+	// FormatYAML selects the single YAML mapping source.
 	FormatYAML
+	// FormatTOML selects the TOML table source.
 	FormatTOML
 )
 
 // Limits are applied consistently to every structured format.
 type Limits struct {
+	// MaxBytes caps each input; zero selects 1 MiB.
 	MaxBytes int64
+	// MaxDepth caps normalized depth; zero selects 64.
 	MaxDepth int
-	MaxKeys  int
+	// MaxKeys caps aggregate mapping keys per document; zero selects 100000.
+	MaxKeys int
 }
 
 // Options configures source metadata, format selection, and parser bounds.
 type Options struct {
-	Name      string
-	Priority  int
+	// Name is the required nonblank diagnostic source label.
+	Name string
+	// Priority is passed unchanged to the selected parser source.
+	Priority int
+	// Sensitive marks provenance without changing plaintext storage.
 	Sensitive bool
-	Optional  bool
-	Format    Format
-	Limits    Limits
+	// Optional permits only ErrNotFound suppression by LoadTree.
+	Optional bool
+	// Format selects the parser; auto is filename-based and invalid for Reader.
+	Format Format
+	// Limits controls each parser's admitted bytes and normalized depth/key bounds.
+	Limits Limits
 }
 
 // OpenFunc returns a new reader for each load. The reader receives the load
-// context and must not be reused after Close.
+// context and must not be reused after Close. The factory must return promptly,
+// not panic, and return nil rather than an owned reader on failure. Reader.Load
+// calls ordinary Close directly, not ContextCloser; it must return and not panic.
 type OpenFunc func(context.Context) (io.ReadCloser, error)
 
 // Reader constructs a repeatable context-aware reader source. Format must be
@@ -101,13 +121,18 @@ func fromPath(
 	)
 }
 
-// FromFS constructs a source for path in filesystem.
+// FromFS constructs a source for an fs.ValidPath name in a borrowed filesystem.
+// It infers format by extension when auto. It does not sandbox the filesystem or
+// impose discovery symlink/permission policy; metadata/generation are trusted.
 func FromFS(filesystem fs.FS, path string, options Options) (config.Source, error) {
 	return fromFS(filesystem, path, path, options)
 }
 
 // FromDiscovered opens the canonical discovered target and records the lexical
-// discovered path in snapshot provenance.
+// discovered path in snapshot provenance. Result is trusted caller metadata;
+// the parent directory identity is bound at construction, not discovery time.
+// Each load rejects final links and compares pre/open/post identity under os.Root.
+// Content authenticity and permission/owner revalidation are not provided.
 func FromDiscovered(result discover.Result, options Options) (config.Source, error) {
 	return fromDiscovered(result, options, filepath.Abs)
 }
@@ -201,6 +226,9 @@ func newDiscoveredFSWithOperations(
 	}, nil
 }
 
+// Hold confinement while checking directory and final file identity. Regular
+// file replacements intentionally remain reloadable; replacing the bound parent
+// directory or inserting a final link is rejected.
 func (filesystem discoveredFS) Open(name string) (fs.File, error) {
 	root, err := filesystem.operations.openRoot(filesystem.directory)
 	if err != nil {

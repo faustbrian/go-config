@@ -1,4 +1,9 @@
-// Package merge combines configuration trees without mutating its inputs.
+// Package merge combines canonical configuration trees without mutating their
+// map/slice containers. Trees recursively merges objects, replaces slices, treats
+// null as explicit replacement, and consumes Delete tombstones at visited keys.
+// Inputs must be acyclic; this standalone seam has no context/resource admission
+// and preserves arbitrary non-container references. Use config loading for
+// canonical validation. No synchronization, I/O or background lifecycle is owned.
 package merge
 
 import (
@@ -13,11 +18,15 @@ type Delete struct{}
 // TypeConflictError reports an incompatible change between configuration
 // layers. Null and Delete are explicit operations and do not cause conflicts.
 type TypeConflictError struct {
-	Path  string
+	// Path is the trusted dotted key of the lexically first conflicting merge.
+	Path string
+	// Lower describes the lower structural/Go type.
 	Lower string
+	// Upper describes the upper structural/Go type.
 	Upper string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *TypeConflictError) Error() string {
 	return fmt.Sprintf(
 		"config merge at %q: cannot replace %s with %s",
@@ -28,7 +37,12 @@ func (e *TypeConflictError) Error() string {
 }
 
 // Trees merges lower and upper configuration objects. Objects merge
-// recursively; all other values replace. Incompatible type changes fail.
+// recursively; all other values replace. Incompatible non-null type changes
+// fail, except all slice types share one structural kind. Nil maps are empty.
+// Canonical maps/[]any are copied; other references are retained. Inputs must
+// remain immutable during the call and be acyclic; no resource/context cap exists.
+// Delete is processed only on visited merge keys, not recursively normalized
+// inside a newly copied object subtree.
 func Trees(lower, upper map[string]any) (map[string]any, error) {
 	merged := cloneMap(lower)
 	if err := mergeMap(merged, upper, ""); err != nil {

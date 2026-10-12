@@ -20,6 +20,8 @@ type benchmarkSettings struct {
 	Labels map[string]int `config:"labels"`
 }
 
+// BenchmarkSourcePlanLoad measures repeated typed loading from one in-memory source;
+// construction is outside b.Loop.
 func BenchmarkSourcePlanLoad(b *testing.B) {
 	source := configtest.NewSource(
 		config.SourceInfo{Name: "benchmark", Priority: 10},
@@ -34,6 +36,8 @@ func BenchmarkSourcePlanLoad(b *testing.B) {
 	}
 }
 
+// BenchmarkDecode measures strict decoding of a fixed scalar/two-label tree into a
+// fresh candidate.
 func BenchmarkDecode(b *testing.B) {
 	tree := map[string]any{
 		"name": "worker", "port": int64(8080),
@@ -48,6 +52,7 @@ func BenchmarkDecode(b *testing.B) {
 	}
 }
 
+// BenchmarkMerge measures copying/merging two fixed nested layers; no source I/O is included.
 func BenchmarkMerge(b *testing.B) {
 	lower := map[string]any{"server": map[string]any{"host": "localhost", "port": int64(80)}}
 	upper := map[string]any{"server": map[string]any{"port": int64(443)}, "debug": true}
@@ -59,6 +64,8 @@ func BenchmarkMerge(b *testing.B) {
 	}
 }
 
+// BenchmarkValidation measures one successful callback on a fixed value without
+// source/decode work.
 func BenchmarkValidation(b *testing.B) {
 	validator := func(context.Context, benchmarkSettings) error { return nil }
 	value := benchmarkSettings{Name: "worker", Port: 8080}
@@ -70,6 +77,8 @@ func BenchmarkValidation(b *testing.B) {
 	}
 }
 
+// BenchmarkLargeConfig measures repeated parsing of a fixed 10000-key JSON document;
+// generation/source construction is outside b.Loop.
 func BenchmarkLargeConfig(b *testing.B) {
 	large := make(map[string]any, 10_000)
 	for index := range 10_000 {

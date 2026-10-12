@@ -10,18 +10,23 @@ import (
 const Redacted = "[REDACTED]"
 
 // Secret stores sensitive text with redacted default formatting and marshaling.
-// Reveal is the only supported way to obtain the underlying value.
+// Reveal is the supported plaintext accessor, not a security or protected-memory
+// boundary. The string is retained/shared, is not encrypted and cannot be erased
+// reliably in Go. The zero Secret holds empty text; equality compares its text.
 type Secret struct {
 	value string
 }
 
-// NewSecret wraps sensitive text.
+// NewSecret retains sensitive text without copying or validating it.
 func NewSecret(value string) Secret { return Secret{value: value} }
 
 // Reveal explicitly returns the sensitive text.
 func (s Secret) Reveal() string { return s.value }
 
-func (Secret) String() string   { return Redacted }
+// String returns Redacted, including for an empty Secret.
+func (Secret) String() string { return Redacted }
+
+// GoString returns Redacted for Go-syntax diagnostics.
 func (Secret) GoString() string { return Redacted }
 
 // Format redacts every fmt formatting verb.

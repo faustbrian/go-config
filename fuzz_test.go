@@ -16,6 +16,9 @@ import (
 	yamlsource "github.com/faustbrian/go-config/v2/yaml"
 )
 
+// FuzzStructuredSources feeds the same arbitrary bytes to all three copied
+// structured sources; it explores parser acceptance without claiming cross-format
+// equivalence.
 func FuzzStructuredSources(f *testing.F) {
 	f.Add([]byte(`{"name":"worker","port":8080}`))
 	f.Add([]byte("name: worker\nport: 8080\n"))
@@ -46,6 +49,8 @@ func FuzzStructuredSources(f *testing.F) {
 	})
 }
 
+// FuzzDotenvInterpolation explores explicit external/file expansion under small
+// limits, including cycles/literals.
 func FuzzDotenvInterpolation(f *testing.F) {
 	f.Add("APP_NAME=${NAME:-worker}\n", "worker")
 	f.Add("APP_NAME=${APP_NAME}\n", "")
@@ -73,6 +78,8 @@ func FuzzDotenvInterpolation(f *testing.F) {
 	})
 }
 
+// FuzzEnvironmentMapping explores one schema-selected variable under explicit small
+// count/byte/value limits.
 func FuzzEnvironmentMapping(f *testing.F) {
 	f.Add("APP_VALUE", "42")
 	f.Add("app_value", "true")
@@ -102,6 +109,8 @@ func FuzzEnvironmentMapping(f *testing.F) {
 	})
 }
 
+// FuzzDecodeTagsAndDestinationTypes explores bounded dynamic tags/destinations and
+// extension panic paths; callbacks are deterministic local fixtures.
 func FuzzDecodeTagsAndDestinationTypes(f *testing.F) {
 	f.Add("value", uint8(0), "42")
 	f.Add("value,required", uint8(1), "true")

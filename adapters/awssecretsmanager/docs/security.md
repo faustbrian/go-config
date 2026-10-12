@@ -6,10 +6,12 @@ static AWS access keys to this adapter. IAM should allow only
 permission required by that secret.
 
 The source identifier and version selectors are configuration metadata, not
-secret material. Payload values are marked sensitive and provider error
-details are redacted from formatting. The transient adapter-owned payload copy
-is cleared after parsing; the returned configuration document necessarily owns
-its decoded values for the lifetime chosen by the caller.
+secret material. Payload values are marked sensitive and provider error details
+are redacted from formatting. The transient adapter-owned payload copy is
+cleared after parsing, but SDK responses, strings and parser copies are not
+securely erased. Size admission follows SDK materialization and the local copy,
+not a whole-HTTP-memory budget; the returned configuration document necessarily
+owns its decoded values for the lifetime chosen by the caller.
 
 Avoid logging source documents, typed settings, AWS responses, or wrapped
 provider causes. Rotation and refresh must be an explicit application workflow

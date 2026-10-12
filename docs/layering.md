@@ -15,9 +15,10 @@
 | 70 | explicit programmatic overrides | later caller entry |
 
 Order within a category is preserved. `NewPlan` supports a custom order by
-sorting stable source priorities. Duplicate names, empty names, invalid
-metadata, and nil sources fail before loading. Inspect `Plan.Sources()` before
-load when startup diagnostics need to show the resolved order.
+sorting stable source priorities. Duplicate exact names, blank names and
+nil/typed-nil sources fail before loading; arbitrary priorities and nonblank
+diagnostic text are accepted. Inspect `Plan.Sources()` before load when startup
+diagnostics need to show the resolved order.
 
 ## Defaults and presence
 
@@ -71,6 +72,7 @@ It does not inspect arbitrary process environment unless the caller explicitly
 copies selected variables into `Interpolation.Variables`.
 
 `decode.IntoContext` and `ValueContext` prefer `ContextValueUnmarshaler` and
-`ContextTextUnmarshaler` when implemented. These cooperative hooks receive the
-load context and already-bounded canonical input. Legacy standard-library text
-hooks remain supported as trusted synchronous application code.
+`ContextTextUnmarshaler` when implemented. These hooks receive canonical
+admitted input through plan loading; standalone decode does not perform that
+admission. Cancellation is cooperative. Legacy standard-library text hooks
+remain supported as trusted synchronous application code.

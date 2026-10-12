@@ -1,5 +1,9 @@
-// Package configservice is the compatibility import path for the target-oriented
-// service adapter at github.com/faustbrian/go-config/v2/adapters/service.
+// Package configservice is the compatibility facade for the target-oriented
+// adapter at github.com/faustbrian/go-config/v2/adapters/service. New delegates
+// loading and translates construction errors into this package's distinct
+// OptionsError type while retaining the sentinel/cause. It owns no watcher,
+// retry or shutdown and inherits the direct adapter's borrowed-resource and
+// Snapshot copying limitations. Prefer adapters/service for new consumers.
 package configservice
 
 import (
@@ -55,7 +59,7 @@ type Dotenv struct {
 	Options dotenv.Options
 }
 
-// Options configure one immutable typed service loader.
+// Options configures a structurally fixed typed loader with borrowed Sources.
 type Options[T any] struct {
 	// Sources contains caller-owned sources grouped by default precedence.
 	Sources config.DefaultSources

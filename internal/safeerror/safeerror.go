@@ -11,6 +11,8 @@ type redacted struct {
 
 // Redact replaces cause formatting while preserving errors.Is checks. The
 // original cause is deliberately not available through Unwrap or errors.As.
+// The message is caller-owned trusted text; errors.Is can still execute the
+// underlying error's Is/Unwrap methods. This is redaction, not an execution sandbox.
 func Redact(cause error, message string) error {
 	if cause == nil {
 		return nil

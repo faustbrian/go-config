@@ -5,6 +5,12 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Documentation
+
+- Clarify per-source admission, typed snapshot/wrapper copying limitations,
+  trusted metadata and cooperative callbacks/I/O; reconcile current
+  CONFIG-DEC-001/002/009 parsing and diagnostic prose.
+
 ### Changed
 
 - Prepare the root v2 module identity and Go 1.27 minimum. Migrate imports to

@@ -1,4 +1,13 @@
-// Package config loads deterministic layered configuration snapshots.
+// Package config composes explicit Sources into deterministic configuration
+// snapshots. NewPlan fixes low-to-high precedence; LoadTree merges canonical
+// documents, and Load adds strict decoding and validation. No source is discovered
+// or refreshed implicitly, and no watcher, goroutine or process environment is owned.
+//
+// Sources, metadata and extension hooks are trusted application collaborators;
+// context cancellation is cooperative, not forced preemption. LoadTree isolates
+// canonical maps/slices. Typed snapshots have the copying limitations documented
+// on Snapshot, particularly for custom arrays and Optional payloads. See the
+// maintained layering and security guides for composition and trust boundaries.
 package config
 
 import (
@@ -17,43 +26,65 @@ import (
 	"github.com/faustbrian/go-config/v2/validation"
 )
 
-// SourceInfo describes a source without exposing its values.
+// SourceInfo describes source policy and diagnostic labels, not its values.
+// Names are not sanitized; callers must keep credentials out of
+// this metadata. NewPlan captures Info once, rather than rereading it on load.
 type SourceInfo struct {
-	Name      string
-	Priority  int
+	// Name is the exact nonblank plan identity and diagnostic label; keep it non-secret.
+	Name string
+	// Priority orders sources from low to high; later equal-priority entries win.
+	Priority int
+	// Sensitive marks provenance, not encryption, value erasure or typed redaction.
 	Sensitive bool
-	Optional  bool
+	// Optional lets LoadTree suppress only errors matching ErrNotFound.
+	Optional bool
 }
 
-// Documented default source priorities, ordered from lowest to highest.
 const (
-	PriorityDefaults          = 10
-	PriorityDiscoveredBase    = 20
+	// PriorityDefaults is the conventional lowest category (10).
+	PriorityDefaults = 10
+	// PriorityDiscoveredBase orders supplied base documents at 20.
+	PriorityDiscoveredBase = 20
+	// PriorityDiscoveredProfile orders supplied profile documents at 30.
 	PriorityDiscoveredProfile = 30
-	PriorityExplicitFiles     = 40
-	PriorityDotenv            = 50
-	PriorityEnvironment       = 60
-	PriorityOverrides         = 70
+	// PriorityExplicitFiles orders supplied explicit files at 40.
+	PriorityExplicitFiles = 40
+	// PriorityDotenv orders supplied dotenv sources at 50.
+	PriorityDotenv = 50
+	// PriorityEnvironment orders supplied environment sources at 60.
+	PriorityEnvironment = 60
+	// PriorityOverrides orders supplied override sources at 70, not above arbitrary
+	// custom priorities.
+	PriorityOverrides = 70
 )
 
-// Document is the intermediate tree produced by a Source.
+// Document is the intermediate tree produced by a Source. LoadTree copies and
+// validates canonical maps/slices before merging; a Source must not mutate them
+// concurrently. Origins are caller-declared provenance, not authenticated evidence.
 type Document struct {
-	Tree    map[string]any
+	// Tree contains canonical maps/slices/scalars, nil or merge.Delete markers.
+	Tree map[string]any
+	// Origins optionally overrides declared provenance by dotted path; values are
+	// never stored here.
 	Origins map[string]Origin
 }
 
 // TreeValueError reports a non-canonical value returned by a Source. It never
 // formats the rejected value.
 type TreeValueError struct {
+	// Path identifies the rejected value by trusted key/index text.
 	Path string
+	// Type identifies its Go type without formatting the rejected value.
 	Type string
 }
 
 // TreeCycleError reports a cyclic source tree without traversing it.
 type TreeCycleError struct {
+	// Path identifies the encountered map/slice cycle without traversing it again.
 	Path string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *TreeCycleError) Error() string {
 	return fmt.Sprintf("config tree at %q: cyclic value", e.Path)
 }
@@ -61,41 +92,54 @@ func (e *TreeCycleError) Error() string {
 // TreeLimitError reports a source-tree structural bound without formatting a
 // value.
 type TreeLimitError struct {
-	Path  string
-	Kind  string
+	// Path identifies the value exceeding a per-source structural bound.
+	Path string
+	// Kind is the exceeded depth, keys or items category.
+	Kind string
+	// Limit is the admitted maximum for that category.
 	Limit int
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *TreeLimitError) Error() string {
 	return fmt.Sprintf("config tree at %q: %s exceeds %d limit", e.Path, e.Kind, e.Limit)
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *TreeValueError) Error() string {
 	return fmt.Sprintf("config tree at %q: unsupported value type %s", e.Path, e.Type)
 }
 
-// SnapshotValueError reports typed state that cannot be copied without
-// retaining caller-visible mutable references. It never formats the value.
+// SnapshotValueError reports typed state rejected by the known cloneability
+// checks, without formatting its value. Absence of this error does not establish
+// universal copying for custom arrays or clone-aware wrappers; see Snapshot.
 type SnapshotValueError struct {
+	// Path identifies typed state rejected before validation/publication.
 	Path string
+	// Type identifies its Go type, not its value.
 	Type string
 }
 
 // SourceError identifies a failed source without exposing arbitrary source
 // error text. Cause identity remains available through errors.Is.
 type SourceError struct {
-	Name  string
+	// Name is the caller-controlled failed source label.
+	Name string
+	// Cause retains the error internally; Unwrap hides its text/type, preserving errors.Is.
 	Cause error
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *SourceError) Error() string {
 	return fmt.Sprintf("load config source %q: source failed", e.Name)
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *SourceError) Unwrap() error {
 	return safeerror.Redact(e.Cause, "config source cause redacted")
 }
 
+// Format keeps every fmt verb on the redacted message and trusted source label.
 func (e *SourceError) Format(state fmt.State, _ rune) {
 	_, _ = state.Write([]byte(e.Error()))
 }
@@ -105,20 +149,30 @@ func (e *SourceError) MarshalText() ([]byte, error) {
 	return []byte(e.Error()), nil
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *SnapshotValueError) Error() string {
 	return fmt.Sprintf("config snapshot at %q: value type %s is not safely cloneable", e.Path, e.Type)
 }
 
 // Source loads one configuration document without mutating global state.
+// Implementations own input admission before their allocations, must return
+// promptly under a bounded context and must not panic. Concurrent/repeated loads
+// require a repeatable, concurrency-safe implementation; Plan adds no source lock.
+// Return ErrNotFound (or a matching error) for optional absence, not empty success.
 type Source interface {
+	// Info returns stable, non-secret diagnostic metadata. NewPlan captures it once.
 	Info() SourceInfo
+	// Load returns a complete candidate or an error. The caller may copy its
+	// canonical tree; do not mutate returned maps/slices during that copy.
 	Load(context.Context) (Document, error)
 }
 
-// ContextFS extends fs.FS with a cancellable open operation. Filesystem source
-// constructors use it when implemented and otherwise call fs.FS.Open.
+// ContextFS extends fs.FS with a cancellable open operation. Filesystem sources
+// prefer it on load when implemented and otherwise call fs.FS.Open.
 type ContextFS interface {
 	fs.FS
+	// OpenContext opens an fs.ValidPath name under ctx and returns a file whose
+	// lifecycle belongs to the source loader, including cleanup after failure.
 	OpenContext(context.Context, string) (fs.File, error)
 }
 
@@ -126,14 +180,18 @@ type ContextFS interface {
 // Filesystem sources use these methods when implemented.
 type ContextFile interface {
 	fs.File
+	// ReadContext follows io.Reader count/error rules and cooperates with ctx.
 	ReadContext(context.Context, []byte) (int, error)
+	// StatContext returns non-nil trustworthy file metadata or an error under ctx.
 	StatContext(context.Context) (fs.FileInfo, error)
 }
 
 // ContextCloser exposes a cancellable close operation for remote resources.
-// Filesystem sources call it with an independent bounded cleanup context and
-// otherwise call Close.
+// fs.FS-backed sources use an independent cleanup context; Reader factories
+// use ordinary Close instead. The implementation must cooperate with deadlines.
 type ContextCloser interface {
+	// CloseContext releases the resource under an independent one-second
+	// cleanup context. The implementation must cooperate; no goroutine is abandoned.
 	CloseContext(context.Context) error
 }
 
@@ -141,10 +199,14 @@ type ContextCloser interface {
 // sources compare it before and after reads to reject mixed generations.
 type GenerationFile interface {
 	fs.File
+	// GenerationContext returns an opaque token that changes whenever the readable
+	// generation changes. Stable tokens must cover same-size/same-time rewrites.
 	GenerationContext(context.Context) (string, error)
 }
 
-// Plan is an immutable, inspectable low-to-high precedence source plan.
+// Plan is an inspectable, structurally fixed low-to-high precedence source plan.
+// It borrows Sources, not their mutable state. The zero Plan has no sources.
+// Concurrent loads are safe only when every borrowed Source is safe for them.
 type Plan struct {
 	sources []plannedSource
 }
@@ -155,7 +217,10 @@ type plannedSource struct {
 }
 
 // NewPlan validates sources and orders them from lowest to highest priority.
-// Sources with equal priority retain caller order.
+// Sources with equal priority retain caller order, so later entries win.
+// Nil/typed-nil sources, blank names and duplicate exact names fail. Arbitrary
+// priorities are accepted; names are not trimmed or sanitized after validation.
+// Source.Info calls are synchronous and are not panic-contained.
 func NewPlan(sources ...Source) (Plan, error) {
 	planned := make([]plannedSource, 0, len(sources))
 	names := make(map[string]struct{}, len(sources))
@@ -194,7 +259,7 @@ func isNilSource(source Source) bool {
 	}
 }
 
-// Sources returns safe metadata in resolved precedence order.
+// Sources returns a fresh metadata slice in precedence order; labels remain caller-trusted.
 func (p Plan) Sources() []SourceInfo {
 	result := make([]SourceInfo, len(p.sources))
 	for index, source := range p.sources {
@@ -204,23 +269,43 @@ func (p Plan) Sources() []SourceInfo {
 	return result
 }
 
-// Origin identifies the winning source for a configuration path.
+// Origin identifies declared winning-source metadata for a dotted path.
+// It never includes a field value, but names/locations/path components are trusted
+// caller or source text. It is not proof of authenticity or complete provenance;
+// supplied Origin overrides can replace presence/state and source labels.
 type Origin struct {
-	Source     string
-	Location   string
-	Sensitive  bool
+	// Source is the declared source label, which overrides may replace.
+	Source string
+	// Location is trusted source-provided path/location metadata, not sanitized text.
+	Location string
+	// Sensitive marks policy metadata; it does not redact the actual typed value.
+	Sensitive bool
+	// Deprecated records the config tag's deprecation annotation, not rejection.
 	Deprecated bool
-	Present    bool
-	State      Presence
+	// Present records declared presence and may be overridden independently of State.
+	Present bool
+	// State distinguishes absence, null, present and defaulted provenance.
+	State Presence
 }
 
-// Snapshot is an immutable configuration tree and its safe provenance.
+// Snapshot holds a loaded value and declared provenance. LoadTree snapshots
+// isolate canonical maps/slices. Typed copying recurses through pointers, maps,
+// slices and exported struct fields, but arrays are copied by value: mutable
+// references inside custom arrays remain shared. Library-owned Optional payloads
+// use a clone hook and are not independently validated for every mutable shape.
+// Keep those payloads acyclic and within the supported copying shape.
+//
+// A successfully loaded snapshot may be read concurrently when custom typed
+// state is immutable. The zero Snapshot contains T's zero value and no origins;
+// a nil *Snapshot is not usable. No secure memory erasure is provided.
 type Snapshot[T any] struct {
 	value   T
 	origins map[string]Origin
 }
 
-// Value returns an independent copy of the loaded value.
+// Value returns a defensive copy of the loaded value within Snapshot's documented
+// copying shape. Custom array references and unsupported wrapper state are not
+// guaranteed independent. Strings and immutable scalar internals are shared.
 func (s *Snapshot[T]) Value() T {
 	return cloneTyped(s.value)
 }
@@ -231,8 +316,15 @@ func (s *Snapshot[T]) Origin(path string) (Origin, bool) {
 	return origin, ok
 }
 
-// LoadTree resolves a Plan atomically. Any source or merge failure returns no
-// snapshot.
+// LoadTree loads Sources synchronously in precedence order and publishes a tree
+// only after every required source and merge succeeds. Atomicity is publication
+// only: it neither rolls back source side effects nor reads a cross-source instant.
+// Optional sources suppress only errors matching ErrNotFound.
+//
+// Each source tree is copied and checked separately for cycles, depth 64,
+// 100000 keys and 100000 array elements. Counters reset per source; source count,
+// aggregate merged bytes and string sizes have no total-plan cap. Source.Load
+// and metadata are trusted; context must be non-nil and cancellation is cooperative.
 func LoadTree(ctx context.Context, plan Plan) (*Snapshot[map[string]any], error) {
 	merged := make(map[string]any)
 	origins := make(map[string]Origin)
@@ -268,12 +360,22 @@ func LoadTree(ctx context.Context, plan Plan) (*Snapshot[map[string]any], error)
 	return &Snapshot[map[string]any]{value: cloneMap(merged), origins: cloneOrigins(origins)}, nil
 }
 
-// Load resolves and strictly decodes a Plan into an immutable typed snapshot.
+// Load resolves and strictly decodes a Plan into a typed snapshot, including
+// any Validate method. It is LoadWithValidators without additional validators;
+// the latter documents publication, copying and callback limitations.
 func Load[T any](ctx context.Context, plan Plan) (*Snapshot[T], error) {
 	return LoadWithValidators[T](ctx, plan)
 }
 
-// LoadWithValidators resolves, decodes, and validates a Plan atomically.
+// LoadWithValidators resolves and decodes into a fresh candidate, propagates
+// field presence/metadata, rejects known uncopyable typed state, then validates a
+// copy before publication. Validation mutation is not an update mechanism.
+// See Snapshot for array/wrapper aliasing limits; callers must keep that state
+// immutable. A failure returns nil, but callback side effects are not rolled back.
+//
+// Decode/validation callbacks run inline with panic recovery at their own seams.
+// Arbitrary blocking code cannot be preempted, and this final publication path
+// does not recheck ctx after the last successful validator. Sources are borrowed.
 func LoadWithValidators[T any](
 	ctx context.Context,
 	plan Plan,
@@ -472,6 +574,9 @@ var ErrNotFound = errors.New("configuration source not found")
 // being read, so no candidate snapshot was accepted.
 var ErrSourceChanged = errors.New("configuration source changed during read")
 
+// Origins are declarations, not an audit log. Replacement/deletion prunes
+// descendant metadata; source overrides retain their own presence/state even
+// if inconsistent with the tree.
 func applyOrigins(
 	origins map[string]Origin,
 	tree map[string]any,
@@ -705,6 +810,8 @@ func validateSnapshotValue(
 		return nil
 	}
 	if value.CanInterface() {
+		// Clone-aware wrappers own their payload policy. This bypass does not
+		// establish that every possible Optional[T] is independently cloneable.
 		if _, ok := value.Interface().(interface{ cloneConfigValue() any }); ok {
 			return nil
 		}
@@ -794,6 +901,8 @@ func joinConfigPath(parent string, definition reflect.StructField) string {
 	return parent + "." + name
 }
 
+// Arrays fall through to value copying, retaining mutable element references.
+// Keep Snapshot's supported copying shape explicit at the public boundary.
 func cloneReflect(value reflect.Value) reflect.Value {
 	if !value.IsValid() {
 		return value

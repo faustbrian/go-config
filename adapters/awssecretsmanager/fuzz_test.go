@@ -7,6 +7,8 @@ import (
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
+// FuzzSourceLoad feeds arbitrary binary payloads through a stub Client and 4096-byte
+// source cap; no AWS service is contacted.
 func FuzzSourceLoad(f *testing.F) {
 	f.Add([]byte(`{"database":{"url":"postgres://synthetic"}}`))
 	f.Add([]byte(`{}`))

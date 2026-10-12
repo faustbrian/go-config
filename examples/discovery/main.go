@@ -1,3 +1,5 @@
+// Command discovery demonstrates explicit upward discovery and loading in an owned
+// temporary directory; it removes that directory before exit.
 package main
 
 import (

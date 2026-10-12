@@ -11,15 +11,24 @@ import (
 type ByteSize int64
 
 const (
+	// KiB is 1024 bytes.
 	KiB ByteSize = 1 << 10
+	// MiB is 1024 KiB.
 	MiB ByteSize = 1 << 20
+	// GiB is 1024 MiB.
 	GiB ByteSize = 1 << 30
-	KB  ByteSize = 1_000
-	MB  ByteSize = 1_000_000
-	GB  ByteSize = 1_000_000_000
+	// KB is 1000 bytes.
+	KB ByteSize = 1_000
+	// MB is 1000 KB.
+	MB ByteSize = 1_000_000
+	// GB is 1000 MB.
+	GB ByteSize = 1_000_000_000
 )
 
-// UnmarshalText parses an integer followed by an optional supported unit.
+// UnmarshalText parses a non-negative decimal integer followed by optional B,
+// KB/MB/GB or KiB/MiB/GiB (case-sensitive). Surrounding and pre-unit whitespace
+// is allowed; fractions and overflowing products fail without changing b.
+// A nil receiver is not supported.
 func (b *ByteSize) UnmarshalText(text []byte) error {
 	input := strings.TrimSpace(string(text))
 	units := []struct {

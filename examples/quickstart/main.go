@@ -1,3 +1,5 @@
+// Command quickstart composes copied defaults, JSON, explicit environment and
+// overrides, then validates and prints only redacted sensitive text.
 package main
 
 import (

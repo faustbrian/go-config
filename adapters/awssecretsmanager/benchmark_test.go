@@ -7,6 +7,8 @@ import (
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
+// BenchmarkSourceLoad measures fixed JSON payload copy/parse through a stub Client,
+// not network/credentials/retries.
 func BenchmarkSourceLoad(b *testing.B) {
 	payload := `{"database":{"url":"postgres://synthetic"},"workers":4}`
 	source, err := New(&stubClient{

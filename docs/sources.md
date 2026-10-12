@@ -78,11 +78,13 @@ otherwise ignored. This includes Windows names such as
 priorities. `Map` accepts an explicit priority. Maps and nested collections are
 normalized to the same tree model and deeply cloned, so caller mutation cannot
 change later loads. Pointer, function, channel, and arbitrary struct values are
-rejected rather than retained by reference. `merge.Delete{}` is the explicit
-deletion marker.
+rejected rather than retained by reference. Programmatic normalization also
+rejects the deletion-marker struct; custom canonical Sources may supply it for
+visited merge keys. Newly copied object subtrees are not recursively processed
+for tombstones.
 
-Every `Source` implementation is rechecked at the plan boundary. Cyclic maps
-or slices, trees deeper than 64 levels, trees exceeding 100,000 aggregate keys,
-and trees exceeding 100,000 aggregate array elements fail before merge. This
-protects callers implementing custom sources in addition to the tighter
-configurable limits on built-in sources.
+Every `Source` implementation is rechecked at the plan boundary. Cyclic maps or
+slices, trees deeper than 64 levels, trees exceeding 100,000 keys per source,
+and trees exceeding 100,000 array elements per source fail before merge. This is
+per-source admission, not a whole-plan budget, and protects custom sources in
+addition to the tighter configurable limits on built-in sources.

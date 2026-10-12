@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+// FuzzDiscoveryBoundary uses injected deterministic filesystem operations to check
+// bounded results and root containment for arbitrary policies/names.
 func FuzzDiscoveryBoundary(f *testing.F) {
 	f.Add("config.yaml", "config.yaml", uint8(0), uint8(0))
 	f.Add("../outside.yaml", "../config.yaml", uint8(1), uint8(1))

@@ -1,5 +1,10 @@
-// Package dotenv provides strict, bounded, optionally interpolated dotenv
-// configuration sources. It parses data only; it never mutates os.Environ.
+// Package dotenv parses explicit dotenv data into a typed environment document,
+// never executes shell text or mutates os.Environ. BytesFor copies data; FromFSFor
+// borrows a repeatable filesystem. Interpolation is opt-in, uses only copied
+// explicit Variables/file values, and precedes environment mapping's own limits.
+// There is no universal dotenv standard/conformance claim. Calls run synchronously;
+// borrowed filesystems must cooperate with cancellation/concurrent reuse.
+// Input and decoded strings remain plaintext; no watcher or erasure is owned.
 package dotenv
 
 import (
@@ -27,40 +32,61 @@ const (
 
 // Limits bounds parser resource use. Zero values select conservative defaults.
 type Limits struct {
-	MaxBytes     int64
-	MaxLines     int
+	// MaxBytes caps input bytes on load; zero selects 1 MiB.
+	MaxBytes int64
+	// MaxLines caps split input lines after splitting; zero selects 100000.
+	MaxLines int
+	// MaxLineBytes caps each physical line; zero selects 64 KiB.
 	MaxLineBytes int
-	MaxKeys      int
+	// MaxKeys caps assignments; zero selects 100000.
+	MaxKeys int
 }
 
 // Interpolation enables ${NAME} and ${NAME:-default} expansion.
 type Interpolation struct {
-	Variables        map[string]string
-	IncludeFile      bool
-	MaxDepth         int
+	// Variables is copied at construction and is the explicit external variable view.
+	Variables map[string]string
+	// IncludeFile lets file assignments win over Variables during resolution.
+	IncludeFile bool
+	// MaxDepth bounds recursive variable resolution; zero selects 32.
+	MaxDepth int
+	// MaxExpandedBytes caps each expanded value after writes; zero selects input MaxBytes.
 	MaxExpandedBytes int
 }
 
 // Options configures source metadata, typed mapping, and parser behavior.
 type Options struct {
-	Name          string
-	Priority      int
-	Sensitive     bool
-	Optional      bool
-	Prefix        string
-	Separator     string
-	Case          environment.CaseMode
-	Limits        Limits
+	// Name is a required nonblank source label.
+	Name string
+	// Priority is the source order; zero selects PriorityDotenv.
+	Priority int
+	// Sensitive marks provenance, not protected storage.
+	Sensitive bool
+	// Optional permits plan-level suppression only of ErrNotFound.
+	Optional bool
+	// Prefix and generated names follow environment.Options.
+	Prefix string
+	// Separator follows environment.Options, defaulting to __.
+	Separator string
+	// Case follows environment.Options matching rules.
+	Case environment.CaseMode
+	// Limits bounds dotenv parsing before typed environment mapping's own defaults.
+	Limits Limits
+	// Interpolation is nil to disable expansion; its map/options are copied.
 	Interpolation *Interpolation
 }
 
 // DuplicateKeyError reports an ambiguous dotenv assignment.
 type DuplicateKeyError struct {
-	Name      string
+	// Name is the trusted duplicated assignment name.
+	Name string
+	// FirstLine is the first one-based physical assignment line.
 	FirstLine int
-	Line      int
+	// Line is the later one-based duplicate line.
+	Line int
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *DuplicateKeyError) Error() string {
 	return fmt.Sprintf(
 		"decode dotenv: duplicate variable %q at line %d (first at line %d)",
@@ -72,21 +98,28 @@ func (e *DuplicateKeyError) Error() string {
 
 // SyntaxError reports location and category without printing source content.
 type SyntaxError struct {
-	Line   int
+	// Line is the one-based physical error line.
+	Line int
+	// Column is the one-based parser-reported byte column.
 	Column int
+	// Reason is the parser-owned failure category.
 	Reason string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *SyntaxError) Error() string {
 	return fmt.Sprintf("decode dotenv at %d:%d: %s", e.Line, e.Column, e.Reason)
 }
 
 // InterpolationError reports a safe variable name and failure category.
 type InterpolationError struct {
-	Name   string
+	// Name identifies the trusted variable/owner at the failed expansion.
+	Name string
+	// Reason is the failure category, not the expanded value.
 	Reason string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *InterpolationError) Error() string {
 	return fmt.Sprintf("interpolate dotenv variable %q: %s", e.Name, e.Reason)
 }
@@ -101,7 +134,10 @@ type source struct {
 	mapValues     mapper
 }
 
-// BytesFor constructs a repeatable typed source from an immutable copy.
+// BytesFor constructs a repeatable typed source from copied bytes/options.
+// Byte admission occurs on load, after the constructor copy. Single quotes disable
+// interpolation; enabled file assignments take precedence over external Variables.
+// Environment mapping subsequently enforces its independent default limits.
 func BytesFor[T any](data []byte, options Options) (config.Source, error) {
 	prepared, err := prepare[T](options)
 	if err != nil {
@@ -111,7 +147,10 @@ func BytesFor[T any](data []byte, options Options) (config.Source, error) {
 	return prepared, nil
 }
 
-// FromFSFor constructs a repeatable typed source for path in filesystem.
+// FromFSFor constructs a repeatable typed source for an fs.ValidPath name in a
+// borrowed filesystem. The path is reopened per load; I/O and generation checks
+// follow config's ContextFS/ContextFile/ContextCloser/GenerationFile contracts.
+// This is not a filesystem sandbox or dotenv watcher.
 func FromFSFor[T any](filesystem fs.FS, path string, options Options) (config.Source, error) {
 	prepared, err := prepare[T](options)
 	if err != nil {

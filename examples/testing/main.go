@@ -1,3 +1,5 @@
+// Command testing demonstrates deterministic environment fixture composition without
+// mutating the process environment.
 package main
 
 import (

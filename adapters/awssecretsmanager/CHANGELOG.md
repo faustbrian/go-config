@@ -4,6 +4,11 @@ All notable changes follow Keep a Changelog and semantic versioning.
 
 ## Unreleased
 
+### Documentation
+
+- Clarify SDK/client ownership, post-materialization payload admission,
+  transient-copy erasure limits and direct provider cause exposure.
+
 ### Changed
 
 - Prepare the adapter's independent v2 identity and Go 1.27 minimum. Use

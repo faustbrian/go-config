@@ -1,5 +1,12 @@
-// Package awssecretsmanager loads bounded JSON configuration from AWS Secrets
-// Manager without owning credentials or mutating the process environment.
+// Package awssecretsmanager loads explicit JSON configuration from AWS Secrets
+// Manager through a caller-owned Client. New fixes options; each Load requests
+// a fresh provider result and parses it as a sensitive config source.
+// Payload size is checked after SDK materialization and an adapter copy, not as
+// an HTTP memory cap. The transient copy is cleared but strings, parser copies,
+// SDK responses and returned documents are not securely erased. Direct provider
+// errors redact formatting but expose raw causes through Unwrap; config plan
+// loading applies its separate redaction boundary. No credential discovery,
+// retry loop, client close, caching, refresh or background goroutine is owned.
 package awssecretsmanager
 
 import (
@@ -33,8 +40,11 @@ var (
 	ErrInvalidResponse = errors.New("AWS Secrets Manager config response is invalid")
 )
 
-// Client is the least-privilege AWS Secrets Manager read surface.
+// Client is the AWS Secrets Manager read surface, not an IAM enforcement boundary.
+// It is borrowed and must honor context, return well-formed results and support
+// the application's repeated/concurrent loads. The adapter does not catch panics.
 type Client interface {
+	// GetSecretValue performs the provider read; Client owns SDK retries and response cleanup.
 	GetSecretValue(
 		context.Context,
 		*secretsmanager.GetSecretValueInput,
@@ -45,12 +55,21 @@ type Client interface {
 // Options defines one explicit JSON configuration source. The default version
 // stage is AWSCURRENT and the default maximum payload is the AWS service limit.
 type Options struct {
-	Name         string
-	Priority     int
-	Optional     bool
-	SecretID     string
-	VersionID    string
+	// Name is a required nonblank source label and must not contain secrets.
+	Name string
+	// Priority zero selects config.PriorityDiscoveredProfile.
+	Priority int
+	// Optional allows plan-level ErrNotFound suppression for missing secrets.
+	Optional bool
+	// SecretID is a required nonblank name/ARN of at most MaximumSecretIDBytes; IAM owns access.
+	SecretID string
+	// VersionID selects a provider version; it is passed unchanged without syntax validation.
+	VersionID string
+	// VersionStage selects a provider stage; AWSCURRENT is supplied only when both
+	// selectors are empty.
 	VersionStage string
+	// MaximumBytes selects 1..MaximumSecretBytes, with zero choosing that maximum;
+	// checked after SDK/copy allocation.
 	MaximumBytes int
 }
 
@@ -65,7 +84,11 @@ type secretsManagerSource struct {
 }
 
 // New constructs a repeatable sensitive JSON source. The caller owns AWS SDK
-// configuration, credential resolution, client retries, and IAM policy.
+// configuration, credential resolution, client retries, response cleanup and IAM
+// policy. Nil/typed-nil clients and invalid options are rejected before provider
+// I/O. Version selectors are passed unchanged; if both are empty AWSCURRENT is used.
+// Each successful load requires exactly one nonempty bounded binary/string payload;
+// plaintext persists in decoded values. No Close or explicit retry is introduced.
 func New(client Client, options Options) (config.Source, error) {
 	if nilLike(client) {
 		return nil, ErrClientRequired
@@ -134,10 +157,13 @@ type operationError struct {
 	cause error
 }
 
+// Error returns the stable operation classification without SDK text.
 func (e *operationError) Error() string { return ErrOperation.Error() }
 
+// Unwrap exposes the classification and raw SDK cause; callers must not log it.
 func (e *operationError) Unwrap() error { return errors.Join(ErrOperation, e.cause) }
 
+// Format keeps every fmt verb on the redacted operation classification.
 func (e *operationError) Format(state fmt.State, _ rune) {
 	_, _ = state.Write([]byte(e.Error()))
 }
@@ -172,6 +198,8 @@ func payload(
 		return nil, ErrInvalidResponse
 	}
 
+	// Admission follows SDK materialization and this local copy. Clearing it
+	// cannot erase SDK strings/buffers or parser/decoded allocations.
 	var value []byte
 	if output.SecretString != nil {
 		value = []byte(*output.SecretString)

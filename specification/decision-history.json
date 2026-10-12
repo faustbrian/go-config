@@ -4,13 +4,15 @@
     {
       "id": "CONFIG-DEC-001",
       "digests": [
-        "36c7c04c194ee53c5bcdba16b1a6b4d5771d1861a803de4b6cf1c84b04891b2e"
+        "36c7c04c194ee53c5bcdba16b1a6b4d5771d1861a803de4b6cf1c84b04891b2e",
+        "6e0584ce8a50a35bbd88d39e905dc2d55c7317074db14e0426a1fe7ffadc1df7"
       ]
     },
     {
       "id": "CONFIG-DEC-002",
       "digests": [
-        "bed8bd0f19425b5b3617e1921cc48c1f9c19df231028a63dff7db71187740d6c"
+        "bed8bd0f19425b5b3617e1921cc48c1f9c19df231028a63dff7db71187740d6c",
+        "53306448b55759db798fada189360184ea8b7cfbb35b64ae75d6eec439de3dee"
       ]
     },
     {
@@ -52,7 +54,8 @@
     {
       "id": "CONFIG-DEC-009",
       "digests": [
-        "a7daf89cc315651001c22b15137caa0c90e254d0e60ae246d64f20da249bd794"
+        "a7daf89cc315651001c22b15137caa0c90e254d0e60ae246d64f20da249bd794",
+        "ce5af9a70691414f73e13df4dba4edd720dfbba41e4890299b021359137524a7"
       ]
     }
   ]

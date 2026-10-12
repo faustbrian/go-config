@@ -10,22 +10,23 @@ boundaries change.
 ## Protected properties
 
 The package protects atomic publication, deterministic precedence, root-bounded
-discovery, bounded parsing/interpolation, immutable returned snapshots, and
-secret-safe supported diagnostics. Inputs are considered untrusted. Callers are
-responsible for selecting trustworthy roots, filesystems, environment sources,
-validators, and custom decoding hooks.
+discovery, bounded parsing/interpolation, canonical tree isolation and supported
+typed copying, and secret-safe supported diagnostics. Inputs are considered
+untrusted. Callers are responsible for selecting trustworthy roots, filesystems,
+environment sources, validators, and custom decoding hooks.
 
 `Secret` formats and marshals as `[REDACTED]`. Source sensitivity and
 `config:",secret"` metadata flow into provenance without storing the field
-value. Decode, mapping, default, interpolation, validation, panic, and parser
-errors describe paths/categories only. Never include secret values in source
-names, environment names, or file paths. Arbitrary decoder, validator, parser,
-environment, and default causes are replaced by safe wrappers throughout the
-public error chain while retaining `errors.Is` sentinel checks. Concrete custom
-cause recovery through `errors.As` is intentionally not supported.
-Cause-bearing errors also override detailed formatting and text/JSON marshaling,
-so structured loggers cannot reflect through exported cause fields. Discovery
-policy errors omit rejected paths and arbitrary platform error text.
+value. Decode, mapping, default, interpolation, validation, panic and YAML/TOML
+errors describe declared paths/categories without input values. Never include secret values in source names, environment names, or
+file paths. Arbitrary decoder, validator, YAML/TOML parser, environment, and
+default causes are replaced by safe wrappers throughout the public error chain
+while retaining `errors.Is` sentinel checks. Concrete custom cause recovery
+through `errors.As` is intentionally not supported. Supported cause-bearing
+errors override fmt/text marshaling. Independent logger reflection of exported
+Cause fields is outside that boundary. Direct JSON syntax errors can retain
+offending characters; plan loading redacts source failures. Discovery policy
+errors omit rejected paths and arbitrary platform error text.
 
 ## Limits and filesystem policy
 
@@ -73,18 +74,24 @@ a protected-memory container. `Reveal` returns plaintext intentionally. A
 caller can still leak it through logging, metrics, tracing, panic values,
 validators, or downstream libraries.
 
-The intermediate source tree accepts only canonical scalar, object, array,
-null, and deletion-marker values. Typed custom values with private maps,
-slices, pointers, interfaces, functions, or channels are rejected unless they
-are library-owned clone-aware wrappers. `time.Time` is treated as a standard
-immutable scalar. Keep custom scalar private state immutable.
+The intermediate source tree accepts only canonical scalar, object, array, null,
+and deletion-marker values. Typed custom values with private maps, slices,
+pointers, interfaces, functions, or channels are rejected unless they are
+library-owned clone-aware wrappers. `time.Time` is treated as a standard
+immutable scalar. Keep custom scalar private state immutable. Custom arrays
+retain mutable element references; Optional payloads bypass validation and may
+contain unsupported/cyclic state. Restrict them to immutable caller-owned
+shapes.
 
-Custom source trees are cycle-checked, cancellation-aware, and bounded to 64
-levels, 100,000 aggregate keys, and 100,000 aggregate array elements before
-merge. Defaults and environment schema walkers reject recursive types and
-nesting beyond 64 structs. Arbitrary source errors are redacted at the plan
-boundary even when the source is not marked sensitive; use `errors.Is` for
-stable identity checks.
+Custom source trees are cycle-checked and cancellation-aware, with per-source
+limits of 64 levels, 100,000 keys and 100,000 array elements before merge.
+Counters reset between sources; these are not total-plan/whole-process budgets.
+Key/container allocation can precede structural rejection, YAML/TOML backends
+materialize before owned depth/key checks, and constructors can copy input
+before load-time byte admission. Defaults and environment schema walkers reject
+recursive types and nesting beyond 64 structs. Arbitrary source errors are
+redacted at the plan boundary even when the source is not marked sensitive; use
+`errors.Is` for stable identity checks.
 
 Context-aware decode hooks receive already-canonical bounded input and the load
 context. Legacy `encoding.TextUnmarshaler` and `ValueUnmarshaler` implementations

@@ -1,4 +1,10 @@
-// Package environment maps explicit environment snapshots into typed trees.
+// Package environment maps a struct schema and explicit environment view into
+// canonical configuration documents. EnvironFor copies supplied entries;
+// ProcessFor acquires os.Environ on every load without mutating it. Unknown names
+// are ignored but count toward entry/aggregate-byte limits. Matching collisions
+// and invalid wanted values fail with no partial document. Sources retain plaintext,
+// not protected memory; metadata/names must be non-secret. No refresh scheduling,
+// I/O worker or process-environment ownership is introduced.
 package environment
 
 import (
@@ -37,31 +43,46 @@ const (
 
 // Options configures typed environment mapping.
 type Options struct {
-	Name      string
-	Priority  int
+	// Name is a required nonblank source/diagnostic label.
+	Name string
+	// Priority is passed unchanged; use NewDefaultPlan for category priorities.
+	Priority int
+	// Sensitive marks all source provenance; values remain plaintext.
 	Sensitive bool
-	Optional  bool
-	Prefix    string
+	// Optional affects ErrNotFound suppression at the plan boundary.
+	Optional bool
+	// Prefix precedes generated environment names; it must be empty or valid name text.
+	Prefix string
+	// Separator joins nested name components; zero selects __, and only underscores are allowed.
 	Separator string
-	Case      CaseMode
-	Limits    Limits
+	// Case controls matching/collision normalization; native is insensitive only on Windows.
+	Case CaseMode
+	// Limits bounds admitted entry/count/value sizes, not environment acquisition allocations.
+	Limits Limits
 }
 
 // Limits bounds work and memory consumed by an environment source. Zero
 // values select conservative defaults.
 type Limits struct {
-	MaxVariables  int
-	MaxBytes      int
+	// MaxVariables caps all acquired entries, including unrelated names; zero selects 4096.
+	MaxVariables int
+	// MaxBytes caps aggregate entry bytes, including unrelated names; zero selects 1 MiB.
+	MaxBytes int
+	// MaxValueBytes caps each matched variable value; zero selects 256 KiB.
 	MaxValueBytes int
 }
 
 // LimitError reports a resource bound without including variable values.
 type LimitError struct {
-	Kind   string
-	Limit  int
+	// Kind names the variables, bytes or value_bytes category.
+	Kind string
+	// Limit is the configured admission bound.
+	Limit int
+	// Actual is the observed count/size, not variable content.
 	Actual int
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *LimitError) Error() string {
 	return fmt.Sprintf("environment %s limit exceeded: %d > %d", e.Kind, e.Actual, e.Limit)
 }
@@ -69,24 +90,34 @@ func (e *LimitError) Error() string {
 // MappingError describes an environment mapping failure without exposing the
 // variable value.
 type MappingError struct {
-	Path     string
-	Name     string
+	// Path is the trusted destination field path.
+	Path string
+	// Name is the matched environment name; do not use secret-bearing names.
+	Name string
+	// Expected is the required type/grammar category.
 	Expected string
+	// Received describes the failure/type category without the variable value.
 	Received string
-	Cause    error
+	// Cause retains conversion failure but Unwrap hides its text and concrete type.
+	Cause error
 }
 
 // SchemaError reports a recursive or excessively deep environment schema.
 type SchemaError struct {
-	Path   string
-	Type   string
+	// Path identifies the trusted recursive or over-depth field path.
+	Path string
+	// Type identifies the schema's Go type.
+	Type string
+	// Reason identifies recursive type or depth limit.
 	Reason string
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *SchemaError) Error() string {
 	return fmt.Sprintf("environment schema at %q: %s %s", e.Path, e.Reason, e.Type)
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *MappingError) Error() string {
 	return fmt.Sprintf(
 		"map environment variable %q to config field %q: expected %s, received %s",
@@ -97,6 +128,7 @@ func (e *MappingError) Error() string {
 	)
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *MappingError) Unwrap() error {
 	return safeerror.Redact(e.Cause, "environment conversion cause redacted")
 }
@@ -126,7 +158,11 @@ type source struct {
 	limits Limits
 }
 
-// EnvironFor maps an immutable copy of values using the schema of T.
+// EnvironFor captures a copied entry slice and maps it using a struct/pointer T
+// schema. Acquisition/copy precedes load limits; input strings are retained.
+// Duplicate normalized wanted names fail, unrelated names are ignored but count
+// toward limits, and required fields are checked only after all plan layers merge.
+// Recursive/deeper-than-64 schemas and ambiguous environment mappings fail.
 func EnvironFor[T any](values []string, options Options) (config.Source, error) {
 	copyOfValues := append([]string(nil), values...)
 	return newSource[T](func() []string {
@@ -134,7 +170,10 @@ func EnvironFor[T any](values []string, options Options) (config.Source, error) 
 	}, options)
 }
 
-// ProcessFor reads the process environment on each load without mutating it.
+// ProcessFor captures the schema/options and reads os.Environ on each load without
+// mutating it. Acquisition occurs before count/byte admission and is not a
+// cross-source atomic snapshot. Concurrent calls follow Go's environment API;
+// external process environment changes can yield different generations.
 func ProcessFor[T any](options Options) (config.Source, error) {
 	return newSource[T](os.Environ, options)
 }

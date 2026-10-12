@@ -1,4 +1,13 @@
-// Package yaml provides strict, bounded YAML configuration sources.
+// Package yaml loads explicit YAML 1.2.2 configuration into canonical documents.
+// Empty input is an empty mapping. Exactly one mapping document is admitted after
+// backend materialization; aliases, merge keys, custom tags and non-string keys are
+// rejected. Timestamp-resolved scalars remain lexical strings.
+// Bytes copies input before load-time byte admission; FromFS borrows/reopens an
+// fs.FS path and checks generation metadata. Sources own no watcher/goroutine,
+// retry or shutdown. Context is cooperative around owned/parser work, not forced
+// preemption of ordinary filesystem or backend operations. See CONFIG-DEC-001
+// through CONFIG-DEC-009 and the maintained conformance guide for exact policy,
+// not a claim of complete specification conformance.
 package yaml
 
 import (
@@ -25,27 +34,39 @@ const (
 
 // Limits bounds parser resource use. Zero values select conservative defaults.
 type Limits struct {
+	// MaxBytes caps each accepted input on load; zero selects 1 MiB.
 	MaxBytes int64
+	// MaxDepth caps normalized value depth; zero selects 64.
 	MaxDepth int
-	MaxKeys  int
+	// MaxKeys caps mapping keys across the document; zero selects 100000.
+	MaxKeys int
 }
 
 // Options configures source metadata and parser bounds.
 type Options struct {
-	Name      string
-	Priority  int
+	// Name is a required nonblank, non-secret diagnostic label.
+	Name string
+	// Priority passes unchanged to NewPlan ordering.
+	Priority int
+	// Sensitive marks provenance, not encrypted or erased storage.
 	Sensitive bool
-	Optional  bool
-	Limits    Limits
+	// Optional permits plan-level ErrNotFound suppression only.
+	Optional bool
+	// Limits chooses positive admission bounds; negative values are invalid.
+	Limits Limits
 }
 
 // ParseError wraps a parser cause without including source text in diagnostics.
 type ParseError struct {
-	Line   int
+	// Line is the one-based parser-reported location, or zero when unavailable.
+	Line int
+	// Column is the parser-reported column, or zero when unavailable.
 	Column int
-	Cause  error
+	// Cause retains parser failure; Unwrap hides arbitrary text and concrete types.
+	Cause error
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *ParseError) Error() string {
 	if e.Line > 0 {
 		return fmt.Sprintf("decode YAML config at %d:%d: malformed document", e.Line, e.Column)
@@ -53,6 +74,7 @@ func (e *ParseError) Error() string {
 	return "decode YAML config: malformed document"
 }
 
+// Unwrap preserves errors.Is identity without exposing arbitrary cause text/type.
 func (e *ParseError) Unwrap() error {
 	return safeerror.Redact(e.Cause, "YAML parser cause redacted")
 }
@@ -69,11 +91,15 @@ func (e *ParseError) MarshalText() ([]byte, error) {
 
 // DuplicateKeyError reports an ambiguous mapping key.
 type DuplicateKeyError struct {
-	Path   string
-	Line   int
+	// Path identifies the trusted dotted key path, without its value.
+	Path string
+	// Line is the one-based parser-reported mapping line.
+	Line int
+	// Column is the one-based parser-reported mapping column.
 	Column int
 }
 
+// Error returns the failure category and declared metadata, not the rejected value.
 func (e *DuplicateKeyError) Error() string {
 	return fmt.Sprintf("decode YAML config: duplicate key %q at %d:%d", e.Path, e.Line, e.Column)
 }
@@ -84,7 +110,9 @@ type source struct {
 	limits Limits
 }
 
-// Bytes constructs a repeatable source from an immutable copy of data.
+// Bytes constructs a repeatable source from copied data and validated options.
+// Size is admitted only on Load after the constructor copy; decoded plaintext
+// and copied input are retained without guaranteed secure erasure.
 func Bytes(data []byte, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -93,7 +121,10 @@ func Bytes(data []byte, options Options) (config.Source, error) {
 	return &source{info: info, input: sourceio.Bytes(data), limits: limits}, nil
 }
 
-// FromFS constructs a repeatable source for path in filesystem.
+// FromFS constructs a source for an fs.ValidPath name in a borrowed filesystem.
+// It reopens the path each load, checks metadata/generation and owns closing each
+// admitted file. It imposes no discovery permission/symlink policy or I/O sandbox;
+// ordinary filesystem methods must return and support the caller's concurrency.
 func FromFS(filesystem fs.FS, path string, options Options) (config.Source, error) {
 	info, limits, err := validate(options)
 	if err != nil {
@@ -117,6 +148,8 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 		return config.Document{Tree: map[string]any{}}, nil
 	}
 
+	// Backend nodes materialize before our single-document/depth/key policy.
+	// Conversion limits are not pre-parser heap caps.
 	loader, _ := yamlv4.NewLoader(
 		sourceio.ContextReader(ctx, data),
 		yamlv4.WithV4Defaults(),

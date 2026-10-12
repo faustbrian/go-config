@@ -14,10 +14,10 @@ until the package selects, rejects, or normalizes it at its public source bounda
 | Issue | JSON permits any serialized value and YAML permits streams containing arbitrary root nodes, while configuration loading requires one mergeable document shape. |
 | Credible interpretations | Accept every specification-valid root and define format-specific merge rules. Require one object, mapping, or root table and reject additional documents or root values. |
 | Known peer behavior | General-purpose JSON and YAML decoders commonly accept scalar, sequence, and multi-document inputs; TOML always exposes a root table. |
-| Selected behavior | Each structured source produces exactly one map[string]any root. JSON scalars, arrays, null, and trailing roots fail; YAML requires exactly one mapping document; TOML uses its root table. |
+| Selected behavior | Each structured source produces one map[string]any root. JSON scalars, arrays, null and trailing roots fail; YAML accepts empty input as an empty mapping and otherwise requires exactly one mapping document; TOML uses its root table. |
 | Normative rationale | A single object-shaped document gives merge and decode one deterministic key-addressable input without inventing scalar or multi-document precedence. |
 | Security consequences | Rejecting additional roots prevents hidden trailing configuration and avoids partial selection from multi-document streams. |
-| Resource consequences | Only one bounded document is converted and retained. |
+| Resource consequences | Byte ingress is bounded. YAML materializes backend documents before rejecting a multi-document stream; exactly one normalized document is published, not a pre-parser single-document allocation guarantee. |
 | Compatibility consequences | Previously rejected non-object roots remain errors across structured sources. |
 | Wire-format consequences | Accepted source bytes are not rewritten; the restriction applies to the loaded configuration tree. |
 | Executable tests | TestSourceRejectsEveryInvalidRootAndDelimiterState, TestSourceRejectsNonMappingRoot, TestBytesLoadsDottedKeysAndArrayTables |
@@ -69,7 +69,7 @@ Structured contract:
 | Selected behavior | JSON, YAML, and TOML reject duplicate definitions. JSON and YAML report a safe key path, YAML also reports location, and no partial tree is published. |
 | Normative rationale | Failing closed follows JSON's interoperability recommendation and preserves YAML and TOML uniqueness instead of silently selecting authority by parser order. |
 | Security consequences | An attacker cannot smuggle a shadow value that different readers interpret differently. |
-| Resource consequences | Duplicate detection uses the same bounded key accounting as normal conversion. |
+| Resource consequences | JSON and YAML detect duplicate keys during owned traversal with normalized key accounting; TOML rejects duplicate definitions in the parser before owned depth/key normalization. |
 | Compatibility consequences | Duplicate configuration remains invalid rather than acquiring first-wins or last-wins semantics. |
 | Wire-format consequences | No ambiguous document produces a normalized tree. |
 | Executable tests | TestSourceRejectsDuplicateKeys, TestSourceRejectsAmbiguousOrExecutableFeatures, TestSourceRejectsDuplicateDefinitions |
@@ -407,11 +407,11 @@ Structured contract:
 | Issue | The format specifications permit implementations to set limits but do not define this library's byte, depth, key, cancellation, diagnostic, or secret-redaction boundaries. |
 | Credible interpretations | Delegate all limits and errors to parser defaults. Apply only a byte limit. Enforce common byte, depth, and key limits with cancellation and redact parser details. |
 | Known peer behavior | General-purpose parsers expose detailed syntax errors and format-specific resource behavior; their defaults are not a shared hostile-input contract. |
-| Selected behavior | Each structured source enforces caller-configurable byte, depth, and key limits, checks cancellation during owned work, publishes no partial tree, and exposes stable errors without source tokens. |
+| Selected behavior | Each structured source enforces admitted byte input and normalized depth/key limits, checks context during owned work and publishes no partial tree. YAML/TOML backend materialization precedes their depth/key checks; direct JSON syntax failures retain standard-library causes. Plan-level SourceError supplies source-error redaction. |
 | Normative rationale | Configuration may contain secrets and can be attacker-controlled, so bounded work and redacted failure surfaces are package-owned requirements. |
-| Security consequences | Hostile inputs cannot request unbounded owned traversal or leak source contents through public diagnostics. |
-| Resource consequences | Default limits are 1 MiB, depth 64, and 100000 keys, with caller-selected positive overrides. |
-| Compatibility consequences | Inputs beyond configured limits and detailed dependency error messages remain unavailable. |
+| Security consequences | Owned normalization rejects out-of-policy structures; it is not a parser/extension sandbox. Paths and names remain trusted metadata. Direct JSON syntax causes may expose offending characters; plan loading hides arbitrary source error text/type while retaining errors.Is. |
+| Resource consequences | Default input limits are 1 MiB, normalized depth 64 and 100000 keys with positive overrides. Constructor copies, backend materialization and some container allocations can precede structural rejection; per-source limits are not total-plan or whole-process memory budgets. |
+| Compatibility consequences | Out-of-policy inputs remain rejected. Detailed arbitrary conversion/YAML/TOML causes are hidden; direct JSON standard-library syntax causes remain inspectable unless loading through a plan. |
 | Wire-format consequences | Rejected input produces no normalized document. |
 | Executable tests | TestSourceEnforcesExactDepthKeyAndArrayIndexBoundaries, TestConvertEnforcesExactDepthKeyAndSequenceBoundaries, TestNormalizeEnforcesExactDepthKeyAndCollectionBoundaries, TestErrorsHaveStableSecretSafeFormatting, TestParseErrorHasStableSecretSafeFormatting, TestSecretAndErrorsNeverLeakAcrossDiagnosticSurfaces |
 | Fixture evidence | None applicable. |

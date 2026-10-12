@@ -9,29 +9,32 @@ describes how the packages compose.
 `Source` exposes stable `SourceInfo` and a context-aware `Load` operation that
 returns a format-independent `Document`. `NewPlan` orders sources by priority
 and preserves caller order at equal priority. `NewDefaultPlan` applies the seven
-documented precedence categories. `Plan.Sources` returns safe metadata for
-inspection.
+documented precedence categories. `Plan.Sources` returns a fresh metadata slice
+for inspection; labels and locations remain caller-trusted, not sanitized.
 
 `LoadTree` merges documents into an immutable tree snapshot. `Load[T]` strictly
 decodes the complete tree into `T`. `LoadWithValidators[T]` additionally runs
 typed validators. All three return a snapshot only after the entire operation
-succeeds. `Snapshot.Value` returns an independent deep copy and
-`Snapshot.Origin` returns source, location, sensitivity, deprecation, presence,
-and state but never a value.
+succeeds. `Snapshot.Value` copies supported pointers/maps/slices/exported
+fields. Custom arrays retain mutable element references, and Optional payloads
+bypass ordinary cloneability validation; keep that state acyclic and immutable,
+not universally isolated. `Snapshot.Origin` returns source, location,
+sensitivity, deprecation, presence, and state but never a value.
 
 Source documents are normalized at the load boundary. Only canonical scalar,
 object, array, null, and `merge.Delete` values are accepted; unsupported values
-return `TreeValueError` without formatting the value. Typed values whose
-private mutable state cannot be cloned return `SnapshotValueError` before
-validation or publication. This keeps the immutability guarantee explicit for
-custom scalar types.
+return `TreeValueError` without formatting the value. Typed values whose private
+mutable state cannot be cloned return `SnapshotValueError` before validation or
+publication. These checks reject known unsafe state, not every unsupported
+custom array or clone-aware payload shape.
 
-The load boundary also rejects cyclic source maps/slices and enforces aggregate
+The load boundary also rejects cyclic source maps/slices and enforces per-source
 limits of 64 levels, 100,000 keys, and 100,000 array elements while checking
-context cancellation.
-`TreeCycleError` and `TreeLimitError` expose only safe path/category metadata.
-Arbitrary source failures become `SourceError`; their identity remains
-available through `errors.Is`, but their text and concrete type are hidden.
+context cancellation. Counters reset per source; no total-plan byte, string,
+source-count or merged-key budget exists. `TreeCycleError` and `TreeLimitError`
+expose only safe path/category metadata. Arbitrary source failures become
+`SourceError`; their identity remains available through `errors.Is`, but their
+text and concrete type are hidden.
 
 `Optional[T]` distinguishes absent, null, present, and defaulted states.
 `Secret` redacts formatting and marshaling; `Reveal` is the explicit access
@@ -65,9 +68,9 @@ errors. `IntoContext` and `ValueContext` support cooperative
 `ContextValueUnmarshaler` and `ContextTextUnmarshaler` hooks. `merge` implements
 recursive object merge, replacement, null, delete, and conflict semantics.
 `validation` provides `At`, deterministic `Errors`, and typed validators.
-`configtest` supplies immutable sources, environment slices, `fstest.MapFS`
-fixtures, plans, snapshots, origin assertions, and `DiffSecrets` for redacted
-secret comparisons in test failures.
+`configtest` supplies copied canonical-container sources, environment slices,
+`fstest.MapFS` fixtures, plans, snapshots, origin assertions, and `DiffSecrets`
+for redacted secret comparisons in test failures.
 
 `adapters/service.New[T]` constructs a command-scoped `service` loader from the
 default precedence model. Import the package as `configservice` for its
@@ -78,10 +81,12 @@ service component construction, owns no resource, performs no retries, and
 retains source and validation errors for inspection. The historical
 `configservice` path remains an API-compatible facade.
 
-Typed conversion and parser errors expose safe metadata and preserve sentinel
-identity through `errors.Is`. Arbitrary underlying error text and concrete
-types are deliberately unavailable through `Unwrap` and `errors.As` because
-extension and parser errors may contain configuration values.
+Typed conversion and YAML/TOML parser errors expose declared metadata and
+preserve sentinel identity through `errors.Is`. Direct JSON syntax causes can
+expose offending characters; plan loading applies source-error redaction.
+Arbitrary conversion/YAML/TOML cause text and concrete types are deliberately
+unavailable through `Unwrap` and `errors.As` because extension and parser errors
+may contain configuration values.
 
 All constructors validate names, policies, types, tags, and bounds before
 returning a source. Zero limit fields select conservative defaults; negative

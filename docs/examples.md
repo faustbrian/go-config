@@ -16,14 +16,15 @@ The [discovery example](../examples/discovery/main.go) creates a bounded root,
 performs explicit upward search with a stop directory, converts the discovered
 result to a filesystem source, and loads a typed snapshot.
 
-The [testing example](../examples/testing/main.go) uses `configtest` to build an
-immutable source and environment slice without changing process-global state.
+The [testing example](../examples/testing/main.go) uses `configtest` to build a
+copied canonical source and environment slice without changing process-global
+state.
 
-Source-specific construction is covered by executable package examples and
-tests for byte inputs, `fs.FS`, paths, readers, JSON, YAML, TOML, dotenv,
-environment, defaults, discovery, programmatic maps, validation, secrets,
-provenance, optional values, and default-plan composition. `make docs` compiles
-and runs all Go examples.
+Source-specific construction is covered by executable package examples and tests
+for byte inputs, `fs.FS`, paths, readers, JSON, YAML, TOML, dotenv, environment,
+defaults, discovery, programmatic maps, validation, secrets, provenance,
+optional values, and default-plan composition. Example bodies remain package
+tests; rendering source documentation is separate from executing them.
 
 The executable examples in [`examples_test.go`](../examples_test.go) cover both
 byte and `fs.FS` structured constructors, both dotenv constructors, explicit
