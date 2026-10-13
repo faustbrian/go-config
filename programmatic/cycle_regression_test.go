@@ -81,3 +81,28 @@ func TestProgrammaticPreservesOverlappingAcyclicSlices(t *testing.T) {
 		t.Fatalf("finite overlapping slices rejected: %v", err)
 	}
 }
+
+// Child probes retain hard-bounded historical-hang proof. This direct public
+// assertion also records the rejected active map/slice path in native coverage.
+func TestProgrammaticRejectsActiveCyclesDirectly(t *testing.T) {
+	cyclicMap := map[string]any{}
+	cyclicMap["self"] = cyclicMap
+	cyclicSlice := make([]any, 1)
+	cyclicSlice[0] = cyclicSlice
+	for _, test := range []struct {
+		name string
+		tree map[string]any
+		path string
+	}{
+		{"map", cyclicMap, "self"},
+		{"slice", map[string]any{"items": cyclicSlice}, "items[0]"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			source, err := programmatic.Map("cycle", 0, test.tree)
+			var rejected *config.TreeCycleError
+			if source != nil || !errors.As(err, &rejected) || rejected.Path != test.path {
+				t.Fatalf("Map = %v, %v; want no source and cycle at %s", source, err, test.path)
+			}
+		})
+	}
+}
