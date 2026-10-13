@@ -82,10 +82,10 @@ The intermediate source tree accepts only canonical scalar, object, array, null,
 and deletion-marker values. Typed custom values with private maps, slices,
 pointers, interfaces, functions, or channels are rejected unless they are
 library-owned clone-aware wrappers. `time.Time` is treated as a standard
-immutable scalar. Keep custom scalar private state immutable. Custom arrays
-retain mutable element references; Optional payloads bypass validation and may
-contain unsupported/cyclic state. Restrict them to immutable caller-owned
-shapes.
+immutable scalar. Keep custom scalar private state immutable. Arrays recursively
+clone their admitted elements. Optional payloads undergo ordinary typed
+admission before cloning; cycles and unsupported mutable state fail before
+recursive presence/metadata processing or validator invocation.
 
 Custom source trees are cycle-checked and cancellation-aware, with per-source
 limits of 64 levels, 100,000 keys and 100,000 array elements before merge.

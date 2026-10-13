@@ -17,18 +17,17 @@ for inspection; labels and locations remain caller-trusted, not sanitized.
 `LoadTree` merges documents into an immutable tree snapshot. `Load[T]` strictly
 decodes the complete tree into `T`. `LoadWithValidators[T]` additionally runs
 typed validators. All three return a snapshot only after the entire operation
-succeeds. `Snapshot.Value` copies supported pointers/maps/slices/exported
-fields. Custom arrays retain mutable element references, and Optional payloads
-bypass ordinary cloneability validation; keep that state acyclic and immutable,
-not universally isolated. `Snapshot.Origin` returns source, location,
+succeeds. `Snapshot.Value` independently copies admitted pointers, maps, slices,
+arrays and exported struct fields. Optional payloads follow the same typed
+admission before cloning; cyclic or unsupported mutable state is rejected. `Snapshot.Origin` returns source, location,
 sensitivity, deprecation, presence, and state but never a value.
 
 Source documents are normalized at the load boundary. Only canonical scalar,
 object, array, null, and `merge.Delete` values are accepted; unsupported values
 return `TreeValueError` without formatting the value. Typed values whose private
 mutable state cannot be cloned return `SnapshotValueError` before validation or
-publication. These checks reject known unsafe state, not every unsupported
-custom array or clone-aware payload shape.
+publication, including inside Optional payloads. Typed admission precedes
+recursive presence/metadata work as well as validation and cloning.
 
 The load boundary also rejects cyclic source maps/slices and enforces per-source
 limits of 64 levels, 100,000 keys, and 100,000 array elements while checking

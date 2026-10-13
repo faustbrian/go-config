@@ -12,6 +12,7 @@ import (
 	"github.com/faustbrian/go-config/v2/dotenv"
 	"github.com/faustbrian/go-config/v2/environment"
 	jsonsource "github.com/faustbrian/go-config/v2/json"
+	"github.com/faustbrian/go-config/v2/programmatic"
 	tomlsource "github.com/faustbrian/go-config/v2/toml"
 	yamlsource "github.com/faustbrian/go-config/v2/yaml"
 )
@@ -125,13 +126,16 @@ func FuzzDecodeTagsAndDestinationTypes(f *testing.F) {
 	f.Add("value", uint8(10), "recursive")
 	f.Add("value", uint8(11), "context-text-hook")
 	f.Add("value", uint8(12), "panic:context-value-hook")
+	f.Add("value", uint8(13), "array")
+	f.Add("value", uint8(14), "optional")
+	f.Add("value", uint8(15), "cycle")
 
 	f.Fuzz(func(t *testing.T, tag string, selector uint8, input string) {
 		if len(tag)+len(input) > 2048 {
 			t.Skip()
 		}
 		var destination any
-		switch selector % 13 {
+		switch selector % 16 {
 		case 0, 1, 2, 3:
 			types := []reflect.Type{
 				reflect.TypeFor[int](),
@@ -158,6 +162,71 @@ func FuzzDecodeTagsAndDestinationTypes(f *testing.F) {
 			destination = &fuzzContextTextHookSettings{}
 		case 12:
 			destination = &fuzzContextValueHookSettings{}
+		case 13:
+			type settings struct {
+				Value boundaryArrays `config:"value"`
+			}
+			plan, err := config.NewPlan(source{info: config.SourceInfo{Name: "fuzz-array"}, tree: map[string]any{"value": input}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			snapshot, err := config.Load[settings](context.Background(), plan)
+			if err != nil {
+				t.Fatal(err)
+			}
+			snapshot.Value().Value.Items[0]["key"][0] = "changed"
+			if snapshot.Value().Value.Items[0]["key"][0] != "original" {
+				t.Fatal("array alias escaped snapshot")
+			}
+			return
+		case 14:
+			plan, err := config.NewPlan(source{info: config.SourceInfo{Name: "fuzz-optional"}, tree: map[string]any{"value": input}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			var snapshot any
+			if len(input)%2 == 0 {
+				type settings struct {
+					Value config.Optional[boundaryPrivatePayload] `config:"value"`
+				}
+				var value *config.Snapshot[settings]
+				value, err = config.Load[settings](context.Background(), plan)
+				if value != nil {
+					snapshot = value
+				}
+			} else {
+				type settings struct {
+					Value config.Optional[boundaryCyclePayload] `config:"value"`
+				}
+				var value *config.Snapshot[settings]
+				value, err = config.Load[settings](context.Background(), plan)
+				if value != nil {
+					snapshot = value
+				}
+			}
+			var rejected *config.SnapshotValueError
+			if snapshot != nil || !errors.As(err, &rejected) {
+				t.Fatal("unsupported or cyclic Optional admitted")
+			}
+			return
+		case 15:
+			items := make([]any, 2)
+			cyclic := len(input)%2 == 0
+			if cyclic {
+				items[1] = items
+			} else {
+				items[1] = items[:1]
+			}
+			built, err := programmatic.Map("fuzz-graph", 0, map[string]any{"items": items})
+			var cycle *config.TreeCycleError
+			if cyclic {
+				if built != nil || !errors.As(err, &cycle) {
+					t.Fatal("programmatic cycle admitted")
+				}
+			} else if err != nil || built == nil {
+				t.Fatal("finite graph rejected")
+			}
+			return
 		}
 		_ = decode.Value(map[string]any{"value": input}, destination)
 	})

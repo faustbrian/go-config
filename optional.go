@@ -22,9 +22,8 @@ const (
 
 // Optional preserves absence, explicit null, and present zero values.
 // Its zero value is Absent. Get returns T directly, not a defensive copy.
-// Snapshot's clone hook supports ordinary maps/slices/pointers, but bypasses
-// payload validation; custom arrays or cyclic/unsupported T state must remain
-// caller-controlled and must not be treated as universally isolated.
+// Snapshot loading admits the payload under the ordinary typed cloneability
+// rules before its clone hook runs; unsupported or cyclic state is rejected.
 type Optional[T any] struct {
 	value T
 	state Presence
@@ -65,4 +64,8 @@ func (o *Optional[T]) UnmarshalConfigValue(input any) error {
 
 func (o Optional[T]) cloneConfigValue() any {
 	return Optional[T]{value: cloneTyped(o.value), state: o.state}
+}
+
+func (o Optional[T]) validateConfigValue(path string, visiting map[cloneVisit]bool) error {
+	return validateSnapshotValue(reflect.ValueOf(o.value), path, visiting)
 }

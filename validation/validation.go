@@ -95,8 +95,8 @@ func (e *Errors) Paths() []string {
 // registered validators. Independent failures are aggregated in stable order.
 // The value is not copied here; a self-validator and validators share its reference
 // graph. Nil validators produce failures. Cancellation before a later validator
-// returns ctx.Err rather than accumulated failures; no final context recheck occurs
-// after the last callback. No callback side effect is rolled back.
+// returns ctx.Err rather than accumulated failures. The same check follows the
+// final callback, including a lone self-validator. No side effect is rolled back.
 func Run[T any](ctx context.Context, value T, validators ...Validator[T]) error {
 	if err := ctx.Err(); err != nil {
 		return err
@@ -126,6 +126,9 @@ func Run[T any](ctx context.Context, value T, validators ...Validator[T]) error 
 		}
 	}
 
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if len(failures) == 0 {
 		return nil
 	}

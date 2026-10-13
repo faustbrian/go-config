@@ -5,8 +5,8 @@
 //
 // Sources, metadata and extension hooks are trusted application collaborators;
 // context cancellation is cooperative, not forced preemption. LoadTree isolates
-// canonical maps/slices. Typed snapshots have the copying limitations documented
-// on Snapshot, particularly for custom arrays and Optional payloads. See the
+// canonical maps/slices and admitted typed containers, including Optional payloads.
+// Typed state is admitted before recursive owned traversal. See the
 // maintained layering and security guides for composition and trust boundaries.
 package config
 
@@ -110,9 +110,8 @@ func (e *TreeValueError) Error() string {
 	return fmt.Sprintf("config tree at %q: unsupported value type %s", e.Path, e.Type)
 }
 
-// SnapshotValueError reports typed state rejected by the known cloneability
-// checks, without formatting its value. Absence of this error does not establish
-// universal copying for custom arrays or clone-aware wrappers; see Snapshot.
+// SnapshotValueError reports cyclic or uncopyable typed state without formatting
+// its value. Optional payloads follow the same admission rules as ordinary fields.
 type SnapshotValueError struct {
 	// Path identifies typed state rejected before validation/publication.
 	Path string
@@ -290,10 +289,9 @@ type Origin struct {
 
 // Snapshot holds a loaded value and declared provenance. LoadTree snapshots
 // isolate canonical maps/slices. Typed copying recurses through pointers, maps,
-// slices and exported struct fields, but arrays are copied by value: mutable
-// references inside custom arrays remain shared. Library-owned Optional payloads
-// use a clone hook and are not independently validated for every mutable shape.
-// Keep those payloads acyclic and within the supported copying shape.
+// slices, arrays and exported struct fields. Optional payloads are admitted
+// before their clone hook runs; cyclic or unsupported mutable private state
+// fails before validation/publication. Strings and immutable scalar state remain shared.
 //
 // A successfully loaded snapshot may be read concurrently when custom typed
 // state is immutable. The zero Snapshot contains T's zero value and no origins;
@@ -304,8 +302,8 @@ type Snapshot[T any] struct {
 }
 
 // Value returns a defensive copy of the loaded value within Snapshot's documented
-// copying shape. Custom array references and unsupported wrapper state are not
-// guaranteed independent. Strings and immutable scalar internals are shared.
+// copying shape, including array elements and Optional payloads. Strings and
+// immutable scalar internals are shared.
 func (s *Snapshot[T]) Value() T {
 	return cloneTyped(s.value)
 }
@@ -370,12 +368,12 @@ func Load[T any](ctx context.Context, plan Plan) (*Snapshot[T], error) {
 // LoadWithValidators resolves and decodes into a fresh candidate, propagates
 // field presence/metadata, rejects known uncopyable typed state, then validates a
 // copy before publication. Validation mutation is not an update mechanism.
-// See Snapshot for array/wrapper aliasing limits; callers must keep that state
-// immutable. A failure returns nil, but callback side effects are not rolled back.
+// Typed admission precedes recursive presence/metadata work and cloning.
+// A failure returns nil, but callback side effects are not rolled back.
 //
 // Decode/validation callbacks run inline with panic recovery at their own seams.
-// Arbitrary blocking code cannot be preempted, and this final publication path
-// does not recheck ctx after the last successful validator. Sources are borrowed.
+// Arbitrary blocking code cannot be preempted. Validation rechecks ctx after
+// the final callback and does not publish canceled candidates. Sources are borrowed.
 func LoadWithValidators[T any](
 	ctx context.Context,
 	plan Plan,
@@ -391,11 +389,13 @@ func LoadWithValidators[T any](
 		annotateDecodeError(err, tree.origins)
 		return nil, err
 	}
-	applyPresence(reflect.ValueOf(&value).Elem(), "", tree.origins)
-	applyFieldMetadata(reflect.TypeFor[T](), "", tree.origins)
+	// Hooks may return cyclic or uncopyable state. Admit it before recursive
+	// presence/metadata traversal as well as before cloning and callbacks.
 	if err := validateSnapshotValue(reflect.ValueOf(value), "", make(map[cloneVisit]bool)); err != nil {
 		return nil, err
 	}
+	applyPresence(reflect.ValueOf(&value).Elem(), "", tree.origins)
+	applyFieldMetadata(reflect.ValueOf(value), "", tree.origins)
 	if err := validation.Run(ctx, cloneTyped(value), validators...); err != nil {
 		return nil, err
 	}
@@ -403,23 +403,27 @@ func LoadWithValidators[T any](
 	return &Snapshot[T]{value: cloneTyped(value), origins: cloneOrigins(tree.origins)}, nil
 }
 
-func applyFieldMetadata(typeOf reflect.Type, path string, origins map[string]Origin) {
-	for typeOf.Kind() == reflect.Pointer {
-		typeOf = typeOf.Elem()
+func applyFieldMetadata(value reflect.Value, path string, origins map[string]Origin) {
+	for value.IsValid() && value.Kind() == reflect.Pointer {
+		if value.IsNil() {
+			return
+		}
+		value = value.Elem()
 	}
-	if typeOf.Kind() != reflect.Struct {
+	if !value.IsValid() || value.Kind() != reflect.Struct {
 		return
 	}
-	for index := 0; index < typeOf.NumField(); index++ {
-		definition := typeOf.Field(index)
+	for index := 0; index < value.NumField(); index++ {
+		definition := value.Type().Field(index)
 		if definition.IsExported() {
-			applyDefinitionMetadata(definition, path, origins)
+			applyDefinitionMetadata(definition, value.Field(index), path, origins)
 		}
 	}
 }
 
 func applyDefinitionMetadata(
 	definition reflect.StructField,
+	value reflect.Value,
 	path string,
 	origins map[string]Origin,
 ) {
@@ -439,7 +443,7 @@ func applyDefinitionMetadata(
 	if sensitive || deprecated {
 		markOriginMetadata(origins, fieldPath, sensitive, deprecated)
 	}
-	applyFieldMetadata(definition.Type, fieldPath, origins)
+	applyFieldMetadata(value, fieldPath, origins)
 }
 
 func metadataOption(options, wanted string) bool {
@@ -668,6 +672,7 @@ const (
 type treeVisit struct {
 	kind    reflect.Kind
 	pointer uintptr
+	length  int
 }
 
 type treeCanonicalizer struct {
@@ -738,7 +743,7 @@ func (c *treeCanonicalizer) value(value any, path string, depth int) (any, error
 	case map[string]any:
 		return c.object(value, path, depth)
 	case []any:
-		visit := treeVisit{kind: reflect.Slice, pointer: reflect.ValueOf(value).Pointer()}
+		visit := treeVisit{kind: reflect.Slice, pointer: reflect.ValueOf(value).Pointer(), length: len(value)}
 		if c.visiting[visit] {
 			return nil, &TreeCycleError{Path: path}
 		}
@@ -799,6 +804,7 @@ func cloneTyped[T any](value T) T {
 type cloneVisit struct {
 	typeOf  reflect.Type
 	pointer uintptr
+	length  int
 }
 
 func validateSnapshotValue(
@@ -809,25 +815,33 @@ func validateSnapshotValue(
 	if !value.IsValid() {
 		return nil
 	}
+	if (value.Kind() == reflect.Pointer || value.Kind() == reflect.Interface) && value.IsNil() {
+		return nil
+	}
+	switch value.Kind() {
+	case reflect.Pointer, reflect.Map, reflect.Slice:
+		visit := cloneVisit{typeOf: value.Type(), pointer: value.Pointer()}
+		if value.Kind() == reflect.Slice {
+			visit.length = value.Len()
+		}
+		if visiting[visit] {
+			return snapshotValueError(path, value.Type())
+		}
+		visiting[visit] = true
+		defer delete(visiting, visit)
+	}
 	if value.CanInterface() {
-		// Clone-aware wrappers own their payload policy. This bypass does not
-		// establish that every possible Optional[T] is independently cloneable.
+		if validator, ok := value.Interface().(interface {
+			validateConfigValue(string, map[cloneVisit]bool) error
+		}); ok {
+			return validator.validateConfigValue(path, visiting)
+		}
 		if _, ok := value.Interface().(interface{ cloneConfigValue() any }); ok {
 			return nil
 		}
 		if _, ok := value.Interface().(time.Time); ok {
 			return nil
 		}
-	}
-
-	switch value.Kind() {
-	case reflect.Pointer, reflect.Map, reflect.Slice:
-		visit := cloneVisit{typeOf: value.Type(), pointer: value.Pointer()}
-		if visiting[visit] {
-			return snapshotValueError(path, value.Type())
-		}
-		visiting[visit] = true
-		defer delete(visiting, visit)
 	}
 
 	switch value.Kind() {
@@ -901,8 +915,7 @@ func joinConfigPath(parent string, definition reflect.StructField) string {
 	return parent + "." + name
 }
 
-// Arrays fall through to value copying, retaining mutable element references.
-// Keep Snapshot's supported copying shape explicit at the public boundary.
+// Clone only previously admitted state; supported containers are independent.
 func cloneReflect(value reflect.Value) reflect.Value {
 	if !value.IsValid() {
 		return value
@@ -953,6 +966,12 @@ func cloneReflect(value reflect.Value) reflect.Value {
 			return reflect.Zero(value.Type())
 		}
 		clone := reflect.MakeSlice(value.Type(), value.Len(), value.Len())
+		for index := 0; index < value.Len(); index++ {
+			clone.Index(index).Set(cloneReflect(value.Index(index)))
+		}
+		return clone
+	case reflect.Array:
+		clone := reflect.New(value.Type()).Elem()
 		for index := 0; index < value.Len(); index++ {
 			clone.Index(index).Set(cloneReflect(value.Index(index)))
 		}

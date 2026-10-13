@@ -5,6 +5,18 @@ and releases use Semantic Versioning.
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore independent typed snapshot copying for mutable references inside
+  arrays and validate Optional payloads before cloning or validator invocation.
+- Reject cyclic programmatic containers and typed hook results before recursive
+  owned traversal. Preserve finite recursive instances and overlapping acyclic
+  slices without adding new constructor depth or count limits.
+- Consume deletion markers at keys in newly copied nested objects; preserve the
+  programmatic source's separate structural admission policy.
+- Recheck cancellation after the final validator or lone self-validator so
+  canceled candidates are not published.
+
 ### Documentation
 
 - Clarify per-source admission, typed snapshot/wrapper copying limitations,

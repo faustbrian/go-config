@@ -198,7 +198,7 @@ func TestMetadataAndPresenceIgnoreExplicitlySkippedFieldsInternally(t *testing.T
 		"-":       {State: Present},
 		"default": {State: Present},
 	}
-	applyFieldMetadata(reflect.TypeFor[configuration](), "", origins)
+	applyFieldMetadata(reflect.ValueOf(configuration{}), "", origins)
 	if origins["-"].Sensitive {
 		t.Fatal("ignored origin was marked sensitive")
 	}

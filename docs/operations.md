@@ -81,8 +81,9 @@ not values. `Secret.Reveal` is the explicit plaintext boundary.
 normally. A native SDK adapter is intentionally absent from core.
 
 **Can I mutate a snapshot?** Supported canonical/typed graphs are copied.
-Custom array references and unsupported wrapper state are not universally
-isolated; keep them immutable. Build a new plan/load for a new generation.
+Array references and Optional payloads are copied under the ordinary typed
+admission rules. Cyclic or unsupported mutable state is rejected before
+publication. Build a new plan/load for a new generation.
 
 **Can cancellation preempt arbitrary extension code?** Only cooperative code
 can be canceled safely in Go. Use context-aware decode and filesystem

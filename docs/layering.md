@@ -52,6 +52,10 @@ field presence. Do not infer presence from a Go zero value.
 | any | `merge.Delete{}` | key removal |
 | incompatible non-null kinds | incompatible non-null kind | `TypeConflictError` |
 
+Deletion markers are consumed at object keys even when their surrounding
+object is newly inserted or replaces null. Programmatic sources intentionally
+reject marker structs; use a canonical `Source` for deletion operations.
+
 Slices never append or merge by index. Maps/objects merge recursively. A scalar
 or slice replacing an object removes descendant provenance. A failure in any
 layer discards the complete candidate snapshot.
@@ -66,8 +70,9 @@ origin. Received descriptions identify a safe type category, never a value.
 After complete decoding, `LoadWithValidators` runs `Validate() error` on the
 candidate when implemented and then caller validators in registration order.
 Use `validation.At("server.port", err)` for a safe path. Panics are recovered as
-typed panic errors without retaining panic values. No failed candidate snapshot
-is returned.
+typed panic errors without retaining panic values. Cancellation is rechecked
+after the final callback, including a lone self-validator; no canceled or failed
+candidate snapshot is returned. Callbacks remain cooperative synchronous code.
 
 Interpolation belongs to the dotenv source and runs before environment mapping.
 It does not inspect arbitrary process environment unless the caller explicitly

@@ -1,6 +1,6 @@
 // Package merge combines canonical configuration trees without mutating their
 // map/slice containers. Trees recursively merges objects, replaces slices, treats
-// null as explicit replacement, and consumes Delete tombstones at visited keys.
+// null as explicit replacement, and consumes Delete tombstones at object keys.
 // Inputs must be acyclic; this standalone seam has no context/resource admission
 // and preserves arbitrary non-container references. Use config loading for
 // canonical validation. No synchronization, I/O or background lifecycle is owned.
@@ -41,8 +41,8 @@ func (e *TypeConflictError) Error() string {
 // fail, except all slice types share one structural kind. Nil maps are empty.
 // Canonical maps/[]any are copied; other references are retained. Inputs must
 // remain immutable during the call and be acyclic; no resource/context cap exists.
-// Delete is processed only on visited merge keys, not recursively normalized
-// inside a newly copied object subtree.
+// Delete is consumed at object keys, including keys in newly copied subtrees.
+// Array elements are replacement values, not independently deletable keys.
 func Trees(lower, upper map[string]any) (map[string]any, error) {
 	merged := cloneMap(lower)
 	if err := mergeMap(merged, upper, ""); err != nil {
@@ -100,6 +100,9 @@ func mergeMap(destination, upper map[string]any, parent string) error {
 func cloneMap(value map[string]any) map[string]any {
 	clone := make(map[string]any, len(value))
 	for key, item := range value {
+		if _, deleted := item.(Delete); deleted {
+			continue
+		}
 		clone[key] = cloneValue(item)
 	}
 
