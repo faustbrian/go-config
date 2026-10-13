@@ -1,5 +1,7 @@
 # Migration guide
 
+[Documentation index](README.md)
+
 ## To v2 and Go 1.27
 
 The v2 release line is maintained on main. Its new module identities make
@@ -92,3 +94,5 @@ During migration, compare a sanitized field inventory and provenance, never a
 dump containing values. Roll out with the old and new loaders reading the same
 inputs only if the old path can be observed safely; publish one authoritative
 configuration to consumers.
+
+Continue with [API reference](api.md).

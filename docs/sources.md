@@ -1,5 +1,7 @@
 # Sources and formats
 
+[Documentation index](README.md)
+
 Every source has a stable name, priority, sensitivity flag, and optional flag.
 Inputs are copied or reopened for each load. A source never writes the process
 environment or destination struct.

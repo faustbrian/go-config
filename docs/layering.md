@@ -1,5 +1,7 @@
 # Layering, defaults, merging, interpolation, and validation
 
+[Documentation index](README.md)
+
 ## Default precedence
 
 `NewDefaultPlan` applies this complete low-to-high table:
@@ -76,3 +78,4 @@ copies selected variables into `Interpolation.Variables`.
 admitted input through plan loading; standalone decode does not perform that
 admission. Cancellation is cooperative. Legacy standard-library text hooks
 remain supported as trusted synchronous application code.
+Continue with [API reference](api.md).

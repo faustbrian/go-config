@@ -1,5 +1,7 @@
 # Operations, compatibility, performance, troubleshooting, and FAQ
 
+[Documentation index](README.md)
+
 ## Startup and lifecycle
 
 Construct sources and the plan once at the composition root, then load with a

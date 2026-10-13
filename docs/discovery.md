@@ -1,5 +1,7 @@
 # Explicit discovery
 
+[Documentation index](README.md)
+
 `discover.Search` only examines paths supplied through `Explicit`,
 `Directories`, `StartDir`, or an explicitly enabled user-config directory. It
 does not traverse parents or home directories by default and never reads file
@@ -60,3 +62,5 @@ paths as provenance. Confinement prevents a replacement from escaping the
 approved directory; it does not authenticate a stable regular file supplied by
 an attacker who can write inside that directory. Use deployment ownership,
 read-only mounts, and artifact verification for content integrity.
+
+Continue with [API reference](api.md).

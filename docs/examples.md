@@ -1,5 +1,7 @@
 # Runnable examples
 
+[Documentation index](README.md)
+
 Run examples from the repository root:
 
 ```console
@@ -31,3 +33,5 @@ byte and `fs.FS` structured constructors, both dotenv constructors, explicit
 and process environment sources, every programmatic constructor, all
 filesystem entry points, discovery-to-load composition, typed validation,
 secrets, provenance, and deterministic `configtest` fixtures.
+
+Continue with [API reference](api.md).

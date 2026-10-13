@@ -15,7 +15,7 @@ root module under `adapters/awssecretsmanager/v*` tags.
 go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2
 ```
 
-Use this command after the v2 release is published. Import its module path:
+The independently published v2 adapter uses this module path:
 
 ```go
 import "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
@@ -129,8 +129,8 @@ the caller-configured client. See [compatibility](docs/compatibility.md),
 ## Documentation
 
 For shared package selection, ownership, construction, and lifecycle guidance,
-see the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
-and its [Foundations family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
+see the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/README.md)
+and its [Foundations family](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/design-language.md#package-families-and-selection).
 
 - [API](docs/api.md)
 - [Adoption](docs/adoption.md)
@@ -164,3 +164,5 @@ provider responses without global AWS state.
 
 See the root [documentation index](../../docs/README.md) for source ownership,
 security, and operations guidance.
+
+Continue with the [documentation index](docs/README.md).

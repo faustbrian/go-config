@@ -1,5 +1,7 @@
 # Security
 
+[Documentation index](README.md)
+
 Use workload identity and the AWS SDK default credential chain. Do not provide
 static AWS access keys to this adapter. IAM should allow only
 `secretsmanager:GetSecretValue` for the configured secret and the KMS decrypt
@@ -16,3 +18,5 @@ owns its decoded values for the lifetime chosen by the caller.
 Avoid logging source documents, typed settings, AWS responses, or wrapped
 provider causes. Rotation and refresh must be an explicit application workflow
 with validated transition and rollback behavior.
+
+Continue with [API](api.md).

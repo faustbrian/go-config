@@ -1,5 +1,7 @@
 # Architecture
 
+[Documentation index](README.md)
+
 The adapter is a leaf module between the AWS SDK and
 `github.com/faustbrian/go-config/v2`. It owns no credentials, client, retry loop,
 cache, refresh goroutine, or global state.
@@ -13,3 +15,5 @@ exactly one payload, parses it with the strict
 AWS SDK configuration and client lifetime remain composition-root
 responsibilities. Typed decoding and source precedence remain responsibilities
 of the enclosing `config.Plan`.
+
+Continue with [API](api.md).

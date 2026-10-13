@@ -1,5 +1,7 @@
 # Troubleshooting
 
+[Documentation index](README.md)
+
 ## Construction fails
 
 Use `errors.Is` to distinguish `ErrClientRequired` from `ErrInvalidOptions`.
@@ -50,3 +52,5 @@ The adapter has no cache or refresh loop. Applications that load once at
 startup continue using their existing decoded configuration. Perform another
 explicit load, validate the complete replacement, and define transition and
 rollback behavior in the application before swapping runtime configuration.
+
+Continue with [API](api.md).

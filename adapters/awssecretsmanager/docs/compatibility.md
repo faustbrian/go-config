@@ -1,5 +1,7 @@
 # Compatibility
 
+[Documentation index](README.md)
+
 The adapter supports AWS Secrets Manager string and binary secret values that
 contain one JSON object. It uses the AWS SDK v2 `GetSecretValue` contract and
 the current `github.com/faustbrian/go-config/v2` document model. The module
@@ -10,3 +12,5 @@ adapter contains no OS-specific code and requires no local service process.
 Adding optional `Options` fields is compatible. Changing the default version
 stage, source priority, JSON object requirement, missing-secret mapping, or
 error redaction is behaviorally breaking and requires a major release.
+
+Continue with [API](api.md).

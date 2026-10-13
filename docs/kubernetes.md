@@ -1,5 +1,7 @@
 # Kubernetes and Infisical recipes
 
+[Documentation index](README.md)
+
 ## ConfigMap and Secret environment variables
 
 Inject ConfigMap and Secret keys normally, then use
@@ -82,3 +84,5 @@ There is no native Infisical adapter in this module. If one is later justified
 for non-Kubernetes tools or services, it must live in a separately imported and
 preferably separately versioned module so the official SDK never inflates the
 core dependency graph.
+
+Continue with [API reference](api.md).

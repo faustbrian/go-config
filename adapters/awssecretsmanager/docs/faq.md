@@ -1,5 +1,7 @@
 # FAQ
 
+[Documentation index](README.md)
+
 ## Does this adapter discover AWS credentials?
 
 No. Construct the SDK client from `awsconfig.LoadDefaultConfig`; the caller
@@ -20,3 +22,5 @@ source at environment priority in the same plan.
 
 No. The payload must be one JSON object so structure, duplicate keys, bounds,
 and typed decoding remain deterministic.
+
+Continue with [API](api.md).

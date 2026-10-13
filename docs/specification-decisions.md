@@ -1,5 +1,7 @@
 # Specification decisions
 
+[Documentation index](README.md)
+
 This register records the observable JSON, YAML, and TOML interpretation
 choices owned by `go-config`. General parser behavior is not treated as policy
 until the package selects, rejects, or normalizes it at its public source boundary.
@@ -457,3 +459,5 @@ Structured contract:
 None. New source formats, parser dialect changes, or changes to any registered
 normalization, rejection, resource, or diagnostic boundary require a new decision
 or a superseding entry before implementation.
+
+Continue with [API reference](api.md).

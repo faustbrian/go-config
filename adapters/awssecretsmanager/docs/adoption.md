@@ -1,5 +1,7 @@
 # Adoption
 
+[Documentation index](README.md)
+
 Use this adapter when an application must retrieve startup configuration
 directly from AWS Secrets Manager using workload identity.
 
@@ -12,3 +14,5 @@ directly from AWS Secrets Manager using workload identity.
 Use the ordinary environment or filesystem sources when an operator, CSI
 driver, or sidecar already materializes the secret. Do not fetch one secret per
 field or use this adapter as a rotation controller.
+
+Continue with [API](api.md).

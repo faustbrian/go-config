@@ -1,5 +1,7 @@
 # Security and threat model
 
+[Documentation index](README.md)
+
 ## Model version and scope
 
 This is threat model `CONFIG-TM-1.1`, reviewed 2026-10-05. It applies to the

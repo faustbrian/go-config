@@ -1,5 +1,7 @@
 # API
 
+[Documentation index](README.md)
+
 `New(Client, Options)` returns a `config.Source`. `Client` contains only
 `GetSecretValue`; callers normally satisfy it with the AWS SDK Secrets Manager
 client created from `awsconfig.LoadDefaultConfig`.
@@ -14,3 +16,5 @@ payload is 65,536 bytes. Every source is marked sensitive.
 `ResourceNotFoundException` becomes `config.ErrNotFound`. Other provider
 causes remain available through `errors.Is` and `errors.As`, while formatted
 errors expose only the stable redacted operation classification.
+
+Continue with [Adoption](adoption.md).

@@ -1,5 +1,7 @@
 # Package-author guide
 
+[Documentation index](README.md)
+
 Reusable packages should define only the configuration they own. A PostgreSQL
 package may own pool and TLS settings; a telemetry package may own exporter
 settings. Core `config` intentionally does not define vendor, database,
@@ -42,3 +44,5 @@ Test the type with `defaults.For`, `environment.EnvironFor`, strict decode,
 validation, malformed text, redaction, and snapshot copying. A package adding a
 remote source should implement `config.Source` in a separate optional module and
 document limits, retries, cancellation, caching, staleness, and shutdown.
+
+Continue with [API reference](api.md).

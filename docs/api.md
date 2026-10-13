@@ -1,5 +1,7 @@
 # API reference
 
+[Documentation index](README.md)
+
 The canonical symbol-level reference is generated from Go doc comments at
 [pkg.go.dev](https://pkg.go.dev/github.com/faustbrian/go-config/v2). This guide
 describes how the packages compose.

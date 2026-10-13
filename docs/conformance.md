@@ -1,5 +1,7 @@
 # Structured-format conformance matrix
 
+[Documentation index](README.md)
+
 JSON, YAML, and TOML sources normalize their shared data model before merge.
 The matrix below is the compatibility contract; differences are deliberate and
 must not depend on parser defaults.

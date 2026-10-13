@@ -1,5 +1,7 @@
 # Verification
 
+[Documentation index](README.md)
+
 This document maps the package guarantees to authoritative repository
 evidence. A filename alone is not proof: the named test behavior and the gate
 that executes it are part of each entry. `make check` and `make ci` use bounded
