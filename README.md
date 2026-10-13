@@ -23,13 +23,16 @@ the [migration guide](docs/migration.md) before adopting the new identities.
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config/v2@v2
-go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2
+go get github.com/faustbrian/go-config/v2@v2.0.0
+go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2.0.1
 ```
 
-The root v2 tag is public. Use the second command after the adapter's own v2
-tag is published, and only when an application reads configuration directly
-from AWS Secrets Manager. Its v2 source on main already consumes public root v2.
+Root v2.0.0 and the independently released AWS adapter v2.0.1 are public.
+Use the adapter only when an application reads configuration directly from AWS
+Secrets Manager. Main prepares root v2.0.1; after qualification and publication,
+upgrade the root requirement to `github.com/faustbrian/go-config/v2@v2.0.1`.
+No import changes or new AWS adapter release are required. See the
+[patch adoption guide](docs/migration.md#to-root-v201).
 
 ## Five-minute quickstart
 

@@ -12,12 +12,29 @@ Replace root imports with `github.com/faustbrian/go-config/v2`, retaining each
 subpackage suffix after `/v2`. The optional AWS adapter instead uses its own
 identity, `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`.
 Its sources return root-v2 types; do not mix them with root-v1 plans or loaders.
-Root v2.0.0 is already public. Wait for the adapter's independent v2 tag, then
-update both module requirements together when using that adapter.
+Root v2.0.0 and the independent AWS adapter v2.0.1 are publicly available.
+Select each published module version explicitly when using the adapter.
 
 Root tags are `v2.0.0`; adapter tags are
 `adapters/awssecretsmanager/v2.0.0`. Both are created from main without separate
 version directories or branches. The existing v1 tags remain unchanged.
+
+## To root v2.0.1
+
+Main prepares a compatible root patch; after release qualification and public
+availability, require `github.com/faustbrian/go-config/v2@v2.0.1`. Keep the same
+imports and Go 1.27.0 minimum. No new AWS adapter release is necessary: an
+application using published AWS adapter v2.0.1 can add the corrected root
+requirement explicitly, without changing the adapter's own dependency pin.
+
+The patch restores snapshot isolation through array references and validates
+Optional payloads before cloning or callbacks. Handle `SnapshotValueError`
+from unsupported or cyclic custom decoded state and `TreeCycleError` from
+cyclic programmatic containers. Finite acyclic inputs remain accepted; no new
+constructor depth or count cap is introduced. Deletion through canonical
+Sources consumes nested object-key tombstones; programmatic marker-struct
+rejection remains unchanged. A context canceled by the final validator now
+returns its context error rather than publishing a candidate.
 
 ## To the target-oriented service adapter
 

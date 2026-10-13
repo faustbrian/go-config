@@ -45,6 +45,45 @@ and releases use Semantic Versioning.
   Correlation v1.1.1 with redacted entropy failures while preserving the
   typed service adapter and compatibility facade loader contracts.
 
+## [2.0.1] - 2026-10-13
+
+Prepared root patch; publication is conditional on release qualification.
+Source range: `v2.0.0` (`81b390daf5`) through `2b79cffba8`.
+Existing Unreleased notes are retained rather than cleared during preparation.
+
+### Fixed
+
+- Restore independent snapshot copying through mutable array elements and
+  Optional payload admission before cloning or callbacks. Reject actual runtime
+  cycles while preserving finite recursive instances and shared acyclic
+  containers. Consume nested object tombstones and recheck cancellation after
+  the final validator so canceled candidates are not published.
+  [2b79cffba8](https://github.com/faustbrian/go-config/commit/2b79cffba8b705c05d6b403be12d068c37162565).
+
+### Changed
+
+- Adopt Service v1.1.3 and Correlation v1.1.1 while retaining service-loader,
+  precedence, cancellation and error contracts.
+  [6da5222d48](https://github.com/faustbrian/go-config/commit/6da5222d481507dcb0c9a5cf962701e0b358274f).
+
+### Documentation
+
+- Clarify source/typed ownership, admission, specification boundaries and
+  current public adoption/security scope without changing selected standards.
+  [cbdd055819](https://github.com/faustbrian/go-config/commit/cbdd055819c9e4532d2a0c90faf05c06fcfffa59), [889a65ca91](https://github.com/faustbrian/go-config/commit/889a65ca919ae33206d36ed80de8ceb02af304ed), [104627c13d](https://github.com/faustbrian/go-config/commit/104627c13dd24c640096346f0ca994cdc2292a7f).
+
+### Maintenance
+
+- Keep repository policy and authenticated tooling aligned; retain bounded
+  assurance, source-documentation checks and credential-free specification
+  checkout. These changes do not add root runtime behavior.
+  [8063c591c8](https://github.com/faustbrian/go-config/commit/8063c591c87c40c11e7a8dbcf542c350d1f713f0), [f0284a48c7](https://github.com/faustbrian/go-config/commit/f0284a48c7dc6dcbd8e1c20648e0515a519e1a11), [25f2fbaeec](https://github.com/faustbrian/go-config/commit/25f2fbaeecf04abcb1708ae0f55ad0afc14844b2), [933a164244](https://github.com/faustbrian/go-config/commit/933a164244858695a927e98d1ee9366a55ab4d4c), [deed76a214](https://github.com/faustbrian/go-config/commit/deed76a21471e4070867fd5fb0644a06660467c8), [42a7ee4f0f](https://github.com/faustbrian/go-config/commit/42a7ee4f0ff2645d4d4865509e3b68d47d1384d1), [6a7e0bf364](https://github.com/faustbrian/go-config/commit/6a7e0bf364d373bb1e8431b78b50a3872509b8d9), [0f35d06d63](https://github.com/faustbrian/go-config/commit/0f35d06d6328655e636ebf314891994ec7c6cbd4), [ae0ee73192](https://github.com/faustbrian/go-config/commit/ae0ee731922e2c7ed0688280a54dd51f826108e0), [b4e93530e3](https://github.com/faustbrian/go-config/commit/b4e93530e3b0a119422a511791fab1d1b29c508d).
+- Account for the independently released AWS adapter's v2 identity and SDK
+  response-cleanup maintenance in this repository range. Those changes belong
+  to its existing releases, not this root patch; no new adapter release or
+  dependency repin is required. See its [changelog](adapters/awssecretsmanager/CHANGELOG.md).
+  [f03e83d52d](https://github.com/faustbrian/go-config/commit/f03e83d52d4e7250238974f564f2ef558f92ff2f), [675e166198](https://github.com/faustbrian/go-config/commit/675e1661981669e61146e158ea55ba036d019223), [1399afc70a](https://github.com/faustbrian/go-config/commit/1399afc70ae36337d23b7e4b43ddf8c9ce5d35ea).
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
