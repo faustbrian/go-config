@@ -27,8 +27,9 @@ go get github.com/faustbrian/go-config/v3@v3.0.0
 ```
 
 Use the independently released AWS Secrets Manager adapter only when an
-application reads configuration directly from AWS Secrets Manager; its v3
-line builds on root v3. See the [migration guide](docs/migration.md#to-v3).
+application reads configuration directly from AWS Secrets Manager. Its v2 line
+builds on root v2 and cannot be combined with root v3; root-v3 applications
+need the adapter's v3 release. See the [migration guide](docs/migration.md#to-v3).
 
 ## Five-minute quickstart
 

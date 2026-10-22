@@ -99,6 +99,11 @@ func TestNewRejectsDotenvOutsideExplicitLocalMode(t *testing.T) {
 	if !errors.Is(err, configservice.ErrInvalidOptions) {
 		t.Fatalf("New() error = %v, want ErrInvalidOptions", err)
 	}
+	var optionsErr *configservice.OptionsError
+	if !errors.As(err, &optionsErr) || optionsErr.Field != "Dotenv" ||
+		optionsErr.Reason != "requires explicit local mode" || len(optionsErr.Unwrap()) != 1 {
+		t.Fatalf("New() error = %#v, want a cause-free Dotenv OptionsError", err)
+	}
 }
 
 func TestNewRejectsInvalidSourceConstruction(t *testing.T) {
