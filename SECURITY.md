@@ -4,7 +4,8 @@
 
 Main tracks root v3; untagged main is not a supported public release. Reports
 against the latest published root v3 and v2 patches and the latest AWS
-Secrets Manager adapter v2 patch are supported. The latest public v1 releases
+Secrets Manager adapter v3 and v2 patches are supported; adapter v2 is
+supported alongside root v2. The latest public v1 releases
 receive security fixes through at least 2026-12-31; published root v2.0.0
 includes the discovery identity fix that v1.1.0 lacks. Fixes land on main before the affected module is released
 independently.
