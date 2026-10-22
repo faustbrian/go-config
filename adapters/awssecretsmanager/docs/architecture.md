@@ -3,7 +3,7 @@
 [Documentation index](README.md)
 
 The adapter is a leaf module between the AWS SDK and
-`github.com/faustbrian/go-config/v2`. It owns no credentials, client, retry loop,
+`github.com/faustbrian/go-config/v3`. It owns no credentials, client, retry loop,
 cache, refresh goroutine, or global state.
 
 Each `Load` checks cancellation first. It invokes the supplied
@@ -11,7 +11,7 @@ Each `Load` checks cancellation first. It invokes the supplied
 observable. The client owns whether its invocation performs network operations
 or retries. After a successful invocation, the adapter copies and bounds
 exactly one payload, parses it with the strict
-`github.com/faustbrian/go-config/v2/json` source, and returns a sensitive document.
+`github.com/faustbrian/go-config/v3/json` source, and returns a sensitive document.
 AWS SDK configuration and client lifetime remain composition-root
 responsibilities. Typed decoding and source precedence remain responsibilities
 of the enclosing `config.Plan`.

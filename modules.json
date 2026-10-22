@@ -300,7 +300,9 @@
           "background_work": "none"
         },
         "optional_owned_dependencies": [],
-        "adapters": [],
+        "adapters": [
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3"
+        ],
         "companions": [],
         "supported_go": {
           "minimum": "1.27.0",
@@ -348,6 +350,7 @@
         "github.com/faustbrian/go-service/v3"
       ],
       "reverse_owned_dependencies": [
+        "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3",
         "github.com/faustbrian/go-international",
         "github.com/faustbrian/go-localized",
         "github.com/faustbrian/go-opening-hours",
@@ -392,14 +395,14 @@
     },
     {
       "directory": "adapters/awssecretsmanager",
-      "module_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+      "module_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3",
       "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": "adapters/awssecretsmanager",
           "directory": ".",
           "name": "awssecretsmanager",
-          "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+          "import_path": "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3",
           "kind": "public",
           "production": true,
           "executable": true,
@@ -431,10 +434,10 @@
         ],
         "public_package_identifier": "awssecretsmanager",
         "primary_entry_packages": [
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3"
         ],
         "package_selection": {
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2": "Use when an application explicitly composes AWS Secrets Manager as a bounded JSON source; use the root module for local, environment, filesystem, or programmatic sources."
+          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3": "Use when an application explicitly composes AWS Secrets Manager as a bounded JSON source; use the root module for local, environment, filesystem, or programmatic sources."
         },
         "lifecycle_status": "active",
         "maturity": "stable",
@@ -481,7 +484,7 @@
           "examples": "adapters/awssecretsmanager/example_test.go",
           "faq": "adapters/awssecretsmanager/docs/faq.md",
           "changelog": "adapters/awssecretsmanager/CHANGELOG.md",
-          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v3",
           "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/README.md"
         },
         "known_good_compatibility_sets": [],
@@ -491,10 +494,10 @@
           "release": "not-started"
         }
       },
-      "version": "2.1.0",
+      "version": "3.0.0",
       "tag_prefix": "adapters/awssecretsmanager/v",
       "owned_dependencies": [
-        "github.com/faustbrian/go-config/v2"
+        "github.com/faustbrian/go-config/v3"
       ],
       "reverse_owned_dependencies": [],
       "external_runtime_dependencies": [

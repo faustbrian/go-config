@@ -10,7 +10,14 @@ github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.4 h1:+qOKY5eW7mwAEUWoI
 github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.4/go.mod h1:1C6Uc76IPws0N2nYeWJKxNoabSXbTdkDpAUnqAz4VCI=
 github.com/aws/smithy-go v1.28.5 h1:OqbqKtzY9NUnr2yAe9+hiTdFb20tNaK/lI0PMOGXX9k=
 github.com/aws/smithy-go v1.28.5/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
-github.com/faustbrian/go-config/v2 v2.0.0 h1:G/ZWxfJ4S9aiws/wdora/2v+RILM893qZwCtS2t0Ytk=
-github.com/faustbrian/go-config/v2 v2.0.0/go.mod h1:LYiKGa3Eg8TAmN3w9wGeo6TvJ0alNPNMkofoqKnfvAg=
+github.com/faustbrian/go-cli/v2 v2.0.0/go.mod h1:OJXTSXgLQkXH0/Sk6oLTUgDHwazPYmMkzvFflFHTPOM=
+github.com/faustbrian/go-config/v3 v3.0.0 h1:EM78bsVWZaI876cqEAiy3G2DXIyJrG2/ZWncJPVj8Sw=
+github.com/faustbrian/go-config/v3 v3.0.0/go.mod h1:YwXZ8OJwr9Hd1E2/KiAc8UA5Tx4N066q93HLNlNsfew=
+github.com/faustbrian/go-correlation v1.1.2/go.mod h1:rzJzNfqfY8DEBD8/qCEGSu9mtCSmNvTcMBABz9wMyn0=
+github.com/faustbrian/go-identifier/v2 v2.0.0/go.mod h1:dfno42Fhe7wvGOXKwBNWO4Y0hSHi5a98RbmeB98ASVw=
+github.com/faustbrian/go-service/v3 v3.0.0/go.mod h1:haleMovKlfM07XwMpJpB/iSaOWZWDFz5tp0EIK5I51U=
+github.com/jackc/pgx/v5 v5.11.0/go.mod h1:mal1tBGAFfLHvZzaYh77YS/eC6IX9OWbRV1QIIM0Jn4=
+go.yaml.in/yaml/v3 v3.0.5/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
 go.yaml.in/yaml/v4 v4.0.0-rc.6 h1:1h7H1ohdUh93/FyE4YaDa1Zh64K6VVbjF4K6WUxMtH4=
 go.yaml.in/yaml/v4 v4.0.0-rc.6/go.mod h1:aZqd9kCMsGL7AuUv/m/PvWLdg5sjJsZ4oHDEnfPPfY0=
+golang.org/x/sync v0.22.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=

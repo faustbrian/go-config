@@ -2,7 +2,18 @@
 
 All notable changes follow Keep a Changelog and semantic versioning.
 
-## Unreleased
+## 3.0.0 - 2026-10-22
+
+### Changed
+
+- Move to `github.com/faustbrian/go-config/adapters/awssecretsmanager/v3` and
+  build on root `github.com/faustbrian/go-config/v3`, so sources satisfy the
+  root-v3 `config.Source`. Secret retrieval, payload bounds and error
+  classification are unchanged.
+
+## 2.1.0 - 2026-10-22
+
+Published from the notes below, which earlier releases left unversioned.
 
 ### Documentation
 
@@ -12,7 +23,7 @@ All notable changes follow Keep a Changelog and semantic versioning.
 ### Changed
 
 - Prepare the adapter's independent v2 identity and Go 1.27 minimum. Use
-  `github.com/faustbrian/go-config/adapters/awssecretsmanager/v2` with root-v2
+  `github.com/faustbrian/go-config/adapters/awssecretsmanager/v3` with root-v2
   plans and loaders; returned sources no longer have the root-v1 type identity.
 
 - Adopt schema-v2 cohesion metadata and the repository's checksum-verified

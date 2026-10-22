@@ -13,9 +13,9 @@ a Service v3 `Invocation`. The `configservice` facade is removed: import
 `OptionsError` with the adapter's `OptionsError`. Source precedence, decoding,
 validation and snapshot semantics are unchanged.
 
-The optional AWS Secrets Manager adapter follows as
+The optional AWS Secrets Manager adapter moves with it to
 `github.com/faustbrian/go-config/adapters/awssecretsmanager/v3`, built on the
-v3 root; until it is published, keep it with root v2.
+v3 root; upgrade both together.
 
 ## To v2 and Go 1.27
 

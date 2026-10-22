@@ -18,8 +18,8 @@ import (
 
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
-	config "github.com/faustbrian/go-config/v2"
-	jsonsource "github.com/faustbrian/go-config/v2/json"
+	config "github.com/faustbrian/go-config/v3"
+	jsonsource "github.com/faustbrian/go-config/v3/json"
 )
 
 const (

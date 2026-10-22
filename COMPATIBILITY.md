@@ -7,9 +7,9 @@ releasable AWS Secrets Manager adapter uses
 to the root module's tag.
 
 Main tracks root v3, which binds Service v3 and removes the `configservice`
-facade. Root v2 and the independent AWS Secrets Manager v2 adapter remain
-published; that adapter builds on root v2 and cannot be combined with root v3
-until its own v3 release. Root v2 and v3 require Go 1.27.0. Published v1
+facade. The independent AWS Secrets Manager adapter's v3 line builds on root
+v3; its v2 line builds on root v2, and the two cannot be mixed. Root v2 and
+v3 require Go 1.27.0. Published v1
 releases retain their original Go 1.26.6 support contract. The adapter supports
 AWS Secrets Manager through the AWS SDK for Go v2 and delegates region,
 endpoint, credentials, transport, and retry compatibility to the caller's client.

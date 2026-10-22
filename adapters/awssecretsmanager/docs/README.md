@@ -5,7 +5,7 @@
 ## Getting started
 
 - [Package overview](../README.md)
-- [Go package documentation](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v2)
+- [Go package documentation](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v3)
 
 ## Guides and reference
 

@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/smithy-go/tracing"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
-	source "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
+	source "github.com/faustbrian/go-config/adapters/awssecretsmanager/v3"
 )
 
 type sdkResponseBody struct {

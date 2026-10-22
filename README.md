@@ -26,9 +26,9 @@ go get github.com/faustbrian/go-config/v3@v3.0.0
 ```
 
 Use the independently released AWS Secrets Manager adapter only when an
-application reads configuration directly from AWS Secrets Manager. Its v2 line
-builds on root v2 and cannot be combined with root v3; root-v3 applications
-need the adapter's v3 release. See the [migration guide](docs/migration.md#to-v3).
+application reads configuration directly from AWS Secrets Manager. Root-v3
+applications use its v3 line; its v2 line builds on root v2. See the
+[migration guide](docs/migration.md#to-v3).
 
 ## Five-minute quickstart
 
@@ -136,9 +136,9 @@ explicit-file sources compose with bounded discovery, merging, typed values,
 validation, copied snapshots, provenance, and an optional service adapter.
 
 The independently versioned
-[`github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`](adapters/awssecretsmanager/README.md)
-module adapts one bounded AWS Secrets Manager JSON document into the root-v2
-`config.Source` contract; a v3 release follows. Use it only when an operator, CSI driver, or sidecar
+[`github.com/faustbrian/go-config/adapters/awssecretsmanager/v3`](adapters/awssecretsmanager/README.md)
+module adapts one bounded AWS Secrets Manager JSON document into the same
+`config.Source` contract. Use it only when an operator, CSI driver, or sidecar
 does not already materialize the secret as an environment variable or file.
 
 ## Documentation
