@@ -19,7 +19,7 @@ v3 root; until it is published, keep it with root v2.
 
 ## To v2 and Go 1.27
 
-The v2 release line is maintained on main. Its new module identities make
+The v2 module identities make
 the Go 1.27 minimum explicit without changing the Go 1.26.6 contract of already
 published v1 releases. Upgrade the toolchain before adopting the new tags.
 

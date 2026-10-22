@@ -15,9 +15,8 @@ copied snapshots with typed-shape limitations, declared provenance, validation
 orchestration and redacted secret formatting without introducing global state or
 implicit filesystem discovery.
 
-Main tracks v2 of the root library and its independently released AWS Secrets
-Manager adapter. Both require Go 1.27.0; published v1 releases retain their
-original Go support contract. Use published tags rather than untagged main. See
+Main tracks v3 of the root library. It requires Go 1.27.0; published v1
+releases retain their original Go support contract. Use published tags rather than untagged main. See
 the [migration guide](docs/migration.md) before adopting the new identities.
 
 ## Install

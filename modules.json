@@ -300,9 +300,7 @@
           "background_work": "none"
         },
         "optional_owned_dependencies": [],
-        "adapters": [
-          "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2"
-        ],
+        "adapters": [],
         "companions": [],
         "supported_go": {
           "minimum": "1.27.0",
@@ -350,7 +348,6 @@
         "github.com/faustbrian/go-service/v3"
       ],
       "reverse_owned_dependencies": [
-        "github.com/faustbrian/go-config/adapters/awssecretsmanager/v2",
         "github.com/faustbrian/go-international",
         "github.com/faustbrian/go-localized",
         "github.com/faustbrian/go-opening-hours",

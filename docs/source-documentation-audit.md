@@ -2,6 +2,10 @@
 
 [Documentation index](README.md)
 
+This is a historical audit of the v2 source at the base commit below. Rows
+naming `configservice`, Service v1 or the `/v2` module describe that base, not
+the current v3 tree.
+
 ## Owner, contract and bounded checks
 
 Base ae0ee731922e2c7ed0688280a54dd51f826108e0; detached main-source worktree.

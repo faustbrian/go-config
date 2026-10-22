@@ -6,12 +6,11 @@ releasable AWS Secrets Manager adapter uses
 `adapters/awssecretsmanager/v<version>` tags. A directory prefix is never added
 to the root module's tag.
 
-Root v2.0.0 and the independent AWS Secrets Manager v2.0.1 are published.
-Main prepares root v2.0.1 with restored copying, admission, merge and
-cancellation guarantees; publication requires its own release qualification.
-Both module identities retain Go 1.27.0. Published v1 releases retain their
-original Go 1.26.6 support contract. The root patch does not require a new AWS
-adapter release; require the corrected root explicitly when adopting it. The adapter supports
+Main tracks root v3, which binds Service v3 and removes the `configservice`
+facade. Root v2 and the independent AWS Secrets Manager v2 adapter remain
+published; that adapter builds on root v2 and cannot be combined with root v3
+until its own v3 release. Root v2 and v3 require Go 1.27.0. Published v1
+releases retain their original Go 1.26.6 support contract. The adapter supports
 AWS Secrets Manager through the AWS SDK for Go v2 and delegates region,
 endpoint, credentials, transport, and retry compatibility to the caller's client.
 
@@ -29,9 +28,8 @@ The target-oriented `adapters/service` package is the only service command
 loader. Until v3, a `configservice` facade path also existed
 with its existing generic option and loader definitions, shared sentinel
 identity, equivalent structured errors, source precedence, cancellation, and
-caller-owned lifecycle semantics. V1 consumers must migrate their module and
-import identities before using either v2 package; facade compatibility does
-not make nominal v1 and v2 types interchangeable.
+caller-owned lifecycle semantics. Nominal types from different root majors are
+not interchangeable; migrate module and import identities together.
 
 Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs

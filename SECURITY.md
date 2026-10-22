@@ -2,14 +2,12 @@
 
 ## Supported versions
 
-The root module and the separately releasable AWS Secrets Manager adapter each
-have a published v1 line. Reports for the latest public v1 releases remain
-supported during the v2 transition. Main tracks the Go 1.27-only v2 lines;
-untagged main is not a supported public release. Published root v2.0.0 includes
-the discovery identity fix; v1.1.0 does not include it. The adapter's own v2
-release remains independent. Fixes
-land on main before the affected module is released independently; no v1
-backport is promised by the v2 plan.
+Main tracks root v3; untagged main is not a supported public release. Reports
+against the latest published root v3 and v2 patches and the latest AWS
+Secrets Manager adapter v2 patch are supported. Reports for the latest public
+v1 releases remain supported during the v2 transition; published root v2.0.0
+includes the discovery identity fix that v1.1.0 lacks. Fixes land on main before the affected module is released
+independently.
 
 ## Reporting a vulnerability
 
