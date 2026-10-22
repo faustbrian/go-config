@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
+	config "github.com/faustbrian/go-config/v3"
 )
 
 func TestParseErrorHasStableSecretSafeFormatting(t *testing.T) {

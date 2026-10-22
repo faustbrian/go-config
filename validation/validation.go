@@ -11,7 +11,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/faustbrian/go-config/v2/internal/safeerror"
+	"github.com/faustbrian/go-config/v3/internal/safeerror"
 )
 
 // Validator checks a complete decoded candidate synchronously under ctx.

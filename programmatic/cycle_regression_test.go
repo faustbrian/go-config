@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/merge"
-	"github.com/faustbrian/go-config/v2/programmatic"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/merge"
+	"github.com/faustbrian/go-config/v3/programmatic"
 )
 
 func TestProgrammaticRejectsRuntimeCycles(t *testing.T) {

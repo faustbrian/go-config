@@ -20,9 +20,9 @@ import (
 	"strconv"
 	"strings"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/internal/safeerror"
-	"github.com/faustbrian/go-config/v2/internal/sourceio"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/internal/safeerror"
+	"github.com/faustbrian/go-config/v3/internal/sourceio"
 	yamlv4 "go.yaml.in/yaml/v4"
 )
 

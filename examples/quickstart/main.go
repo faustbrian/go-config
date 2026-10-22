@@ -7,12 +7,12 @@ import (
 	"errors"
 	"fmt"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/defaults"
-	"github.com/faustbrian/go-config/v2/environment"
-	jsonsource "github.com/faustbrian/go-config/v2/json"
-	"github.com/faustbrian/go-config/v2/programmatic"
-	"github.com/faustbrian/go-config/v2/validation"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/defaults"
+	"github.com/faustbrian/go-config/v3/environment"
+	jsonsource "github.com/faustbrian/go-config/v3/json"
+	"github.com/faustbrian/go-config/v3/programmatic"
+	"github.com/faustbrian/go-config/v3/validation"
 )
 
 type settings struct {

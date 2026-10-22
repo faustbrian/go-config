@@ -13,7 +13,7 @@ import (
 	"reflect"
 	"strings"
 
-	config "github.com/faustbrian/go-config/v2"
+	config "github.com/faustbrian/go-config/v3"
 )
 
 type source struct {

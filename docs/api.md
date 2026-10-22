@@ -3,7 +3,7 @@
 [Documentation index](README.md)
 
 The canonical symbol-level reference is generated from Go doc comments at
-[pkg.go.dev](https://pkg.go.dev/github.com/faustbrian/go-config/v2). This guide
+[pkg.go.dev](https://pkg.go.dev/github.com/faustbrian/go-config/v3). This guide
 describes how the packages compose.
 
 ## Root package
@@ -79,8 +79,8 @@ target-oriented API. `Options.Local` must explicitly permit a filesystem-backed
 `Dotenv` source. A non-nil `Environment` adds the process environment after
 dotenv and before caller overrides. The loader returns a validated value before
 service component construction, owns no resource, performs no retries, and
-retains source and validation errors for inspection. The historical
-`configservice` path remains an API-compatible facade.
+retains source and validation errors for inspection. The former
+`configservice` facade path was removed in v3.
 
 Typed conversion and YAML/TOML parser errors expose declared metadata and
 preserve sentinel identity through `errors.Is`. Direct JSON syntax causes can

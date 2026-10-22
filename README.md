@@ -4,7 +4,7 @@
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-config/actions/workflows/ci.yml)
 [![Mutation](https://img.shields.io/badge/mutation-local_or_scheduled-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-config/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-config/v3.svg)](https://pkg.go.dev/github.com/faustbrian/go-config/v3)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-config?sort=semver)](https://github.com/faustbrian/go-config/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -23,16 +23,12 @@ the [migration guide](docs/migration.md) before adopting the new identities.
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config/v2@v2.0.0
-go get github.com/faustbrian/go-config/adapters/awssecretsmanager/v2@v2.0.1
+go get github.com/faustbrian/go-config/v3@v3.0.0
 ```
 
-Root v2.0.0 and the independently released AWS adapter v2.0.1 are public.
-Use the adapter only when an application reads configuration directly from AWS
-Secrets Manager. Main prepares root v2.0.1; after qualification and publication,
-upgrade the root requirement to `github.com/faustbrian/go-config/v2@v2.0.1`.
-No import changes or new AWS adapter release are required. See the
-[patch adoption guide](docs/migration.md#to-root-v201).
+Use the independently released AWS Secrets Manager adapter only when an
+application reads configuration directly from AWS Secrets Manager; its v3
+line builds on root v3. See the [migration guide](docs/migration.md#to-v3).
 
 ## Five-minute quickstart
 
@@ -43,11 +39,11 @@ import (
 	"context"
 	"fmt"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/defaults"
-	"github.com/faustbrian/go-config/v2/environment"
-	jsonsource "github.com/faustbrian/go-config/v2/json"
-	"github.com/faustbrian/go-config/v2/programmatic"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/defaults"
+	"github.com/faustbrian/go-config/v3/environment"
+	jsonsource "github.com/faustbrian/go-config/v3/json"
+	"github.com/faustbrian/go-config/v3/programmatic"
 )
 
 type Settings struct {
@@ -130,10 +126,8 @@ The adapter owns no resource, performs no retries, and does not reload
 configuration. The caller owns every source and decides whether repeated loads
 are safe.
 
-Within v2, `github.com/faustbrian/go-config/v2/configservice` remains an
-API-compatible facade for the target-oriented v2 service adapter. V1 consumers
-must first migrate their imports; choosing between the two v2 adapter paths
-does not require a coordinated migration.
+The v3 module removes the former `configservice` facade path; see the
+[migration guide](docs/migration.md#to-v3).
 
 ## What is included
 

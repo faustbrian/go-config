@@ -25,8 +25,8 @@ protocol behavior, persistence schemas, environment variables, command output,
 resource ownership, ordering, retry/idempotency semantics, and documented
 defaults. A compile-compatible change can still be behaviorally breaking.
 
-The target-oriented `adapters/service` package owns service command loading.
-Within v2, `configservice` remains an API-compatible facade
+The target-oriented `adapters/service` package is the only service command
+loader. Until v3, a `configservice` facade path also existed
 with its existing generic option and loader definitions, shared sentinel
 identity, equivalent structured errors, source precedence, cancellation, and
 caller-owned lifecycle semantics. V1 consumers must migrate their module and

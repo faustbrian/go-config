@@ -3,7 +3,7 @@ package merge_test
 import (
 	"testing"
 
-	"github.com/faustbrian/go-config/v2/merge"
+	"github.com/faustbrian/go-config/v3/merge"
 )
 
 func TestNewObjectSubtreesConsumeDeletionMarkers(t *testing.T) {

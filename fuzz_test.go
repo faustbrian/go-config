@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/decode"
-	"github.com/faustbrian/go-config/v2/dotenv"
-	"github.com/faustbrian/go-config/v2/environment"
-	jsonsource "github.com/faustbrian/go-config/v2/json"
-	"github.com/faustbrian/go-config/v2/programmatic"
-	tomlsource "github.com/faustbrian/go-config/v2/toml"
-	yamlsource "github.com/faustbrian/go-config/v2/yaml"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/decode"
+	"github.com/faustbrian/go-config/v3/dotenv"
+	"github.com/faustbrian/go-config/v3/environment"
+	jsonsource "github.com/faustbrian/go-config/v3/json"
+	"github.com/faustbrian/go-config/v3/programmatic"
+	tomlsource "github.com/faustbrian/go-config/v3/toml"
+	yamlsource "github.com/faustbrian/go-config/v3/yaml"
 )
 
 // FuzzStructuredSources feeds the same arbitrary bytes to all three copied

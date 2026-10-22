@@ -3,16 +3,17 @@ package configservice_test
 import (
 	"context"
 	"errors"
+	"io"
 	"testing"
 	"testing/fstest"
 
-	"github.com/faustbrian/go-config/v2"
-	configservice "github.com/faustbrian/go-config/v2/adapters/service"
-	"github.com/faustbrian/go-config/v2/dotenv"
-	"github.com/faustbrian/go-config/v2/environment"
-	"github.com/faustbrian/go-config/v2/programmatic"
-	"github.com/faustbrian/go-config/v2/validation"
-	"github.com/faustbrian/go-service"
+	"github.com/faustbrian/go-config/v3"
+	configservice "github.com/faustbrian/go-config/v3/adapters/service"
+	"github.com/faustbrian/go-config/v3/dotenv"
+	"github.com/faustbrian/go-config/v3/environment"
+	"github.com/faustbrian/go-config/v3/programmatic"
+	"github.com/faustbrian/go-config/v3/validation"
+	"github.com/faustbrian/go-service/v3"
 )
 
 type settings struct {
@@ -262,5 +263,59 @@ func TestLoaderSnapshotsOptionSlicesAndReadsProcessEnvironmentPerLoad(t *testing
 	}
 	if loaded.Port != 2000 {
 		t.Fatalf("Port = %d, want current process environment value 2000", loaded.Port)
+	}
+}
+
+func TestLoaderDrivesServiceV3CommandLoading(t *testing.T) {
+	defaults, err := programmatic.Defaults("defaults", map[string]any{"port": int64(8080)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalid := errors.New("port is reserved")
+	for _, test := range []struct {
+		name    string
+		args    []string
+		reject  bool
+		exit    int
+		handled bool
+	}{
+		{name: "valid", args: []string{"migrate"}, exit: 0, handled: true},
+		{name: "end of options", args: []string{"migrate", "--"}, exit: 0, handled: true},
+		{name: "validation failure", args: []string{"migrate"}, reject: true, exit: 78},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var validators []validation.Validator[settings]
+			if test.reject {
+				validators = append(validators, func(context.Context, settings) error {
+					return validation.At("port", invalid)
+				})
+			}
+			loader, err := configservice.New(configservice.Options[settings]{
+				Sources:    config.DefaultSources{Defaults: []config.Source{defaults}},
+				Validators: validators,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			handled := false
+			command := service.CommandFor(service.CommandSpec[settings]{
+				Name: "migrate",
+				Kind: service.CommandKindOneShot,
+				Load: loader,
+				Build: func(_ context.Context, _ service.BuildContext, loaded settings) (service.Plan, error) {
+					return service.Plan{Tasks: []service.Task{{Name: "migration", Run: func(context.Context) error {
+						handled = loaded.Port == 8080
+						return nil
+					}}}}, nil
+				},
+			})
+			exit := service.Execute(context.Background(), service.Definition{
+				Identity: service.Identity{Name: "postal"},
+				Commands: service.Commands{Migrate: command},
+			}, service.Invocation{Args: test.args, Stdout: io.Discard, Stderr: io.Discard})
+			if exit != test.exit || handled != test.handled {
+				t.Fatalf("exit = %d, handled %t; want %d, %t", exit, handled, test.exit, test.handled)
+			}
+		})
 	}
 }

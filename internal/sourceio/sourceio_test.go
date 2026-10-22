@@ -14,7 +14,7 @@ import (
 	"testing/fstest"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
+	config "github.com/faustbrian/go-config/v3"
 )
 
 func TestBytesIsImmutableRepeatableAndBounded(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/configtest"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/configtest"
 )
 
 func TestNewSourceIsDeterministicAndImmutable(t *testing.T) {

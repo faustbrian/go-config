@@ -3,6 +3,21 @@
 All notable changes are documented here. The format follows Keep a Changelog
 and releases use Semantic Versioning.
 
+## 3.0.0 - 2026-10-22
+
+### Changed
+
+- Move the root module to `github.com/faustbrian/go-config/v3` and bind
+  `adapters/service` to `github.com/faustbrian/go-service/v3`, whose command
+  types build on go-cli v2. `Loader[T]` now takes a Service v3 `Invocation`.
+
+### Removed
+
+- Remove the `configservice` compatibility facade. Import
+  `github.com/faustbrian/go-config/v3/adapters/service` instead; its options,
+  loader, `ErrInvalidOptions` and `OptionsError` are the same, but its
+  `OptionsError` is the only structured option error.
+
 ## 2.0.2 - 2026-10-22
 
 ### Changed

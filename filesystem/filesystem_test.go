@@ -12,9 +12,9 @@ import (
 	"testing"
 	"testing/fstest"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/discover"
-	"github.com/faustbrian/go-config/v2/filesystem"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/discover"
+	"github.com/faustbrian/go-config/v3/filesystem"
 )
 
 func TestFromFSDispatchesSupportedExtensions(t *testing.T) {

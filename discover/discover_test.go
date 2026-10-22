@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/faustbrian/go-config/v2/discover"
+	"github.com/faustbrian/go-config/v3/discover"
 )
 
 func TestSearchDoesNotTraverseParentsByDefault(t *testing.T) {

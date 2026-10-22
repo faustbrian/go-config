@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/configtest"
-	"github.com/faustbrian/go-config/v2/environment"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/configtest"
+	"github.com/faustbrian/go-config/v3/environment"
 )
 
 type settings struct {

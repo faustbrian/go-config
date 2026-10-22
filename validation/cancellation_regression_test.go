@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/faustbrian/go-config/v2/validation"
+	"github.com/faustbrian/go-config/v3/validation"
 )
 
 type cancelingSelf struct{ cancel context.CancelFunc }

@@ -16,9 +16,9 @@ import (
 	"strings"
 	"unicode"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/environment"
-	"github.com/faustbrian/go-config/v2/internal/sourceio"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/environment"
+	"github.com/faustbrian/go-config/v3/internal/sourceio"
 )
 
 const (

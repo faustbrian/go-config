@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"testing"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/configtest"
-	"github.com/faustbrian/go-config/v2/decode"
-	jsonsource "github.com/faustbrian/go-config/v2/json"
-	"github.com/faustbrian/go-config/v2/merge"
-	"github.com/faustbrian/go-config/v2/validation"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/configtest"
+	"github.com/faustbrian/go-config/v3/decode"
+	jsonsource "github.com/faustbrian/go-config/v3/json"
+	"github.com/faustbrian/go-config/v3/merge"
+	"github.com/faustbrian/go-config/v3/validation"
 )
 
 type benchmarkSettings struct {

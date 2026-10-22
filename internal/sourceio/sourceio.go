@@ -18,7 +18,7 @@ import (
 	"syscall"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
+	config "github.com/faustbrian/go-config/v3"
 )
 
 // Input is a repeatable copied-byte or borrowed-filesystem input. The zero

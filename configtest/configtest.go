@@ -14,7 +14,7 @@ import (
 	"sort"
 	"testing/fstest"
 
-	config "github.com/faustbrian/go-config/v2"
+	config "github.com/faustbrian/go-config/v3"
 )
 
 // TestingT is the subset of testing.T used by configtest helpers.

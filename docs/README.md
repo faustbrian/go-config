@@ -6,11 +6,11 @@
 
 - [Package overview and installation](../README.md)
 - [Compiler-checked package examples](../examples_test.go)
-- [Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/v2)
-- [Testing helpers (`configtest`)](https://pkg.go.dev/github.com/faustbrian/go-config/v2/configtest)
+- [Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/v3)
+- [Testing helpers (`configtest`)](https://pkg.go.dev/github.com/faustbrian/go-config/v3/configtest)
 - [Testing-helper example](../examples/testing/main.go)
 - [API](api.md)
-- [Service adapter API](https://pkg.go.dev/github.com/faustbrian/go-config/v2/adapters/service)
+- [Service adapter API](https://pkg.go.dev/github.com/faustbrian/go-config/v3/adapters/service)
 - [Sources and formats](sources.md)
 - [Examples](examples.md)
 

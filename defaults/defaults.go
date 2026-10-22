@@ -19,9 +19,9 @@ import (
 	"strings"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/decode"
-	"github.com/faustbrian/go-config/v2/internal/safeerror"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/decode"
+	"github.com/faustbrian/go-config/v3/internal/safeerror"
 )
 
 type source struct {

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	config "github.com/faustbrian/go-config/v2"
-	"github.com/faustbrian/go-config/v2/environment"
+	config "github.com/faustbrian/go-config/v3"
+	"github.com/faustbrian/go-config/v3/environment"
 )
 
 func TestProcessForReadsFreshProcessSnapshotWithoutMutation(t *testing.T) {

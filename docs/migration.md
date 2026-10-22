@@ -2,6 +2,21 @@
 
 [Documentation index](README.md)
 
+## To v3
+
+Replace root imports with `github.com/faustbrian/go-config/v3`, retaining each
+subpackage suffix, and move the service definition that uses the loader to
+`github.com/faustbrian/go-service/v3` in the same change; `Loader[T]` now takes
+a Service v3 `Invocation`. The `configservice` facade is removed: import
+`github.com/faustbrian/go-config/v3/adapters/service` (conventionally aliased
+`configservice`) and replace any `errors.As` target of the facade's
+`OptionsError` with the adapter's `OptionsError`. Source precedence, decoding,
+validation and snapshot semantics are unchanged.
+
+The optional AWS Secrets Manager adapter follows as
+`github.com/faustbrian/go-config/adapters/awssecretsmanager/v3`, built on the
+v3 root; until it is published, keep it with root v2.
+
 ## To v2 and Go 1.27
 
 The v2 release line is maintained on main. Its new module identities make
@@ -38,18 +53,9 @@ returns its context error rather than publishing a candidate.
 
 ## To the target-oriented service adapter
 
-New integrations should import
-`github.com/faustbrian/go-config/v2/adapters/service`, conventionally aliased as
-`configservice`. Its generic `Options[T]` and `Loader[T]` shapes,
-`ErrInvalidOptions`, `OptionsError`, `Dotenv`, and `New[T]` behavior match the
-v2 facade path. Types remain named by their import paths, so migrate an import
-as one source change rather than mixing both packages in one assignment.
-
-After migrating from v1, consumers may use
-`github.com/faustbrian/go-config/v2/configservice` as a compatibility facade.
-Switching between this facade and the target-oriented v2 adapter does not
-require a coordinated source migration; adopting v2 still requires the module
-and import changes described above.
+Import `github.com/faustbrian/go-config/v3/adapters/service`, conventionally
+aliased as `configservice`. The v2 `configservice` facade path is removed in
+v3; see "To v3".
 
 ## From direct `os.Getenv`
 

@@ -5,8 +5,9 @@
 ## Model version and scope
 
 This is threat model `CONFIG-TM-1.1`, reviewed 2026-10-05. It applies to the
-published root-v2 contract, `github.com/faustbrian/go-config/v2`, available
-from v2.0.0. Current source documentation can be newer than released prose;
+root-v3 contract, `github.com/faustbrian/go-config/v3`, available from
+v3.0.0; v3 changes only the module identity, the Service v3 binding and the
+removed `configservice` facade. Current source documentation can be newer than released prose;
 the independently versioned AWS adapter retains its own security and release
 boundary. Reassess this model when discovery, filesystem loading, source trust,
 platform support, or secret-handling boundaries change.
