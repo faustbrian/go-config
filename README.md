@@ -137,8 +137,8 @@ validation, copied snapshots, provenance, and an optional service adapter.
 
 The independently versioned
 [`github.com/faustbrian/go-config/adapters/awssecretsmanager/v2`](adapters/awssecretsmanager/README.md)
-module adapts one bounded AWS Secrets Manager JSON document into the same
-`config.Source` contract. Use it only when an operator, CSI driver, or sidecar
+module adapts one bounded AWS Secrets Manager JSON document into the root-v2
+`config.Source` contract; a v3 release follows. Use it only when an operator, CSI driver, or sidecar
 does not already materialize the secret as an environment variable or file.
 
 ## Documentation

@@ -36,8 +36,8 @@ version directories or branches. The existing v1 tags remain unchanged.
 
 ## To root v2.0.1
 
-Main prepares a compatible root patch; after release qualification and public
-availability, require `github.com/faustbrian/go-config/v2@v2.0.1`. Keep the same
+Root v2.0.1 is a compatible patch; require
+`github.com/faustbrian/go-config/v2@v2.0.1` or later. Keep the same
 imports and Go 1.27.0 minimum. No new AWS adapter release is necessary: an
 application using published AWS adapter v2.0.1 can add the corrected root
 requirement explicitly, without changing the adapter's own dependency pin.

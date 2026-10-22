@@ -28,7 +28,7 @@ and releases use Semantic Versioning.
 - Publish independently versioned modules from the same source snapshot:
   - `adapters/awssecretsmanager/v2.1.0`.
 
-## [Unreleased]
+## Earlier unversioned notes (shipped by 2.0.1)
 
 ### Fixed
 
@@ -72,9 +72,7 @@ and releases use Semantic Versioning.
 
 ## [2.0.1] - 2026-10-13
 
-Prepared root patch; publication is conditional on release qualification.
 Source range: `v2.0.0` (`81b390daf5`) through `2b79cffba8`.
-Existing Unreleased notes are retained rather than cleared during preparation.
 
 ### Fixed
 
@@ -254,6 +252,5 @@ Existing Unreleased notes are retained rather than cleared during preparation.
 - Explicit conformance assertions that decoding, defaults, environment
   loading, metadata, and snapshot cloning do not mutate private struct state.
 
-[Unreleased]: https://github.com/faustbrian/go-config/compare/v1.1.0...HEAD
 [1.1.0]: https://github.com/faustbrian/go-config/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/faustbrian/go-config/releases/tag/v1.0.0
