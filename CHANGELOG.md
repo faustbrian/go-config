@@ -3,6 +3,14 @@
 All notable changes are documented here. The format follows Keep a Changelog
 and releases use Semantic Versioning.
 
+## 2.0.2 - 2026-10-22
+
+### Changed
+
+- Publish the current source and documentation with a fresh immutable tag.
+- Publish independently versioned modules from the same source snapshot:
+  - `adapters/awssecretsmanager/v2.1.0`.
+
 ## [Unreleased]
 
 ### Fixed
