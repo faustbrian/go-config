@@ -346,7 +346,7 @@
       "owned_dependencies": [
         "github.com/faustbrian/go-cli/v2",
         "github.com/faustbrian/go-correlation",
-        "github.com/faustbrian/go-identifier",
+        "github.com/faustbrian/go-identifier/v2",
         "github.com/faustbrian/go-service/v3"
       ],
       "reverse_owned_dependencies": [
@@ -411,7 +411,7 @@
           "build_tags": []
         }
       ],
-      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `github.com/faustbrian/go-config/v2` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
+      "purpose": "This adapter loads one bounded JSON configuration document from AWS Secrets Manager into a sensitive `github.com/faustbrian/go-config/v3` source. It leaves AWS credential resolution, retries, IAM, secret creation, and rotation to the caller.",
       "lifecycle": "stable",
       "kind": "adapter",
       "releasable": true,

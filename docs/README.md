@@ -27,7 +27,7 @@
 - [AWS Secrets Manager adapter](../adapters/awssecretsmanager/docs/README.md)
 - [AWS adapter overview and installation](../adapters/awssecretsmanager/README.md)
 - [AWS adapter compiler-checked example](../adapters/awssecretsmanager/example_test.go)
-- [AWS adapter Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v2)
+- [AWS adapter Go package reference](https://pkg.go.dev/github.com/faustbrian/go-config/adapters/awssecretsmanager/v3)
 - [Operations, performance, troubleshooting, and FAQ](operations.md)
 - [Security](security.md)
 - [Verification](verification.md)

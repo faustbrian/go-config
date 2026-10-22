@@ -3,6 +3,14 @@
 All notable changes are documented here. The format follows Keep a Changelog
 and releases use Semantic Versioning.
 
+## Unreleased
+
+### Changed
+
+- Release the AWS Secrets Manager adapter as
+  `adapters/awssecretsmanager/v3.0.0`, built on root v3. See its
+  [changelog](adapters/awssecretsmanager/CHANGELOG.md).
+
 ## 3.0.0 - 2026-10-22
 
 ### Changed
