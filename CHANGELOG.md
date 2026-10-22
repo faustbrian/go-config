@@ -252,5 +252,6 @@ Source range: `v2.0.0` (`81b390daf5`) through `2b79cffba8`.
 - Explicit conformance assertions that decoding, defaults, environment
   loading, metadata, and snapshot cloning do not mutate private struct state.
 
+[2.0.1]: https://github.com/faustbrian/go-config/compare/v2.0.0...v2.0.1
 [1.1.0]: https://github.com/faustbrian/go-config/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/faustbrian/go-config/releases/tag/v1.0.0
