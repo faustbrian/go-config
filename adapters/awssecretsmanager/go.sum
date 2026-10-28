@@ -8,8 +8,8 @@ github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.6 h1:FpBq24TG6WVSObTNhQO
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.6/go.mod h1:ONzdPVYC95oBOu0VWNEsKEntcoemP3xVKjT+qWml1s4=
 github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.4 h1:+qOKY5eW7mwAEUWoIEtNR2qj351eOWMo+nglB+AhCQU=
 github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.4/go.mod h1:1C6Uc76IPws0N2nYeWJKxNoabSXbTdkDpAUnqAz4VCI=
-github.com/aws/smithy-go v1.28.5 h1:OqbqKtzY9NUnr2yAe9+hiTdFb20tNaK/lI0PMOGXX9k=
-github.com/aws/smithy-go v1.28.5/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
+github.com/aws/smithy-go v1.28.6 h1:Pj+/sUviNYjow8ELRtNwKHZ9ECeF+7pATX3+shjLIrw=
+github.com/aws/smithy-go v1.28.6/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
 github.com/faustbrian/go-config/v3 v3.0.0 h1:EM78bsVWZaI876cqEAiy3G2DXIyJrG2/ZWncJPVj8Sw=
 github.com/faustbrian/go-config/v3 v3.0.0/go.mod h1:YwXZ8OJwr9Hd1E2/KiAc8UA5Tx4N066q93HLNlNsfew=
 go.yaml.in/yaml/v4 v4.0.0-rc.6 h1:1h7H1ohdUh93/FyE4YaDa1Zh64K6VVbjF4K6WUxMtH4=
