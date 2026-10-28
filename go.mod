@@ -14,5 +14,5 @@ require (
 	github.com/faustbrian/go-identifier/v2 v2.0.0 // indirect
 	github.com/jackc/pgx/v5 v5.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/sync v0.22.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
 )
