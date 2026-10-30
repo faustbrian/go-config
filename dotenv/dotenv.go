@@ -5,11 +5,14 @@
 // There is no universal dotenv standard/conformance claim. Calls run synchronously;
 // borrowed filesystems must cooperate with cancellation/concurrent reuse.
 // Input and decoded strings remain plaintext; no watcher or erasure is owned.
+// Document.Digest covers the raw file bytes only, so values interpolation looked
+// up from Variables can change without changing the digest.
 package dotenv
 
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -42,7 +45,8 @@ type Limits struct {
 	MaxKeys int
 }
 
-// Interpolation enables ${NAME} and ${NAME:-default} expansion.
+// Interpolation enables ${NAME} and ${NAME:-default} expansion. Expanded values
+// are not part of the source digest, which covers only the raw file bytes.
 type Interpolation struct {
 	// Variables is copied at construction and is the explicit external variable view.
 	Variables map[string]string
@@ -225,7 +229,13 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 	for index, record := range records {
 		values[index] = record.name + "=" + strings.ReplaceAll(record.value, escapedDollar, "$")
 	}
-	return s.mapValues(ctx, values)
+	document, err := s.mapValues(ctx, values)
+	if err != nil {
+		return config.Document{}, err
+	}
+	// The digest covers the file bytes, not values interpolation looked up.
+	document.Digest = &config.SourceDigest{SHA256: sha256.Sum256(data)}
+	return document, nil
 }
 
 func normalizeLimits(limits Limits) (Limits, error) {

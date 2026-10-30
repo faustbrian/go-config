@@ -12,6 +12,7 @@ package yaml
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -145,7 +146,7 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 		return config.Document{}, err
 	}
 	if len(data) == 0 || len(bytesTrimSpace(data)) == 0 {
-		return config.Document{Tree: map[string]any{}}, nil
+		return config.Document{Tree: map[string]any{}, Digest: &config.SourceDigest{SHA256: sha256.Sum256(data)}}, nil
 	}
 
 	// Backend nodes materialize before our single-document/depth/key policy.
@@ -165,7 +166,12 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 			documents = append(documents, document)
 		default:
 			if errors.Is(err, io.EOF) {
-				return s.convertDocuments(ctx, documents)
+				converted, convertErr := s.convertDocuments(ctx, documents)
+				if convertErr != nil {
+					return config.Document{}, convertErr
+				}
+				converted.Digest = &config.SourceDigest{SHA256: sha256.Sum256(data)}
+				return converted, nil
 			}
 			return config.Document{}, parseError(0, 0, err)
 		}

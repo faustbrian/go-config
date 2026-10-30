@@ -4,10 +4,10 @@
 
 ## Model version and scope
 
-This is threat model `CONFIG-TM-1.1`, reviewed 2026-10-05. It applies to the
+This is threat model `CONFIG-TM-1.2`, reviewed 2026-10-30. It applies to the
 root-v3 contract, `github.com/faustbrian/go-config/v3`, available from
 v3.0.0; v3 changes only the module identity, the Service v3 binding and the
-removed `configservice` facade. Current source documentation can be newer than released prose;
+removed `configservice` facade. 1.2 adds source digests (CONFIG-DIGEST-001). Current source documentation can be newer than released prose;
 the independently versioned AWS adapter retains its own security and release
 boundary. Reassess this model when discovery, filesystem loading, source trust,
 platform support, or secret-handling boundaries change.
@@ -65,10 +65,11 @@ path-following for caller-approved hot-reload paths.
 
 ## Versioned risk register
 
-| Risk | Status in CONFIG-TM-1.1 | Owner | Rationale | Control or required mitigation | Review condition |
+| Risk | Status in CONFIG-TM-1.2 | Owner | Rationale | Control or required mitigation | Review condition |
 |---|---|---|---|---|---|
 | CONFIG-FS-001: a discovered target or its approved directory is replaced before load to escape the trusted root | Mitigated on operating systems with descriptor-backed `os.Root` confinement | Library maintainers | The discovered path is attacker-mutable after discovery, so lexical validation alone cannot authorize the later open. | Directory identity binding, root-confined open, final-symlink rejection, and pre/open/post file identity comparison. | Reassess when discovery, filesystem loading, or the minimum Go version changes. |
 | CONFIG-FS-002: an attacker writes a stable regular file inside the approved directory | Accepted caller boundary | Deploying application owner | A generic configuration loader cannot distinguish authorized bytes from malicious bytes at a caller-approved path. | Read-only ownership, deployment policy, and artifact authenticity controls; this library does not authenticate local file contents. | Reassess if the library adds content-authenticity policy or accepts a new source trust model. |
+| CONFIG-DIGEST-001: a published source digest lets a holder test guesses of a short secret file offline | Mitigated | Library maintainers | `SourceDigest` is an unsalted SHA-256 of the accepted bytes, so for low-entropy secret content it acts as a guessing oracle. | Snapshots record no digest for a `Sensitive` source; byte sources still set `Document.Digest`, so custom code that reads `Document` directly must apply the same rule. Field-level `secret` tags and origin overrides do not suppress the digest, so a file that contains secrets must mark its source `Sensitive`. | Reassess if digests become keyed or salted, or if sensitivity is no longer declared per source. |
 | CONFIG-FS-003: JavaScript or Plan 9 directory replacement, or OS-level bind-mount/device namespace changes | Accepted platform boundary | Library maintainers | The supported standard-library confinement primitive cannot provide stronger guarantees on these platforms or against namespace administration. | Do not treat attacker-writable roots as confined on JavaScript; avoid hostile directory renames on Plan 9; protect mount and namespace administration on all platforms. | Reassess when `os.Root` platform guarantees change or supported platforms change. |
 
 ## Known limits

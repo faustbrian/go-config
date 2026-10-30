@@ -2,6 +2,13 @@
 
 All notable changes follow Keep a Changelog and semantic versioning.
 
+## Unreleased
+
+### Documentation
+
+- Record that root snapshots from go-config v3.1.0 or later carry no
+  `SourceDigest` for this adapter's sources, because they are sensitive.
+
 ## 3.0.0 - 2026-10-22
 
 ### Changed
