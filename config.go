@@ -78,7 +78,9 @@ type Document struct {
 // parsed, before any normalization. It identifies those bytes; it does not
 // authenticate their origin or prove they were not replaced before the read.
 // Snapshots never record it for a Sensitive source, because an unsalted digest
-// of a short secret lets anyone holding it test guesses offline.
+// of a short secret lets anyone holding it test guesses offline. Field-level
+// secret tags and Origin overrides do not suppress it, so a source whose bytes
+// contain secrets must itself be marked Sensitive.
 type SourceDigest struct {
 	// SHA256 is the digest of the accepted bytes.
 	SHA256 [sha256.Size]byte
