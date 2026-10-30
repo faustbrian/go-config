@@ -27,7 +27,9 @@ exact bytes, that the named source read and parsed during the load that built
 the snapshot. The JSON, YAML, TOML and dotenv sources, and the filesystem
 sources built on them, set `Document.Digest`; environment, defaults and
 programmatic sources have no byte form and report none, as do optional
-sources skipped as not found. Each load digests its own read, so a later load
+sources skipped as not found. A `Sensitive` source never reports a digest,
+because an unsalted SHA-256 of a short secret is an offline guessing oracle;
+the AWS Secrets Manager adapter's sources are sensitive and so report none. Each load digests its own read, so a later load
 of a changed file never alters an earlier snapshot. A source overridden by a
 higher-priority one still reports its digest. A dotenv digest covers the file
 bytes, not values that interpolation looked up. The digest identifies bytes;

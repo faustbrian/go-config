@@ -7,10 +7,14 @@ and releases use Semantic Versioning.
 
 ### Added
 
-- Add `SourceDigest`, `Document.Digest` and `Snapshot.SourceDigest(name)`.
-  The JSON, YAML, TOML and dotenv sources, including their filesystem forms,
-  report the SHA-256 of the exact bytes each load accepted, so callers can bind
-  a loaded value to the bytes it came from without reading the file twice.
+- Add `SourceDigest`, `Document.Digest` and `Snapshot.SourceDigest(name)` to
+  identify the bytes each source accepted. The JSON, YAML, TOML and dotenv
+  sources, including their filesystem forms, report the SHA-256 of the exact
+  bytes each load parsed, so callers can bind a loaded value to those bytes
+  without reading the file twice. Snapshots record no digest for `Sensitive`
+  sources, and a dotenv digest covers the raw file, not interpolated values.
+  Custom sources that build `Document` with unkeyed literals must add the new
+  field.
 
 ### Changed
 

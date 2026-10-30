@@ -131,10 +131,15 @@ func AssertOrigin(
 }
 
 func cloneDocument(document config.Document) config.Document {
-	return config.Document{
+	clone := config.Document{
 		Tree:    cloneMap(document.Tree),
 		Origins: cloneOrigins(document.Origins),
 	}
+	if document.Digest != nil {
+		digest := *document.Digest
+		clone.Digest = &digest
+	}
+	return clone
 }
 
 func cloneMap(value map[string]any) map[string]any {

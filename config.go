@@ -69,13 +69,16 @@ type Document struct {
 	// never stored here.
 	Origins map[string]Origin
 	// Digest identifies the exact bytes a byte-backed source accepted for this
-	// Tree. It is nil for sources without a byte representation.
+	// Tree. It is nil for sources without a byte representation. Custom sources
+	// building Document with unkeyed literals must add this field.
 	Digest *SourceDigest
 }
 
 // SourceDigest is the SHA-256 of the exact bytes one source load read and
 // parsed, before any normalization. It identifies those bytes; it does not
 // authenticate their origin or prove they were not replaced before the read.
+// Snapshots never record it for a Sensitive source, because an unsalted digest
+// of a short secret lets anyone holding it test guesses offline.
 type SourceDigest struct {
 	// SHA256 is the digest of the accepted bytes.
 	SHA256 [sha256.Size]byte
@@ -306,8 +309,9 @@ type Origin struct {
 // fails before validation/publication. Strings and immutable scalar state remain shared.
 //
 // A successfully loaded snapshot may be read concurrently when custom typed
-// state is immutable. The zero Snapshot contains T's zero value and no origins;
-// a nil *Snapshot is not usable. No secure memory erasure is provided.
+// state is immutable. The zero Snapshot contains T's zero value, no origins and
+// no source digests; a nil *Snapshot is not usable. No secure memory erasure
+// is provided.
 type Snapshot[T any] struct {
 	value   T
 	origins map[string]Origin
@@ -329,8 +333,9 @@ func (s *Snapshot[T]) Origin(path string) (Origin, bool) {
 
 // SourceDigest returns the digest of the bytes the named source accepted during
 // the load that produced this snapshot. It reports false for sources that
-// supply no digest, optional sources skipped as not found, and unknown names.
-// A source overridden by a later one still reports its own digest.
+// supply no digest, Sensitive sources, optional sources skipped as not found,
+// and unknown names. A source overridden by a later one still reports its own
+// digest.
 func (s *Snapshot[T]) SourceDigest(name string) (SourceDigest, bool) {
 	digest, ok := s.digests[name]
 	return digest, ok
@@ -376,7 +381,8 @@ func LoadTree(ctx context.Context, plan Plan) (*Snapshot[map[string]any], error)
 		}
 		merged = next
 		applyOrigins(origins, tree, document.Origins, "", planned.info)
-		if document.Digest != nil {
+		// An unsalted digest of a short secret is an offline guessing oracle.
+		if document.Digest != nil && !planned.info.Sensitive {
 			digests[planned.info.Name] = *document.Digest
 		}
 	}

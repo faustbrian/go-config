@@ -218,3 +218,26 @@ type originFixture struct {
 }
 
 func (f originFixture) Origin(string) (config.Origin, bool) { return f.origin, f.found }
+
+func TestNewSourceCopiesTheDocumentDigest(t *testing.T) {
+	t.Parallel()
+
+	digest := &config.SourceDigest{SHA256: [32]byte{1}}
+	source := configtest.NewSource(config.SourceInfo{Name: "fixture"}, config.Document{Tree: map[string]any{}, Digest: digest})
+	digest.SHA256[0] = 2
+	first, err := source.Load(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.Digest == nil || first.Digest.SHA256[0] != 1 {
+		t.Fatalf("Load Digest = %v, want the captured digest", first.Digest)
+	}
+	first.Digest.SHA256[0] = 3
+	second, err := source.Load(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.Digest == nil || second.Digest.SHA256[0] != 1 || second.Digest == first.Digest {
+		t.Fatal("each load must return a fresh copy of the captured digest")
+	}
+}

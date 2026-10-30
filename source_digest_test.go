@@ -212,3 +212,112 @@ func (customDigestSource) Info() config.SourceInfo { return config.SourceInfo{Na
 func (s customDigestSource) Load(context.Context) (config.Document, error) {
 	return config.Document{Tree: map[string]any{}, Digest: s.digest}, nil
 }
+
+func TestSensitiveSourcesRecordNoDigest(t *testing.T) {
+	t.Parallel()
+
+	// A sensitive source is how the AWS Secrets Manager adapter and mounted
+	// secret files are declared; an unsalted digest of a short secret would be
+	// an offline guessing oracle.
+	secret, err := jsonsource.Bytes([]byte(`{"name":"s3cr3t"}`), jsonsource.Options{Name: "secret", Sensitive: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	public, err := jsonsource.Bytes([]byte(`{}`), jsonsource.Options{Name: "public", Priority: -1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan, err := config.NewPlan(public, secret)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshot, err := config.Load[digestSettings](context.Background(), plan)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if digest, ok := snapshot.SourceDigest("secret"); ok {
+		t.Fatalf("SourceDigest(secret) = %x, want none for a sensitive source", digest.SHA256)
+	}
+	if _, ok := snapshot.SourceDigest("public"); !ok {
+		t.Fatal("SourceDigest(public) missing")
+	}
+}
+
+func TestDotenvDigestCoversRawBytesNotInterpolatedValues(t *testing.T) {
+	t.Parallel()
+
+	raw := []byte("NAME=${GREETING}-world\r\n")
+	digestFor := func(greeting string) config.SourceDigest {
+		t.Helper()
+		source, err := dotenv.BytesFor[digestSettings](raw, dotenv.Options{
+			Name:          "dotenv",
+			Interpolation: &dotenv.Interpolation{Variables: map[string]string{"GREETING": greeting}},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		plan, err := config.NewPlan(source)
+		if err != nil {
+			t.Fatal(err)
+		}
+		snapshot, err := config.Load[digestSettings](context.Background(), plan)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if snapshot.Value().Name != greeting+"-world" {
+			t.Fatalf("interpolated name = %q", snapshot.Value().Name)
+		}
+		digest, ok := snapshot.SourceDigest("dotenv")
+		if !ok {
+			t.Fatal("dotenv digest missing")
+		}
+		return digest
+	}
+	hello, goodbye := digestFor("hello"), digestFor("goodbye")
+	if hello.SHA256 != sha256.Sum256(raw) || goodbye != hello {
+		t.Fatal("dotenv digest must be the raw file bytes, independent of interpolation variables")
+	}
+}
+
+func TestFilesystemFormsReportTheDigestOfTheFileBytes(t *testing.T) {
+	t.Parallel()
+
+	files := fstest.MapFS{"settings.env": {Data: []byte("NAME=file\n")}}
+	dotenvSource, err := dotenv.FromFSFor[digestSettings](files, "settings.env", dotenv.Options{Name: "dotenv"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, test := range []struct {
+		name   string
+		data   string
+		source func([]byte) (config.Source, error)
+	}{
+		{"dotenv-fs", "NAME=file\n", func([]byte) (config.Source, error) { return dotenvSource, nil }},
+		{"yaml-reader", "name: reader\n", func(data []byte) (config.Source, error) {
+			return filesystem.Reader(func(context.Context) (io.ReadCloser, error) {
+				return io.NopCloser(bytes.NewReader(data)), nil
+			}, filesystem.Options{Name: "yaml", Format: filesystem.FormatYAML})
+		}},
+		{"toml-reader", "name = \"reader\"\n", func(data []byte) (config.Source, error) {
+			return filesystem.Reader(func(context.Context) (io.ReadCloser, error) {
+				return io.NopCloser(bytes.NewReader(data)), nil
+			}, filesystem.Options{Name: "toml", Format: filesystem.FormatTOML})
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			source, err := test.source([]byte(test.data))
+			if err != nil {
+				t.Fatal(err)
+			}
+			document, err := source.Load(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if document.Digest == nil || document.Digest.SHA256 != sha256.Sum256([]byte(test.data)) {
+				t.Fatalf("Digest = %v, want SHA-256 of the file bytes", document.Digest)
+			}
+		})
+	}
+}

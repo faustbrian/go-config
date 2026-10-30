@@ -15,6 +15,10 @@ securely erased. Size admission follows SDK materialization and the local copy,
 not a whole-HTTP-memory budget; the returned configuration document necessarily
 owns its decoded values for the lifetime chosen by the caller.
 
+Because the source is sensitive, a root snapshot from go-config v3.1.0 or later
+records no `SourceDigest` for it. An unsalted digest of a short secret payload
+would let anyone holding it test guesses offline.
+
 Avoid logging source documents, typed settings, AWS responses, or wrapped
 provider causes. Rotation and refresh must be an explicit application workflow
 with validated transition and rollback behavior.
