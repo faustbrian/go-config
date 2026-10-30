@@ -22,7 +22,7 @@ the [migration guide](docs/migration.md) before adopting the new identities.
 ## Install
 
 ```console
-go get github.com/faustbrian/go-config/v3@v3.0.0
+go get github.com/faustbrian/go-config/v3@v3.1.0
 ```
 
 Use the independently released AWS Secrets Manager adapter only when an
