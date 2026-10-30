@@ -10,6 +10,7 @@ package dotenv
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -225,7 +226,13 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 	for index, record := range records {
 		values[index] = record.name + "=" + strings.ReplaceAll(record.value, escapedDollar, "$")
 	}
-	return s.mapValues(ctx, values)
+	document, err := s.mapValues(ctx, values)
+	if err != nil {
+		return config.Document{}, err
+	}
+	// The digest covers the file bytes, not values interpolation looked up.
+	document.Digest = &config.SourceDigest{SHA256: sha256.Sum256(data)}
+	return document, nil
 }
 
 func normalizeLimits(limits Limits) (Limits, error) {

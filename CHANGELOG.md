@@ -5,6 +5,13 @@ and releases use Semantic Versioning.
 
 ## Unreleased
 
+### Added
+
+- Add `SourceDigest`, `Document.Digest` and `Snapshot.SourceDigest(name)`.
+  The JSON, YAML, TOML and dotenv sources, including their filesystem forms,
+  report the SHA-256 of the exact bytes each load accepted, so callers can bind
+  a loaded value to the bytes it came from without reading the file twice.
+
 ### Changed
 
 - Release the AWS Secrets Manager adapter as

@@ -14,6 +14,7 @@ package json
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	stdjson "encoding/json"
 	"errors"
 	"fmt"
@@ -119,7 +120,7 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 		return config.Document{}, err
 	}
 
-	return config.Document{Tree: tree}, nil
+	return config.Document{Tree: tree, Digest: &config.SourceDigest{SHA256: sha256.Sum256(data)}}, nil
 }
 
 func validate(options Options) (config.SourceInfo, Limits, error) {

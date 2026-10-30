@@ -12,6 +12,7 @@ package toml
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -133,7 +134,7 @@ func (s *source) Load(ctx context.Context) (config.Document, error) {
 		return config.Document{}, err
 	}
 	normalized := value.(map[string]any)
-	return config.Document{Tree: normalized}, nil
+	return config.Document{Tree: normalized, Digest: &config.SourceDigest{SHA256: sha256.Sum256(data)}}, nil
 }
 
 func validate(options Options) (config.SourceInfo, Limits, error) {

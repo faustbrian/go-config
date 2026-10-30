@@ -12,6 +12,7 @@ package config
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -67,6 +68,17 @@ type Document struct {
 	// Origins optionally overrides declared provenance by dotted path; values are
 	// never stored here.
 	Origins map[string]Origin
+	// Digest identifies the exact bytes a byte-backed source accepted for this
+	// Tree. It is nil for sources without a byte representation.
+	Digest *SourceDigest
+}
+
+// SourceDigest is the SHA-256 of the exact bytes one source load read and
+// parsed, before any normalization. It identifies those bytes; it does not
+// authenticate their origin or prove they were not replaced before the read.
+type SourceDigest struct {
+	// SHA256 is the digest of the accepted bytes.
+	SHA256 [sha256.Size]byte
 }
 
 // TreeValueError reports a non-canonical value returned by a Source. It never
@@ -299,6 +311,7 @@ type Origin struct {
 type Snapshot[T any] struct {
 	value   T
 	origins map[string]Origin
+	digests map[string]SourceDigest
 }
 
 // Value returns a defensive copy of the loaded value within Snapshot's documented
@@ -314,6 +327,15 @@ func (s *Snapshot[T]) Origin(path string) (Origin, bool) {
 	return origin, ok
 }
 
+// SourceDigest returns the digest of the bytes the named source accepted during
+// the load that produced this snapshot. It reports false for sources that
+// supply no digest, optional sources skipped as not found, and unknown names.
+// A source overridden by a later one still reports its own digest.
+func (s *Snapshot[T]) SourceDigest(name string) (SourceDigest, bool) {
+	digest, ok := s.digests[name]
+	return digest, ok
+}
+
 // LoadTree loads Sources synchronously in precedence order and publishes a tree
 // only after every required source and merge succeeds. Atomicity is publication
 // only: it neither rolls back source side effects nor reads a cross-source instant.
@@ -326,6 +348,7 @@ func (s *Snapshot[T]) Origin(path string) (Origin, bool) {
 func LoadTree(ctx context.Context, plan Plan) (*Snapshot[map[string]any], error) {
 	merged := make(map[string]any)
 	origins := make(map[string]Origin)
+	digests := make(map[string]SourceDigest)
 
 	for _, planned := range plan.sources {
 		if err := ctx.Err(); err != nil {
@@ -353,9 +376,12 @@ func LoadTree(ctx context.Context, plan Plan) (*Snapshot[map[string]any], error)
 		}
 		merged = next
 		applyOrigins(origins, tree, document.Origins, "", planned.info)
+		if document.Digest != nil {
+			digests[planned.info.Name] = *document.Digest
+		}
 	}
 
-	return &Snapshot[map[string]any]{value: cloneMap(merged), origins: cloneOrigins(origins)}, nil
+	return &Snapshot[map[string]any]{value: cloneMap(merged), origins: cloneOrigins(origins), digests: digests}, nil
 }
 
 // Load resolves and strictly decodes a Plan into a typed snapshot, including
@@ -400,7 +426,7 @@ func LoadWithValidators[T any](
 		return nil, err
 	}
 
-	return &Snapshot[T]{value: cloneTyped(value), origins: cloneOrigins(tree.origins)}, nil
+	return &Snapshot[T]{value: cloneTyped(value), origins: cloneOrigins(tree.origins), digests: tree.digests}, nil
 }
 
 func applyFieldMetadata(value reflect.Value, path string, origins map[string]Origin) {

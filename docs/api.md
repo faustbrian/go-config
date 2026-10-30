@@ -22,6 +22,17 @@ arrays and exported struct fields. Optional payloads follow the same typed
 admission before cloning; cyclic or unsupported mutable state is rejected. `Snapshot.Origin` returns source, location,
 sensitivity, deprecation, presence, and state but never a value.
 
+`Snapshot.SourceDigest(name)` returns the `SourceDigest`, the SHA-256 of the
+exact bytes, that the named source read and parsed during the load that built
+the snapshot. The JSON, YAML, TOML and dotenv sources, and the filesystem
+sources built on them, set `Document.Digest`; environment, defaults and
+programmatic sources have no byte form and report none, as do optional
+sources skipped as not found. Each load digests its own read, so a later load
+of a changed file never alters an earlier snapshot. A source overridden by a
+higher-priority one still reports its digest. A dotenv digest covers the file
+bytes, not values that interpolation looked up. The digest identifies bytes;
+it does not authenticate where they came from.
+
 Source documents are normalized at the load boundary. Only canonical scalar,
 object, array, null, and `merge.Delete` values are accepted; unsupported values
 return `TreeValueError` without formatting the value. Typed values whose private
