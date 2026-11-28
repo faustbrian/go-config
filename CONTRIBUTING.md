@@ -45,8 +45,7 @@ GOWORK=off go test . -run '^$' -fuzz '^FuzzStructuredSources$' -fuzztime=2s
 
 Select the native target and package affected by your change; ordinary Go tests
 already exercise deterministic fuzz seeds. For shared checks, install the public
-`golib` v2.4.0 release declared in `.golib.yaml` and verify its checksums. The
-ordinary shared workflow and specification setup use that same public verifier:
+`golib` release declared in `.golib.yaml` and verify its checksums:
 
 ```bash
 make check
@@ -62,7 +61,9 @@ golib mutation --module . --package ./decode
 
 Use `make check-full` for explicit full assurance, including the online
 specification check, configured full fuzz budgets, conformance and both modules'
-API baselines. Hosted CI retains its separate blocking online specification job.
+API baselines. Hosted Required CI validates specification evidence offline.
+The [central upstream monitor](https://github.com/faustbrian/go-library-tools/actions/workflows/specification-monitor.yml)
+checks live authorities and review age separately.
 For source, filesystem, cancellation or AWS adapter changes, select the affected
 behavioral, lifecycle and integration tests; the AWS adapter's client and retry
 ownership remain caller-controlled. Run directly affected public consumers for

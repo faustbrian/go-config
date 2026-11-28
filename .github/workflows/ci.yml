@@ -31,9 +31,9 @@ permissions:
 jobs:
   ci:
     if: github.event_name != 'workflow_dispatch' || !inputs.security_diagnostic
-    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@09b43f49385650c44dd4151a12b0877ca6b48a88 # v2.5.1
+    uses: faustbrian/go-library-tools/.github/workflows/library-ci.yml@db2cb6e7bb3b2fcaf6591bec9f5e8be958fa5296
     with:
-      tooling_sha: 09b43f49385650c44dd4151a12b0877ca6b48a88
+      tooling_sha: db2cb6e7bb3b2fcaf6591bec9f5e8be958fa5296
       source_bootstrap: false
       source_documentation: check
       public_dependencies: true
@@ -131,48 +131,14 @@ jobs:
             fi
           done
 
-  specification:
-    name: Specification governance
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: .go-version
-          cache: false
-      - uses: faustbrian/go-library-tools/.github/actions/setup-golib@0e8ff6fee42e88858069a6f6ae6f1080d95c5eae # v2.4.0
-        with:
-          source_bootstrap: false
-          tooling_sha: 0e8ff6fee42e88858069a6f6ae6f1080d95c5eae
-      - run: golib specification check --online
-      - name: Remove specification source bootstrap resources
-        if: always()
-        run: |
-          set -euo pipefail
-          if [[ -n "${GOLIB_SOURCE_INSTALL_ROOT:-}" ]]; then
-            case "${GOLIB_SOURCE_INSTALL_ROOT}" in
-              "${RUNNER_TEMP}/golib-source-install."*) ;;
-              *) echo 'unexpected specification bootstrap resource path' >&2; exit 1 ;;
-            esac
-            if [[ -d "${GOLIB_SOURCE_INSTALL_ROOT}" ]]; then
-              chmod -R u+w "${GOLIB_SOURCE_INSTALL_ROOT}"
-              find "${GOLIB_SOURCE_INSTALL_ROOT}" -depth -delete
-            fi
-          fi
-
   required:
     name: Required
     if: always()
-    needs: [ci, specification]
+    needs: ci
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Require shared workflow and specification governance
+      - name: Require shared workflow
         env:
           CI_RESULT: ${{ needs.ci.result }}
-          SPECIFICATION_RESULT: ${{ needs.specification.result }}
-        run: test "${CI_RESULT}" = success && test "${SPECIFICATION_RESULT}" = success
+        run: test "${CI_RESULT}" = success
