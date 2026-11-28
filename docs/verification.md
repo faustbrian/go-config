@@ -6,9 +6,9 @@ This document maps the package guarantees to authoritative repository
 evidence. A filename alone is not proof: the named test behavior and the gate
 that executes it are part of each entry. `make check` and `make ci` use bounded
 local checks. `make check-full` selects full assurance and online specification
-checks; the repository's authoritative root CI workflow delegates its selected
-per-module contract to the pinned shared workflow and separately requires online
-specification governance.
+checks. The root CI workflow delegates its selected module contract and
+offline specification validation to the pinned shared workflow. The central
+upstream monitor checks reviewed authorities separately.
 
 ## Source order, presence, and atomicity
 
